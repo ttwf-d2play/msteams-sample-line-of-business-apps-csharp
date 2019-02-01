@@ -7,7 +7,6 @@ namespace CrossVertical.Announcement.Helper
 
         public static string AppFeature { get; set; } = "message";
 
-
         public static string BaseUrl { get; set; }
 
         public static string ConnectionName { get; set; }

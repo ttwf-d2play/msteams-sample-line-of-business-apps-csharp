@@ -5,7 +5,6 @@ namespace CrossVertical.Announcement.Helpers
 {
     public class Constants
     {
-
         public const string ConfigureAdminSettings = "ConfigureAdminSettings";
         public const string ShowAllDrafts = "ShowDrafts";
         public const string ShowAnnouncement = "ShowAnnouncementDraft";
@@ -28,8 +27,7 @@ namespace CrossVertical.Announcement.Helpers
         public const string ContactSender = "Contact Sender";
         public const string ShowWelcomeScreen = "ShowWelcomeScreen";
 
-        public static string HistoryTabDeeplink { get; set; } =
-    $"https://teams.microsoft.com/l/entity/{ApplicationSettings.AppId}/com.contoso.Announcement.history?webUrl={HttpUtility.UrlEncode(ApplicationSettings.BaseUrl + "/history?tid={tid}")}&label=History";
+        public static string HistoryTabDeeplink { get; set; } = $"https://teams.microsoft.com/l/entity/{ApplicationSettings.AppId}/com.contoso.Announcement.history?webUrl={HttpUtility.UrlEncode(ApplicationSettings.BaseUrl + "/history?tid={tid}")}&label=History";
 
     }
 }

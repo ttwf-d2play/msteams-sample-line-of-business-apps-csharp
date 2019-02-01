@@ -2,11 +2,7 @@
 using CrossVertical.Announcement.Helpers;
 using CrossVertical.Announcement.Models;
 using CrossVertical.Announcement.Repository;
-using Microsoft.Bot.Connector.Teams.Models;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;

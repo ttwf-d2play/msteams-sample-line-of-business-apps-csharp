@@ -15,9 +15,7 @@ namespace CrossVertical.Announcement
     {
         public async static Task<ComposeExtensionResponse> HandleMessageExtensionQuery(ConnectorClient connector, Activity activity, string tid, string emailId)
         {
-
             var query = activity.GetComposeExtensionQueryData();
-
             if (query == null || query.CommandId != "getMyMessages")
             {
                 // We only process the 'getMyMessages' queries with this message extension
@@ -25,9 +23,7 @@ namespace CrossVertical.Announcement
             }
 
             var searchString = string.Empty;
-
             var titleParam = query.Parameters?.FirstOrDefault(p => p.Name == "title");
-
             if (titleParam != null)
             {
                 searchString = titleParam.Value.ToString().ToLower();
@@ -42,8 +38,8 @@ namespace CrossVertical.Announcement
             var response = new ComposeExtensionResponse(new ComposeExtensionResult("list", "result"));
             response.ComposeExtension.Attachments = attachments.ToList();
             return response;
-
         }
+
         public static async Task<List<Campaign>> GetMyAnnouncements(string tid, string emailId, string searchString)
         {
             var tenatInfo = await Cache.Tenants.GetItemAsync(tid);
@@ -76,14 +72,13 @@ namespace CrossVertical.Announcement
                 }
             }
             return myTenantAnnouncements;
-
         }
 
         private static ComposeExtensionAttachment GetAttachment(Campaign campaign)
         {
             var previewCard = new ThumbnailCard
             {
-                Title = campaign.Title/*!string.IsNullOrWhiteSpace(title) ? title : Faker.Lorem.Sentence()*/,
+                Title = campaign.Title,
                 Text = campaign.SubTitle,
             };
             previewCard.Images = new List<CardImage>() {

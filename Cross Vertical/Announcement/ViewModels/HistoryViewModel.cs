@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using CrossVertical.Announcement.Models;
+using System.Collections.Generic;
 
-namespace CrossVertical.Announcement.Models
+namespace CrossVertical.Announcement.ViewModels
 {
     public class HistoryViewModel
     {

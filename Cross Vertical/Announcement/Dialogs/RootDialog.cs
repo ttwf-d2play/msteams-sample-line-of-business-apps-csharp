@@ -94,9 +94,11 @@ namespace CrossVertical.Announcement.Dialogs
                         return;
                     var token = await GraphHelper.GetAccessToken(tenantData.Id, ApplicationSettings.AppId, ApplicationSettings.AppSecret);
                     GraphHelper helper = new GraphHelper(token);
-                    foreach (var user in tenantData.Users)
+                    foreach (var userId in tenantData.Users)
                     {
-                        var photo = await helper.GetUserProfilePhoto(tenantData.Id, user);
+                        var userInfo = await helper.GetUser(userId);
+                        if (userInfo != null)
+                            await helper.GetUserProfilePhoto(tid, userInfo.Id);
                     }
                     await context.PostAsync("Profile photos are refreshed.");
                 }
@@ -187,145 +189,7 @@ namespace CrossVertical.Announcement.Dialogs
         }
         #endregion
 
-        private static async Task HandleExcelAttachement(IDialogContext context, Attachment attachment, TeamsChannelData channelData)
-        {
-            if (attachment.ContentType == FileDownloadInfo.ContentType)
-            {
-                FileDownloadInfo downloadInfo = (attachment.Content as JObject).ToObject<FileDownloadInfo>();
-                var filePath = System.Web.Hosting.HostingEnvironment.MapPath("~/Files/");
-                if (!Directory.Exists(filePath))
-                    Directory.CreateDirectory(filePath);
-
-                filePath += attachment.Name + DateTime.Now.Millisecond; // just to avoid name collision with other users. 
-                if (downloadInfo != null)
-                {
-                    using (WebClient myWebClient = new WebClient())
-                    {
-                        // Download the Web resource and save it into the current filesystem folder.
-                        myWebClient.DownloadFile(downloadInfo.DownloadUrl, filePath);
-
-                    }
-                    if (File.Exists(filePath))
-                    {
-                        var groupDetails = ExcelHelper.GetAddTeamDetails(filePath);
-                        if (groupDetails != null)
-                        {
-                            var tenantData = await CheckAndAddTenantDetails(channelData);
-                            // Clean up earlier group data
-                            foreach (var groupId in tenantData.Groups)
-                            {
-                                await Cache.Groups.DeleteItemAsync(groupId);
-                            }
-                            tenantData.Groups.Clear();
-
-                            foreach (var groupDetail in groupDetails)
-                            {
-                                await Cache.Groups.AddOrUpdateItemAsync(groupDetail.Id, groupDetail);
-                                tenantData.Groups.Add(groupDetail.Id);
-                            }
-                            await Cache.Tenants.AddOrUpdateItemAsync(tenantData.Id, tenantData);
-                        }
-                        else
-                        {
-                            await context.PostAsync($"Attachment received but unfortunately we are not able to read group details. Please make sure that all the colums are correct.");
-                        }
-
-                        await context.PostAsync($"Successfully updated Group details for this tenant.");
-                        File.Delete(filePath);
-                    }
-                }
-            }
-        }
-
-        internal async static Task<User> CheckAndAddUserDetails(Activity activity, TeamsChannelData channelData)
-        {
-            var currentUser = await GetCurrentUser(activity);
-            // User not present in cache
-            var userDetails = await Cache.Users.GetItemAsync(currentUser.UserPrincipalName.ToLower());
-            if (userDetails == null && currentUser != null)
-            {
-                userDetails = new User()
-                {
-                    BotConversationId = activity.From.Id,
-                    Id = currentUser.UserPrincipalName.ToLower(),
-                    Name = currentUser.Name ?? currentUser.GivenName
-                };
-                await Cache.Users.AddOrUpdateItemAsync(userDetails.Id, userDetails);
-
-                Tenant tenantData = await CheckAndAddTenantDetails(channelData);
-                if (!tenantData.Users.Contains(userDetails.Id))
-                {
-                    tenantData.Users.Add(userDetails.Id);
-                    await Cache.Tenants.AddOrUpdateItemAsync(tenantData.Id, tenantData);
-                }
-            }
-
-            return userDetails;
-        }
-
-        internal static async Task<Tenant> CheckAndAddTenantDetails(TeamsChannelData channelData)
-        {
-            // Tenant not present in cached check DB
-            var tenantData = await Cache.Tenants.GetItemAsync(channelData.Tenant.Id);
-            if (tenantData == null)
-            {
-                tenantData = new Tenant()
-                {
-                    Id = channelData.Tenant.Id,
-                };
-                await Cache.Tenants.AddOrUpdateItemAsync(tenantData.Id, tenantData);
-            }
-
-            return tenantData;
-        }
-
-        private static string GetKey(IActivity activity, string key)
-        {
-            return activity.From.Id + key;
-        }
-
-        public static async Task<string> GetUserEmailId(Activity activity)
-        {
-            // Fetch the members in the current conversation
-            ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
-            try
-            {
-                var members = await connector.Conversations.GetConversationMembersAsync(activity.Conversation.Id);
-                if (members.Count == 0)
-                    return null;
-                return members.Where(m => m.Id == activity.From.Id).First().AsTeamsChannelAccount().UserPrincipalName.ToLower();
-            }
-            catch (Exception)
-            {
-                // This is the case for compose extension.
-                var channelData = activity.GetChannelData<TeamsChannelData>();
-                var tid = channelData.Tenant.Id;
-                return await GetEmailIdFromGraphAPI(activity, tid);
-            }
-        }
-
-        private static async Task<string> GetEmailIdFromGraphAPI(Activity activity, string tid)
-        {
-            var tenant = await Cache.Tenants.GetItemAsync(tid);
-            if (tenant == null || !tenant.IsAdminConsented)
-                return null;
-
-            var token = await GraphHelper.GetAccessToken(tid, ApplicationSettings.AppId, ApplicationSettings.AppSecret);
-            GraphHelper helper = new GraphHelper(token);
-
-            var emailId = await helper.GetUserEmailId(activity.From.AadObjectId);
-            return emailId;
-        }
-
-        public static async Task<TeamsChannelAccount> GetCurrentUser(Activity activity)
-        {
-            // Fetch the members in the current conversation
-            ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
-            var members = await connector.Conversations.GetConversationMembersAsync(activity.Conversation.Id);
-            if (members.Count == 0)
-                return null;
-            return members.Where(m => m.Id == activity.From.Id).First().AsTeamsChannelAccount();
-        }
+        #region Handle Actions
 
         private async Task HandleActions(IDialogContext context, Activity activity, Tenant tenant, User userDetails)
         {
@@ -463,6 +327,7 @@ namespace CrossVertical.Announcement.Dialogs
             else
                 await context.PostAsync("You don't seem to have any messages received recently. Hang on!");
         }
+
         private static async Task SendAdminPanelCard(IDialogContext context, Activity activity, TeamsChannelData channelData)
         {
             var reply = activity.CreateReply();
@@ -955,5 +820,151 @@ namespace CrossVertical.Announcement.Dialogs
 
             return announcement;
         }
+
+        #endregion
+        
+        #region Helpers
+
+        internal async static Task<User> CheckAndAddUserDetails(Activity activity, TeamsChannelData channelData)
+        {
+            var currentUser = await GetCurrentUser(activity);
+            // User not present in cache
+            var userDetails = await Cache.Users.GetItemAsync(currentUser.UserPrincipalName.ToLower());
+            if (userDetails == null && currentUser != null)
+            {
+                userDetails = new User()
+                {
+                    BotConversationId = activity.From.Id,
+                    Id = currentUser.UserPrincipalName.ToLower(),
+                    Name = currentUser.Name ?? currentUser.GivenName
+                };
+                await Cache.Users.AddOrUpdateItemAsync(userDetails.Id, userDetails);
+
+                Tenant tenantData = await CheckAndAddTenantDetails(channelData);
+                if (!tenantData.Users.Contains(userDetails.Id))
+                {
+                    tenantData.Users.Add(userDetails.Id);
+                    await Cache.Tenants.AddOrUpdateItemAsync(tenantData.Id, tenantData);
+                }
+            }
+
+            return userDetails;
+        }
+
+        private static async Task HandleExcelAttachement(IDialogContext context, Attachment attachment, TeamsChannelData channelData)
+        {
+            if (attachment.ContentType == FileDownloadInfo.ContentType)
+            {
+                FileDownloadInfo downloadInfo = (attachment.Content as JObject).ToObject<FileDownloadInfo>();
+                var filePath = System.Web.Hosting.HostingEnvironment.MapPath("~/Files/");
+                if (!Directory.Exists(filePath))
+                    Directory.CreateDirectory(filePath);
+
+                filePath += attachment.Name + DateTime.Now.Millisecond; // just to avoid name collision with other users. 
+                if (downloadInfo != null)
+                {
+                    using (WebClient myWebClient = new WebClient())
+                    {
+                        // Download the Web resource and save it into the current filesystem folder.
+                        myWebClient.DownloadFile(downloadInfo.DownloadUrl, filePath);
+
+                    }
+                    if (File.Exists(filePath))
+                    {
+                        var groupDetails = ExcelHelper.GetAddTeamDetails(filePath);
+                        if (groupDetails != null)
+                        {
+                            var tenantData = await CheckAndAddTenantDetails(channelData);
+                            // Clean up earlier group data
+                            foreach (var groupId in tenantData.Groups)
+                            {
+                                await Cache.Groups.DeleteItemAsync(groupId);
+                            }
+                            tenantData.Groups.Clear();
+
+                            foreach (var groupDetail in groupDetails)
+                            {
+                                await Cache.Groups.AddOrUpdateItemAsync(groupDetail.Id, groupDetail);
+                                tenantData.Groups.Add(groupDetail.Id);
+                            }
+                            await Cache.Tenants.AddOrUpdateItemAsync(tenantData.Id, tenantData);
+                        }
+                        else
+                        {
+                            await context.PostAsync($"Attachment received but unfortunately we are not able to read group details. Please make sure that all the colums are correct.");
+                        }
+
+                        await context.PostAsync($"Successfully updated Group details for this tenant.");
+                        File.Delete(filePath);
+                    }
+                }
+            }
+        }
+
+        internal static async Task<Tenant> CheckAndAddTenantDetails(TeamsChannelData channelData)
+        {
+            // Tenant not present in cached check DB
+            var tenantData = await Cache.Tenants.GetItemAsync(channelData.Tenant.Id);
+            if (tenantData == null)
+            {
+                tenantData = new Tenant()
+                {
+                    Id = channelData.Tenant.Id,
+                };
+                await Cache.Tenants.AddOrUpdateItemAsync(tenantData.Id, tenantData);
+            }
+
+            return tenantData;
+        }
+
+        private static string GetKey(IActivity activity, string key)
+        {
+            return activity.From.Id + key;
+        }
+
+        public static async Task<string> GetUserEmailId(Activity activity)
+        {
+            // Fetch the members in the current conversation
+            ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
+            try
+            {
+                var members = await connector.Conversations.GetConversationMembersAsync(activity.Conversation.Id);
+                if (members.Count == 0)
+                    return null;
+                return members.Where(m => m.Id == activity.From.Id).First().AsTeamsChannelAccount().UserPrincipalName.ToLower();
+            }
+            catch (Exception)
+            {
+                // This is the case for compose extension.
+                var channelData = activity.GetChannelData<TeamsChannelData>();
+                var tid = channelData.Tenant.Id;
+                return await GetEmailIdFromGraphAPI(activity, tid);
+            }
+        }
+
+        private static async Task<string> GetEmailIdFromGraphAPI(Activity activity, string tid)
+        {
+            var tenant = await Cache.Tenants.GetItemAsync(tid);
+            if (tenant == null || !tenant.IsAdminConsented)
+                return null;
+
+            var token = await GraphHelper.GetAccessToken(tid, ApplicationSettings.AppId, ApplicationSettings.AppSecret);
+            GraphHelper helper = new GraphHelper(token);
+
+            var emailId = await helper.GetUserEmailId(activity.From.AadObjectId);
+            return emailId;
+        }
+
+        public static async Task<TeamsChannelAccount> GetCurrentUser(Activity activity)
+        {
+            // Fetch the members in the current conversation
+            ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
+            var members = await connector.Conversations.GetConversationMembersAsync(activity.Conversation.Id);
+            if (members.Count == 0)
+                return null;
+            return members.Where(m => m.Id == activity.From.Id).First().AsTeamsChannelAccount();
+        } 
+
+        #endregion
     }
 }

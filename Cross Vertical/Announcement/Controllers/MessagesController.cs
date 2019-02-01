@@ -126,28 +126,6 @@ namespace CrossVertical.Announcement.Controllers
                     taskInfo["height"] = 900;
                     taskInfo["width"] = 600;
 
-                    //var myCampaign = await Cache.Announcements.GetItemAsync(showDetails.Data.Data.Id);
-                    //var emailId = await RootDialog.GetUserEmailId(activity);
-                    //if(emailId != null)
-                    //{
-                    //    taskInfo["height"] = 100;
-                    //    taskInfo["width"] = 500;
-                    //    if (myCampaign == null)
-                    //    {
-                    //        card = JObject.FromObject(AdaptiveCardDesigns.GetUpdateMessageCard("This announcement has been removed from the system."));
-                    //    }
-                    //    else if (!myCampaign.Recipients.Channels.Any(c => c.Members.Contains(emailId))
-                    //          && !myCampaign.Recipients.Groups.Any(g => g.Users.Any(u => u.Id == emailId)))
-                    //    {
-                    //        card = JObject.FromObject(AdaptiveCardDesigns.GetUpdateMessageCard("You do not have permission to access this message."));
-                    //    }
-                    //    else
-                    //    {
-                    //        card = JObject.FromObject(await AdaptiveCardDesigns.GetPreviewAnnouncementCard(showDetails.Data.Data.Id));
-                    //        taskInfo["height"] = 900;
-                    //        taskInfo["width"] = 600;
-                    //    }
-                    //}
                     break;
                 case Constants.ShowEditAnnouncementTaskModule:
                     taskInfo["title"] = "Edit a message";
@@ -457,13 +435,6 @@ namespace CrossVertical.Announcement.Controllers
                                 $"Welcome to {ApplicationSettings.AppName}. We will deliver company {ApplicationSettings.AppFeature}s here.", null);
                         }
                     }
-                    //if (!result.IsSuccessful) // Disable messages in channel.
-                    //{
-                    //    ConnectorClient connector = new ConnectorClient(new Uri(message.ServiceUrl));
-                    //    var reply = message.CreateReply();
-                    //    reply.Text = $"Failed to send welcome message to {member.UserPrincipalName}. Error: {result.FailureMessage}";
-                    //    connector.Conversations.ReplyToActivity(reply);
-                    //}
                 }
             }
         }
