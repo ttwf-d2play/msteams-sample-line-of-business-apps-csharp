@@ -46,7 +46,7 @@ namespace CrossVertical.Announcement.Models
             messageTypeChoices.Add(new AdaptiveChoice() { Title = "❕ Important", Value = "Important" });
             messageTypeChoices.Add(new AdaptiveChoice() { Title = "❗ Emergency", Value = "Emergency" });
             messageTypeChoices.Add(new AdaptiveChoice() { Title = "📄 Information", Value = "Information" });
-            var newCampaignCard = new AdaptiveCard()
+            var newCampaignCard = new AdaptiveCard(new AdaptiveSchemaVersion("1.0"))
             {
                 Body = new List<AdaptiveElement>()
                 {
@@ -493,7 +493,7 @@ namespace CrossVertical.Announcement.Models
                     break;
             }
             AdaptiveCardRenderer renderer = new AdaptiveCardRenderer();
-            var previewCard = new AdaptiveCard()
+            var previewCard = new AdaptiveCard(new AdaptiveSchemaVersion("1.0"))
             {
                 Body = new List<AdaptiveElement>()
                 {

@@ -25,7 +25,7 @@ namespace CrossVertical.Announcement.Dialogs
     public class RootDialog : IDialog<object>
     {
         /// <summary>
-        /// This is the name of the OAuth Connection Setting that is configured for this bot
+        /// Called when the dialog is started.
         /// </summary>
         public async Task StartAsync(IDialogContext context)
         {
@@ -35,7 +35,7 @@ namespace CrossVertical.Announcement.Dialogs
         private const string ProfileKey = "profile";
 
         /// <summary>
-        /// Supports the commands recents, send, me, and signout against the Graph API
+        /// Called when a message is received by the dialog
         /// </summary>
         private async Task MessageReceivedAsync(IDialogContext context, IAwaitable<object> result)
         {
@@ -44,7 +44,7 @@ namespace CrossVertical.Announcement.Dialogs
             string message = string.Empty;
             if (activity.Text != null)
                 message = Microsoft.Bot.Connector.Teams.ActivityExtensions.GetTextWithoutMentions(activity).ToLowerInvariant();
-            // Check if User or Team is registered.
+            // Check if User or Team is registered in the database, and store the information in ConversationData for quick retrieval later.
             string profileKey = GetKey(activity, ProfileKey);
             User userDetails = null;
             var channelData = context.Activity.GetChannelData<TeamsChannelData>();
@@ -59,10 +59,10 @@ namespace CrossVertical.Announcement.Dialogs
             else
             {
                 userDetails = await CheckAndAddUserDetails(activity, channelData);
-                context.ConversationData.SetValue<User>(profileKey, userDetails);
+                context.ConversationData.SetValue(profileKey, userDetails);
             }
 
-            Tenant tenantData = await CheckAndAddTenantDetails(channelData);
+            Tenant tenantData = await CheckAndAddTenantDetails(channelData.Tenant.Id);
             if (!tenantData.IsAdminConsented)
             {
                 if (channelData.Team == null)
@@ -75,14 +75,15 @@ namespace CrossVertical.Announcement.Dialogs
                 }
                 return;
             }
-            //Check and add tenant details
             if (activity.Attachments != null && activity.Attachments.Any(a => a.ContentType == FileDownloadInfo.ContentType))
             {
+                // Excel file with tenant-level group information was uploaded: update the tenant info in the database
                 var attachment = activity.Attachments.First();
                 await HandleExcelAttachement(context, attachment, channelData);
             }
             else if (activity.Value != null)
             {
+                // Handle clicks on adaptive card buttons, whether from a card in the conversation, or in a task module
                 await HandleActions(context, activity, tenantData, userDetails);
             }
             else
@@ -111,7 +112,6 @@ namespace CrossVertical.Announcement.Dialogs
                     Cache.Users = new DBCache<User>();
 
                     await context.PostAsync("Cache cleared.");
-                    // Reset if needed
                 }
                 else
                 {
@@ -193,10 +193,14 @@ namespace CrossVertical.Announcement.Dialogs
 
         private async Task HandleActions(IDialogContext context, Activity activity, Tenant tenant, User userDetails)
         {
+            var channelData = context.Activity.GetChannelData<TeamsChannelData>();
+
+            // Get the kind of action that was requested
+            // The structure is slightly different if the button was on a task module, or on a card sent by the bot 
             string type = string.Empty;
             try
             {
-                // For Task Module Edit
+                // Try to parse it as a task module button first
                 var details = JsonConvert.DeserializeObject<TaskModule.BotFrameworkCardValue<ActionDetails>>(activity.Value.ToString());
                 type = details.Data.ActionType;
             }
@@ -207,7 +211,7 @@ namespace CrossVertical.Announcement.Dialogs
             }
 
             var role = Common.GetUserRole(userDetails.Id, tenant);
-            var channelData = context.Activity.GetChannelData<TeamsChannelData>();
+
             if (role == Role.User && type != Constants.Acknowledge && type != Constants.ShowRecents && type != Constants.ShowSentAnnouncement)
             {
                 await context.PostAsync("You do not have permissions to perform this task.");
@@ -331,8 +335,8 @@ namespace CrossVertical.Announcement.Dialogs
         private static async Task SendAdminPanelCard(IDialogContext context, Activity activity, TeamsChannelData channelData)
         {
             var reply = activity.CreateReply();
-            Tenant tenantData = await CheckAndAddTenantDetails(channelData);
-            reply.Attachments.Add(await AdaptiveCardDesigns.GetAdminPanelCard(string.Join(",", tenantData.Moderators)));
+            Tenant tenantData = await CheckAndAddTenantDetails(channelData.Tenant.Id);
+            reply.Attachments.Add(AdaptiveCardDesigns.GetAdminPanelCard(string.Join(",", tenantData.Moderators)));
             await context.PostAsync(reply);
         }
 
@@ -435,7 +439,7 @@ namespace CrossVertical.Announcement.Dialogs
                 details = JsonConvert.DeserializeObject<TaskModule.BotFrameworkCardValue<AnnouncementAcknowledgeActionDetails>>
                     (activity.Value.ToString()).Data;
             }
-            // Add announcemnet in DB.
+            // Add announcement in DB.
             var campaign = await Cache.Announcements.GetItemAsync(details.Id);
             if (campaign == null)
             {
@@ -478,11 +482,13 @@ namespace CrossVertical.Announcement.Dialogs
             var campaign = await Cache.Announcements.GetItemAsync(details.Id);
             if (campaign == null)
             {
+                // Error: the annoucement was already sent
                 await context.PostAsync("Unable to find this announcement. Please create new announcement.");
                 return;
             }
             if (campaign.Status == Status.Sent)
             {
+                // Error: no recipients
                 await context.PostAsync("This announcement is already sent and can not be resent. Please create new announcement.");
                 return;
             }
@@ -501,6 +507,8 @@ namespace CrossVertical.Announcement.Dialogs
                 campaign.Recipients.TenantId = channelData.Tenant.Id;
                 campaign.Recipients.ServiceUrl = activity.ServiceUrl;
             }
+
+            // Send or schedule the announcement, depending on what the user clicked
             if (type == Constants.SendAnnouncement)
                 await SendAnnouncement(context, activity, channelData, campaign);
             else
@@ -586,7 +594,7 @@ namespace CrossVertical.Announcement.Dialogs
             var details = JsonConvert.DeserializeObject<TaskModule.BotFrameworkCardValue<CreateNewAnnouncementData>>(activity.Value.ToString());
 
             // Add announcemnet in DB.
-            var campaign = await AddAnnouncecmentInDB(activity, details.Data, channelData.Tenant.Id);
+            var campaign = await AddAnnouncementToDB(activity, details.Data, channelData.Tenant.Id);
             bool isEditPeview = true;
             if (details.Data.ActionType == Constants.EditAnnouncementFromTab)
                 isEditPeview = false;
@@ -598,6 +606,7 @@ namespace CrossVertical.Announcement.Dialogs
         {
             if (campaign.Status == Status.Sent)
             {
+                // Send error message if the campaign was already sent
                 await context.PostAsync("This announcement is already sent.");
                 return;
             }
@@ -606,20 +615,15 @@ namespace CrossVertical.Announcement.Dialogs
             var reply = activity.CreateReply();
             reply.Attachments.Add(campaign.GetPreviewCard().ToAttachment());
 
-            // await context.PostAsync(reply);
-
+            // Check if the user is editing a message that is currently being previewed
             PreviewCardMessageDetails previewMessageDetails = null;
             if (isEditPreview)
                 previewMessageDetails = context.ConversationData.GetValueOrDefault<PreviewCardMessageDetails>(campaign.Id);
 
             if (previewMessageDetails == null)
             {
-                var messageResouce = await connector.Conversations.SendToConversationAsync(reply);
-
-                previewMessageDetails = new PreviewCardMessageDetails()
-                {
-                    MessageCardId = messageResouce.Id
-                };
+                // Send the preview, and keep track of the message IDs for the card and action buttons
+                var previewCardActivity = await connector.Conversations.SendToConversationAsync(reply);
 
                 // Send action buttons.
                 reply = activity.CreateReply();
@@ -628,12 +632,20 @@ namespace CrossVertical.Announcement.Dialogs
                     dateTimeOffset = campaign.Schedule.ScheduledTime;
 
                 reply.Attachments.Add(AdaptiveCardDesigns.GetScheduleConfirmationCard(campaign.Id, dateTimeOffset.ToString("MM/dd/yyyy"), dateTimeOffset.ToString("HH:mm"), true));
-                messageResouce = await connector.Conversations.SendToConversationAsync(reply);
-                previewMessageDetails.MessageActionId = messageResouce.Id;
+                var actionCardActivity = await connector.Conversations.SendToConversationAsync(reply);
+
+                // Store information about the preview and actions so that we can update them later
+                previewMessageDetails = new PreviewCardMessageDetails()
+                {
+                    MessageCardId = previewCardActivity.Id,
+                    MessageActionId = actionCardActivity.Id
+                };
+
                 context.ConversationData.SetValue(campaign.Id, previewMessageDetails);
             }
             else
             {
+                // User is editing the message currently being previewed, so just update the current preview
                 await connector.Conversations.UpdateActivityAsync(activity.Conversation.Id, previewMessageDetails.MessageCardId, reply);
             }
         }
@@ -653,7 +665,7 @@ namespace CrossVertical.Announcement.Dialogs
                 await context.PostAsync("Please set at least one moderator.");
                 return;
             }
-            Tenant tenantData = await CheckAndAddTenantDetails(channelData);
+            Tenant tenantData = await CheckAndAddTenantDetails(channelData.Tenant.Id);
             tenantData.Moderators = moderatorList;
 
             await Cache.Tenants.AddOrUpdateItemAsync(tenantData.Id, tenantData);
@@ -705,7 +717,7 @@ namespace CrossVertical.Announcement.Dialogs
             return $"https://login.microsoftonline.com/{tenant}/adminconsent?client_id={appId}&state={data}&redirect_uri={ System.Web.HttpUtility.UrlEncode(ApplicationSettings.BaseUrl + "/adminconsent")}";
         }
 
-        private async Task<Campaign> AddAnnouncecmentInDB(Activity activity, CreateNewAnnouncementData data, string tenantId)
+        private async Task<Campaign> AddAnnouncementToDB(Activity activity, CreateNewAnnouncementData data, string tenantId)
         {
             Campaign announcement = new Campaign()
             {
@@ -822,7 +834,7 @@ namespace CrossVertical.Announcement.Dialogs
         }
 
         #endregion
-        
+
         #region Helpers
 
         internal async static Task<User> CheckAndAddUserDetails(Activity activity, TeamsChannelData channelData)
@@ -840,7 +852,7 @@ namespace CrossVertical.Announcement.Dialogs
                 };
                 await Cache.Users.AddOrUpdateItemAsync(userDetails.Id, userDetails);
 
-                Tenant tenantData = await CheckAndAddTenantDetails(channelData);
+                Tenant tenantData = await CheckAndAddTenantDetails(channelData.Tenant.Id);
                 if (!tenantData.Users.Contains(userDetails.Id))
                 {
                     tenantData.Users.Add(userDetails.Id);
@@ -851,6 +863,9 @@ namespace CrossVertical.Announcement.Dialogs
             return userDetails;
         }
 
+        /// <summary>
+        ///  Process the Excel file attachment with information about user groups
+        /// </summary>
         private static async Task HandleExcelAttachement(IDialogContext context, Attachment attachment, TeamsChannelData channelData)
         {
             if (attachment.ContentType == FileDownloadInfo.ContentType)
@@ -860,7 +875,7 @@ namespace CrossVertical.Announcement.Dialogs
                 if (!Directory.Exists(filePath))
                     Directory.CreateDirectory(filePath);
 
-                filePath += attachment.Name + DateTime.Now.Millisecond; // just to avoid name collision with other users. 
+                filePath += attachment.Name + DateTime.Now.Millisecond; // just to avoid name collision with other users
                 if (downloadInfo != null)
                 {
                     using (WebClient myWebClient = new WebClient())
@@ -874,7 +889,7 @@ namespace CrossVertical.Announcement.Dialogs
                         var groupDetails = ExcelHelper.GetAddTeamDetails(filePath);
                         if (groupDetails != null)
                         {
-                            var tenantData = await CheckAndAddTenantDetails(channelData);
+                            var tenantData = await CheckAndAddTenantDetails(channelData.Tenant.Id);
                             // Clean up earlier group data
                             foreach (var groupId in tenantData.Groups)
                             {
@@ -901,15 +916,15 @@ namespace CrossVertical.Announcement.Dialogs
             }
         }
 
-        internal static async Task<Tenant> CheckAndAddTenantDetails(TeamsChannelData channelData)
+        internal static async Task<Tenant> CheckAndAddTenantDetails(string tenantId)
         {
             // Tenant not present in cached check DB
-            var tenantData = await Cache.Tenants.GetItemAsync(channelData.Tenant.Id);
+            var tenantData = await Cache.Tenants.GetItemAsync(tenantId);
             if (tenantData == null)
             {
                 tenantData = new Tenant()
                 {
-                    Id = channelData.Tenant.Id,
+                    Id = tenantId,
                 };
                 await Cache.Tenants.AddOrUpdateItemAsync(tenantData.Id, tenantData);
             }
@@ -963,7 +978,7 @@ namespace CrossVertical.Announcement.Dialogs
             if (members.Count == 0)
                 return null;
             return members.Where(m => m.Id == activity.From.Id).First().AsTeamsChannelAccount();
-        } 
+        }
 
         #endregion
     }

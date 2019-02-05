@@ -16,7 +16,7 @@ namespace CrossVertical.Announcement.Helpers
 
         public static Attachment GetWelcomeScreen(bool isChannelCard, Role role)
         {
-            var card = new AdaptiveCard()
+            var card = new AdaptiveCard(new AdaptiveSchemaVersion("1.0"))
             {
                 Body = new List<AdaptiveElement>()
                 {
@@ -126,7 +126,7 @@ namespace CrossVertical.Announcement.Helpers
 
         public static Attachment GetCardForNonConsentedTenant()
         {
-            var card = new AdaptiveCard()
+            var card = new AdaptiveCard(new AdaptiveSchemaVersion("1.0"))
             {
                 Body = new List<AdaptiveElement>()
                 {
@@ -247,7 +247,7 @@ namespace CrossVertical.Announcement.Helpers
             var date = campaign.Schedule.ScheduledTime.ToString("MM/dd/yyyy");
             var time = campaign.Schedule.ScheduledTime.ToString("HH:mm");
 
-            var card = new AdaptiveCard()
+            var card = new AdaptiveCard(new AdaptiveSchemaVersion("1.0"))
             {
                 Body = new List<AdaptiveElement>()
                 {
@@ -304,9 +304,9 @@ namespace CrossVertical.Announcement.Helpers
             };
         }
 
-        public static async Task<Attachment> GetAdminPanelCard(string currentModerators)
+        public static Attachment GetAdminPanelCard(string currentModerators)
         {
-            var Card = new AdaptiveCard()
+            var Card = new AdaptiveCard(new AdaptiveSchemaVersion("1.0"))
             {
                 Body = new List<AdaptiveElement>()
                 {
@@ -337,7 +337,7 @@ namespace CrossVertical.Announcement.Helpers
                             {
                                 Id = "setModerators",
                                 Title="Set Moderators",
-                                Card=new AdaptiveCard()
+                                Card=new AdaptiveCard(new AdaptiveSchemaVersion("1.0"))
                                 {
                                     Body=new List<AdaptiveElement>()
                                     {
@@ -381,7 +381,7 @@ namespace CrossVertical.Announcement.Helpers
 
         public static Attachment GetScheduleConfirmationCard(string announcementId, string date, string time, bool allowEdit)
         {
-            var Card = new AdaptiveCard()
+            var Card = new AdaptiveCard(new AdaptiveSchemaVersion("1.0"))
             {
                 Body = new List<AdaptiveElement>()
                 {
@@ -413,7 +413,7 @@ namespace CrossVertical.Announcement.Helpers
                             {
                                 Id = "sendLater",
                                 Title="Send Later",
-                                Card=new AdaptiveCard()
+                                Card=new AdaptiveCard(new AdaptiveSchemaVersion("1.0"))
                                 {
                                     Body=new List<AdaptiveElement>()
                                     {
@@ -482,7 +482,7 @@ namespace CrossVertical.Announcement.Helpers
 
         public static Attachment GetUpdateMessageCard(string message)
         {
-            var Card = new AdaptiveCard()
+            var Card = new AdaptiveCard(new AdaptiveSchemaVersion("1.0"))
             {
                 Body = new List<AdaptiveElement>()
                 {
@@ -571,7 +571,7 @@ namespace CrossVertical.Announcement.Helpers
 
         internal static Attachment GetAnnouncementBasicDetails(Campaign campaign)
         {
-            var basicDetailsCard = new AdaptiveCard()
+            var basicDetailsCard = new AdaptiveCard(new AdaptiveSchemaVersion("1.0"))
             {
                 Body = new List<AdaptiveElement>()
                 {
