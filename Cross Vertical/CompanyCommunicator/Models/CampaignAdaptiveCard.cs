@@ -409,13 +409,12 @@ namespace CrossVertical.Announcement.Models
                                             new AdaptiveToggleInput()
                                             {
                                                 Id="allowContactIns",
-                                                Title="Allow Contact-ins",
+                                                Title="Allow recipient to contact",
                                                 Value=isEditCard? IsContactAllowed.ToString(): "false",
                                             }
                                         },
                                         Width="stretch"
                                     }
-
                                 }
                             },
                             new AdaptiveColumnSet()
@@ -492,7 +491,7 @@ namespace CrossVertical.Announcement.Models
                 default:
                     break;
             }
-            AdaptiveCardRenderer renderer = new AdaptiveCardRenderer();
+
             var previewCard = new AdaptiveCard(new AdaptiveSchemaVersion("1.0"))
             {
                 Body = new List<AdaptiveElement>()
@@ -586,24 +585,8 @@ namespace CrossVertical.Announcement.Models
                     }
                 },
             };
-            try
-            {
-                // Render the card
-                RenderedAdaptiveCard renderedCard = renderer.RenderCard(previewCard);
 
-                // Get the output HTML 
-                HtmlTag html = renderedCard.Html;
-                              // (Optional) Check for any renderer warnings
-                // This includes things like an unknown element type found in the card
-                // Or the card exceeded the maxmimum number of supported actions, etc
-                IList<AdaptiveWarning> warnings = renderedCard.Warnings;
-            }
-            catch (AdaptiveException ex)
-            {
-                throw ex;
-                // Failed rendering
-            }
-
+            // Image element without url does not render on phone. Remove empty images.
             AdaptiveElement adaptiveElement = previewCard.Body.FirstOrDefault(i => i.Id == "bannerImage");
             if(!Uri.IsWellFormedUriString(ImageUrl, UriKind.Absolute) && adaptiveElement != null )
             {

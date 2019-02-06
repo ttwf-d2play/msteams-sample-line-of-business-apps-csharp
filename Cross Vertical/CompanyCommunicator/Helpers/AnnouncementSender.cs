@@ -48,7 +48,7 @@ namespace CrossVertical.Announcement.Helpers
                             continue;
                         }
 
-                        var campaignCard = AdaptiveCardDesigns.GetCardWithAcknowledgementDetails(card, campaign.Id, user.Id, group.GroupId);
+                        var campaignCard = CardHelper.GetCardWithAcknowledgementDetails(card, campaign.Id, user.Id, group.GroupId);
                         var response = await ProactiveMessageHelper.SendNotification(campaign.Recipients.ServiceUrl, campaign.Recipients.TenantId, user.BotConversationId, null, card);
                         if (response.IsSuccessful)
                         {
@@ -78,7 +78,7 @@ namespace CrossVertical.Announcement.Helpers
                 }
                 else
                 {
-                    var campaignCard = AdaptiveCardDesigns.GetCardWithoutAcknowledgementAction(card);
+                    var campaignCard = CardHelper.GetCardWithoutAcknowledgementAction(card);
 
                     if (notifiedUsers.Contains(recipient.Channel.Id))
                     {

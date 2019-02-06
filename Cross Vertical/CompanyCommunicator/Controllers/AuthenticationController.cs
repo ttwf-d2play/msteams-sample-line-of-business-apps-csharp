@@ -2,6 +2,7 @@
 using CrossVertical.Announcement.Helpers;
 using CrossVertical.Announcement.Models;
 using CrossVertical.Announcement.Repository;
+using Microsoft.Bot.Connector;
 using Newtonsoft.Json;
 using System.Threading.Tasks;
 using System.Web;
@@ -28,13 +29,11 @@ namespace CrossVertical.Announcement.Controllers
             tenantDetails.Admin = adminUserDetails.UserEmailId;
             await Cache.Tenants.AddOrUpdateItemAsync(tenantDetails.Id, tenantDetails);
 
-           
             var userDetails = await Cache.Users.GetItemAsync(adminUserDetails.UserEmailId);
 
-            await ProactiveMessageHelper.SendNotification(adminUserDetails.ServiceUrl, tenant, userDetails.BotConversationId, "Your app consent is successfully granted. Please go ahead and set groups in Admin Panel." , null);
+            await ProactiveMessageHelper.SendNotification(adminUserDetails.ServiceUrl, tenant, userDetails.BotConversationId, "Your app consent is successfully granted. Please go ahead and set groups." , null);
 
-            await ProactiveMessageHelper.SendNotification(adminUserDetails.ServiceUrl, tenant, userDetails.BotConversationId, null, AdaptiveCardDesigns.GetWelcomeScreen(false,role));
-
+            await ProactiveMessageHelper.SendNotification(adminUserDetails.ServiceUrl, tenant, userDetails.BotConversationId, null, CardHelper.GetGroupConfigurationCard().ToAttachment());
 
             return View();
         }

@@ -24,6 +24,7 @@ namespace CrossVertical.Announcement.Dialogs
     [Serializable]
     public class RootDialog : IDialog<object>
     {
+
         /// <summary>
         /// Called when the dialog is started.
         /// </summary>
@@ -31,8 +32,6 @@ namespace CrossVertical.Announcement.Dialogs
         {
             context.Wait(MessageReceivedAsync);
         }
-
-        private const string ProfileKey = "profile";
 
         /// <summary>
         /// Called when a message is received by the dialog
@@ -45,13 +44,13 @@ namespace CrossVertical.Announcement.Dialogs
             if (activity.Text != null)
                 message = Microsoft.Bot.Connector.Teams.ActivityExtensions.GetTextWithoutMentions(activity).ToLowerInvariant();
             // Check if User or Team is registered in the database, and store the information in ConversationData for quick retrieval later.
-            string profileKey = GetKey(activity, ProfileKey);
+            string profileKey = GetKey(activity, Constants.ProfileKey);
             User userDetails = null;
             var channelData = context.Activity.GetChannelData<TeamsChannelData>();
-            var tid = channelData.Tenant.Id;
             var emailId = await GetUserEmailId(activity);
-            var tenatInfo = await Cache.Tenants.GetItemAsync(tid);
+            var tenatInfo = await Cache.Tenants.GetItemAsync(channelData.Tenant.Id);
             Role role = Common.GetUserRole(emailId, tenatInfo);
+
             if (context.ConversationData.ContainsKey(profileKey))
             {
                 userDetails = context.ConversationData.GetValue<User>(profileKey);
@@ -70,7 +69,7 @@ namespace CrossVertical.Announcement.Dialogs
                 else
                 {
                     var reply = activity.CreateReply();
-                    reply.Attachments.Add(AdaptiveCardDesigns.GetCardForNonConsentedTenant());
+                    reply.Attachments.Add(CardHelper.GetCardForNonConsentedTenant());
                     await context.PostAsync(reply);
                 }
                 return;
@@ -90,28 +89,11 @@ namespace CrossVertical.Announcement.Dialogs
             {
                 if (message.ToLowerInvariant().Contains("refresh photos") && role == Role.Admin)
                 {
-                    // Perform configuration.
-                    if (!tenantData.IsAdminConsented)
-                        return;
-                    var token = await GraphHelper.GetAccessToken(tenantData.Id, ApplicationSettings.AppId, ApplicationSettings.AppSecret);
-                    GraphHelper helper = new GraphHelper(token);
-                    foreach (var userId in tenantData.Users)
-                    {
-                        var userInfo = await helper.GetUser(userId);
-                        if (userInfo != null)
-                            await helper.GetUserProfilePhoto(tid, userInfo.Id);
-                    }
-                    await context.PostAsync("Profile photos are refreshed.");
+                    await RefreshProfilePhotos(context, activity, tenantData, userDetails);
                 }
                 else if (message.ToLowerInvariant().Contains("clear cache"))
                 {
-                    Cache.Announcements = new DBCache<Campaign>();
-                    Cache.Groups = new DBCache<Group>();
-                    Cache.Teams = new DBCache<Team>();
-                    Cache.Tenants = new DBCache<Tenant>();
-                    Cache.Users = new DBCache<User>();
-
-                    await context.PostAsync("Cache cleared.");
+                    await ClearCache(context);
                 }
                 else
                 {
@@ -127,11 +109,10 @@ namespace CrossVertical.Announcement.Dialogs
                     }
 
                     if (tenantData.Admin == userDetails.Id || tenantData.Moderators.Contains(userDetails.Id))
-                        reply.Attachments.Add(AdaptiveCardDesigns.GetWelcomeScreen(channelData.Team != null, role));
+                        reply.Attachments.Add(CardHelper.GetWelcomeScreen(channelData.Team != null, role));
                     else
                     {
-                        //reply.Text = "We will deliver your announcements here.";
-                        reply.Attachments.Add(AdaptiveCardDesigns.GetWelcomeScreen(channelData.Team != null, role));
+                        reply.Attachments.Add(CardHelper.GetWelcomeScreen(channelData.Team != null, role));
                     }
                     await context.PostAsync(reply);
                 }
@@ -139,10 +120,11 @@ namespace CrossVertical.Announcement.Dialogs
         }
 
         #region Sign In Flow
+
         private async Task SendOAuthCardAsync(IDialogContext context, Activity activity)
         {
             var reply = await context.Activity.CreateOAuthReplyAsync(ApplicationSettings.ConnectionName,
-                "To do this, you'll first need to sign in.", "Sign In", true).ConfigureAwait(false);
+                "To start using this app, you'll first need to sign in.", "Sign In", true).ConfigureAwait(false);
             await context.PostAsync(reply);
 
             context.Wait(WaitForToken);
@@ -187,6 +169,7 @@ namespace CrossVertical.Announcement.Dialogs
                 context.Wait(MessageReceivedAsync);
             }
         }
+
         #endregion
 
         #region Handle Actions
@@ -212,7 +195,11 @@ namespace CrossVertical.Announcement.Dialogs
 
             var role = Common.GetUserRole(userDetails.Id, tenant);
 
-            if (role == Role.User && type != Constants.Acknowledge && type != Constants.ShowRecents && type != Constants.ShowSentAnnouncement)
+            // For user role, only these actions are allowed.
+            if (role == Role.User &&
+                type != Constants.Acknowledge &&
+                type != Constants.ShowRecents &&
+                type != Constants.ShowSentAnnouncement)
             {
                 await context.PostAsync("You do not have permissions to perform this task.");
                 return;
@@ -230,7 +217,7 @@ namespace CrossVertical.Announcement.Dialogs
                     break;
                 case Constants.ConfigureGroups:
                     // Allow user to configure the groups.
-                    await SendConfigurationCard(context, activity, channelData);
+                    await SendUpdateGroupConfigurationCard(context, activity, channelData);
                     break;
                 case Constants.SetModerators:
                     // Allow user to configure the groups.
@@ -266,32 +253,15 @@ namespace CrossVertical.Announcement.Dialogs
         private async Task ShowRecentAnnouncements(IDialogContext context, Activity activity, TeamsChannelData channelData)
         {
             var tid = channelData.Tenant.Id;
-            var emailId = await RootDialog.GetUserEmailId(activity);
-            var tenatInfo = await Cache.Tenants.GetItemAsync(tid);
-            var myTenantAnnouncements = new List<Campaign>();
-            emailId = emailId.ToLower();
-            var myAnnouncements = tenatInfo.Announcements;
-            Role role = Common.GetUserRole(emailId, tenatInfo);
-            foreach (var announcementId in myAnnouncements)
-            {
-                var announcement = await Cache.Announcements.GetItemAsync(announcementId);
-                if (announcement != null && announcement.Status == Status.Sent)
-                {
-                    if (role == Role.Moderator || role == Role.Admin)
-                    {
-                        myTenantAnnouncements.Add(announcement);
-                    }
-                    else if (announcement.Recipients.Channels.Any(c => c.Members.Contains(emailId))
-                          || announcement.Recipients.Groups.Any(g => g.Users.Any(u => u.Id == emailId)))
-                    {
-                        // Validate if user is part of this announcement.
-                        myTenantAnnouncements.Add(announcement);
-                    }
-                }
-            }
+            var emailId = await GetUserEmailId(activity);
 
-            var listCard = new ListCard();
-            listCard.content = new Content();
+            // Fetch my announcements
+            var myTenantAnnouncements = await Common.GetMyAnnouncements(emailId, tid);
+
+            var listCard = new ListCard
+            {
+                content = new Content()
+            };
             listCard.content.title = "Here are all your recent announcements:"; ;
             var list = new List<Item>();
             foreach (var announcement in myTenantAnnouncements.OrderByDescending(a => a.CreatedTime).Take(10))
@@ -321,9 +291,11 @@ namespace CrossVertical.Announcement.Dialogs
             if (list.Count > 0)
             {
                 listCard.content.items = list.ToArray();
-                Attachment attachment = new Attachment();
-                attachment.ContentType = listCard.contentType;
-                attachment.Content = listCard.content;
+                Attachment attachment = new Attachment
+                {
+                    ContentType = listCard.contentType,
+                    Content = listCard.content
+                };
                 var reply = activity.CreateReply();
                 reply.Attachments.Add(attachment);
                 await context.PostAsync(reply);
@@ -336,7 +308,7 @@ namespace CrossVertical.Announcement.Dialogs
         {
             var reply = activity.CreateReply();
             Tenant tenantData = await CheckAndAddTenantDetails(channelData.Tenant.Id);
-            reply.Attachments.Add(AdaptiveCardDesigns.GetAdminPanelCard(string.Join(",", tenantData.Moderators)));
+            reply.Attachments.Add(CardHelper.GetAdminPanelCard(string.Join(",", tenantData.Moderators)));
             await context.PostAsync(reply);
         }
 
@@ -369,12 +341,12 @@ namespace CrossVertical.Announcement.Dialogs
                 var group = campaign.Recipients.Groups.FirstOrDefault(g => g.Users.Any(u => u.Id == userEmailId));
                 if (group != null)
                 {
-                    var campaignCard = AdaptiveCardDesigns.GetCardWithAcknowledgementDetails(card, campaign.Id, userEmailId, group.GroupId);
+                    var campaignCard = CardHelper.GetCardWithAcknowledgementDetails(card, campaign.Id, userEmailId, group.GroupId);
                     reply.Attachments.Add(campaignCard);
                 }
                 else
                 {
-                    var campaignCard = AdaptiveCardDesigns.GetCardWithoutAcknowledgementAction(card);
+                    var campaignCard = CardHelper.GetCardWithoutAcknowledgementAction(card);
                     reply.Attachments.Add(campaignCard);
                 }
                 await context.PostAsync(reply);
@@ -419,9 +391,11 @@ namespace CrossVertical.Announcement.Dialogs
             if (list.Count > 0)
             {
                 listCard.content.items = list.ToArray();
-                Attachment attachment = new Attachment();
-                attachment.ContentType = listCard.contentType;
-                attachment.Content = listCard.content;
+                var attachment = new Attachment
+                {
+                    ContentType = listCard.contentType,
+                    Content = listCard.content
+                };
                 var reply = activity.CreateReply();
                 reply.Attachments.Add(attachment);
                 await context.PostAsync(reply);
@@ -524,7 +498,7 @@ namespace CrossVertical.Announcement.Dialogs
 
                 var updateMessage = context.MakeMessage();
 
-                updateMessage.Attachments.Add(AdaptiveCardDesigns.GetCardToUpdatePreviewCard(updateCard,
+                updateMessage.Attachments.Add(CardHelper.GetCardToUpdatePreviewCard(updateCard,
                     $"Note: This announcement is { (type == Constants.SendAnnouncement ? "sent" : "scheduled") } successfully."));
                 await connectorClient.Conversations.UpdateActivityAsync(activity.Conversation.Id, oldAnnouncementDetails.MessageCardId, (Activity)updateMessage);
 
@@ -532,7 +506,7 @@ namespace CrossVertical.Announcement.Dialogs
                 var message = type == Constants.SendAnnouncement ? "We have send this announcement successfully. Please create new announcement to send again." :
                     $"We have scheduled this announcement to be sent at {campaign.Schedule.ScheduledTime.ToString("MM/dd/yyyy hh:mm tt")}. Note that announcements scheduled for past date will be sent immediately.";
 
-                var updateAnnouncement = AdaptiveCardDesigns.GetUpdateMessageCard(message);
+                var updateAnnouncement = CardHelper.GetUpdateMessageCard(message);
                 updateMessage = context.MakeMessage();
                 updateMessage.Attachments.Add(updateAnnouncement);
                 await connectorClient.Conversations.UpdateActivityAsync(activity.Conversation.Id, oldAnnouncementDetails.MessageActionId, (Activity)updateMessage);
@@ -543,7 +517,7 @@ namespace CrossVertical.Announcement.Dialogs
                 var message = $"We have re-scheduled the announcement to be sent at {campaign.Schedule.ScheduledTime.ToString("MM/dd/yyyy hh:mm tt")}.";
                 await context.PostAsync(message);
                 var reply = activity.CreateReply();
-                reply.Attachments.Add(AdaptiveCardDesigns.GetAnnouncementBasicDetails(campaign));
+                reply.Attachments.Add(CardHelper.GetAnnouncementBasicDetails(campaign));
 
                 await context.PostAsync(reply);
             }
@@ -631,7 +605,7 @@ namespace CrossVertical.Announcement.Dialogs
                 if (campaign.Schedule != null)
                     dateTimeOffset = campaign.Schedule.ScheduledTime;
 
-                reply.Attachments.Add(AdaptiveCardDesigns.GetScheduleConfirmationCard(campaign.Id, dateTimeOffset.ToString("MM/dd/yyyy"), dateTimeOffset.ToString("HH:mm"), true));
+                reply.Attachments.Add(CardHelper.GetScheduleConfirmationCard(campaign.Id, dateTimeOffset.ToString("MM/dd/yyyy"), dateTimeOffset.ToString("HH:mm"), true));
                 var actionCardActivity = await connector.Conversations.SendToConversationAsync(reply);
 
                 // Store information about the preview and actions so that we can update them later
@@ -672,16 +646,9 @@ namespace CrossVertical.Announcement.Dialogs
             await context.PostAsync("Moderators are set successfully. These users can now create message and post.");
         }
 
-        private async Task SendConfigurationCard(IDialogContext context, Activity activity, TeamsChannelData channelData)
+        private async Task SendUpdateGroupConfigurationCard(IDialogContext context, Activity activity, TeamsChannelData channelData)
         {
-            var configurationCard = new ThumbnailCard
-            {
-                Text = @"Please go ahead and upload the excel file with Group details in following format:  
-                        <ol>
-                        <li><strong>Group Name</strong>: String eg: <pre>All Employees</pre></li>
-                        <li><strong>Members</strong>  : Comma separated user emails eg: <pre>user1@org.com, user2@org.com</pre></li></ol>
-                        </br> <strong>Note: Please keep first row header as described above. You can provide details for multiple teams row by row. Members/Channels columns can be empty.</strong>",
-            };
+            var configurationCard = CardHelper.GetGroupConfigurationCard();
 
             var reply = activity.CreateReply();
             reply.Attachments.Add(configurationCard.ToAttachment());
@@ -690,13 +657,17 @@ namespace CrossVertical.Announcement.Dialogs
 
         private async Task SendGrantAdminConsentCard(IDialogContext context, Activity activity, TeamsChannelData channelData)
         {
-            var configurationCard = new ThumbnailCard();
+            var configurationCard = new ThumbnailCard
+            {
+                Text = "Please grant permission to the application first."
+            };
 
-            configurationCard.Text = "Please grant permission to the application first.";
             // Show button with Open URl.
-            AdminUserDetails adminDetails = new AdminUserDetails();
-            adminDetails.ServiceUrl = activity.ServiceUrl;
-            adminDetails.UserEmailId = await GetUserEmailId(activity);
+            AdminUserDetails adminDetails = new AdminUserDetails
+            {
+                ServiceUrl = activity.ServiceUrl,
+                UserEmailId = await GetUserEmailId(activity)
+            };
             var loginUrl = GetAdminConsentUrl(channelData.Tenant.Id, ApplicationSettings.AppId, adminDetails);
             configurationCard.Buttons = new List<CardAction>();
             configurationCard.Buttons.Add(new CardAction()
@@ -837,6 +808,37 @@ namespace CrossVertical.Announcement.Dialogs
 
         #region Helpers
 
+        private static async Task ClearCache(IDialogContext context)
+        {
+            Cache.Announcements = new DBCache<Campaign>();
+            Cache.Groups = new DBCache<Group>();
+            Cache.Teams = new DBCache<Team>();
+            Cache.Tenants = new DBCache<Tenant>();
+            Cache.Users = new DBCache<User>();
+
+            await context.PostAsync("Cache cleared.");
+        }
+
+        private async Task ShowWelcomeScreen(IDialogContext context, Activity activity, Tenant tenant, User userDetails)
+        {
+        }
+
+        private async Task RefreshProfilePhotos(IDialogContext context, Activity activity, Tenant tenant, User userDetails)
+        {
+            if (!tenant.IsAdminConsented)
+                return;
+
+            var token = await GraphHelper.GetAccessToken(tenant.Id, ApplicationSettings.AppId, ApplicationSettings.AppSecret);
+            GraphHelper helper = new GraphHelper(token);
+            foreach (var userId in tenant.Users)
+            {
+                var userInfo = await helper.GetUser(userId);
+                if (userInfo != null)
+                    await helper.GetUserProfilePhoto(tenant.Id, userInfo.Id);
+            }
+            await context.PostAsync("Profile photos are refreshed.");
+        }
+
         internal async static Task<User> CheckAndAddUserDetails(Activity activity, TeamsChannelData channelData)
         {
             var currentUser = await GetCurrentUser(activity);
@@ -909,7 +911,7 @@ namespace CrossVertical.Announcement.Dialogs
                             await context.PostAsync($"Attachment received but unfortunately we are not able to read group details. Please make sure that all the colums are correct.");
                         }
 
-                        await context.PostAsync($"Successfully updated Group details for this tenant.");
+                        await context.PostAsync($"Successfully updated Group details for this tenant. ");
                         File.Delete(filePath);
                     }
                 }

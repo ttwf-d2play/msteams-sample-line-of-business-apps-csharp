@@ -18,6 +18,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
+using TaskModule;
 
 namespace CrossVertical.Announcement.Controllers
 {
@@ -108,56 +109,59 @@ namespace CrossVertical.Announcement.Controllers
             var channelData = activity.GetChannelData<TeamsChannelData>();
             var tenantId = channelData.Tenant.Id;
 
-            JObject taskEnvelope = new JObject();
-
-            JObject taskObj = new JObject();
-            JObject taskInfo = new JObject();
-
             // Default to common parameters for task module
-            taskObj["type"] = "continue";
-            taskObj["value"] = taskInfo;
-            taskInfo["height"] = 900;
-            taskInfo["width"] = 600;
+            var taskInfo = new TaskModuleTaskInfo()
+            {
+                Title = ApplicationSettings.AppName,
+                Height = 900,
+                Width = 600,
+            };
 
             // Populate the task module content, based on the kind of dialog requested
-            JObject card = null;
-            // Fetch Tenant Id and pass it.
-
+            Attachment card = null;
             switch (action.Data.Data.ActionType)
             {
                 case Constants.CreateOrEditAnnouncement:
-                    taskInfo["title"] = "Create New";
-                    card = JObject.FromObject(await AdaptiveCardDesigns.GetCreateNewAnnouncementCard(tenantId));
+                    taskInfo.Title = "Create New";
+                    card = await CardHelper.GetCreateNewAnnouncementCard(tenantId);
                     break;
                 case Constants.ShowMoreDetails:
-                    taskInfo["title"] = "Details";
+                    taskInfo.Title = "Details";
                     var showDetails = JsonConvert.DeserializeObject<TaskModule.TaskModuleActionData<AnnouncementActionDetails>>(activityValue);
-                    card = JObject.FromObject(await AdaptiveCardDesigns.GetPreviewAnnouncementCard(showDetails.Data.Data.Id));
-                    taskInfo["height"] = 900;
-                    taskInfo["width"] = 600;
+                    card = await CardHelper.GetPreviewAnnouncementCard(showDetails.Data.Data.Id);
+                   taskInfo.Height = 900;
+                   taskInfo.Width = 600;
 
                     break;
                 case Constants.ShowEditAnnouncementTaskModule:
-                    taskInfo["title"] = "Edit a message";
+                    taskInfo.Title = "Edit a message";
                     var editAnnouncement = JsonConvert.DeserializeObject<TaskModule.TaskModuleActionData<AnnouncementActionDetails>>(activityValue);
 
                     var campaign = await Cache.Announcements.GetItemAsync(editAnnouncement.Data.Data.Id);
                     if (campaign == null || campaign.Status == Status.Sent)
                     {
-                        card = JObject.FromObject(AdaptiveCardDesigns.GetUpdateMessageCard($"This {Helper.ApplicationSettings.AppFeature} is already sent and not allowed to edit."));
-                        taskInfo["height"] = 100;
-                        taskInfo["width"] = 500;
+                        card = CardHelper.GetUpdateMessageCard($"This {Helper.ApplicationSettings.AppFeature} is already sent and not allowed to edit.");
+                       taskInfo.Height = 100;
+                       taskInfo.Width = 500;
                     }
                     else
-                        card = JObject.FromObject(await AdaptiveCardDesigns.GetEditAnnouncementCard(editAnnouncement.Data.Data.Id, tenantId));
+                        card = await CardHelper.GetEditAnnouncementCard(editAnnouncement.Data.Data.Id, tenantId);
                     break;
                 default:
                     break;
             }
-            taskInfo["card"] = card;
-            taskEnvelope["task"] = taskObj;
 
-            return Request.CreateResponse(HttpStatusCode.OK, taskEnvelope);
+            taskInfo.Card = card;
+            TaskModuleResponseEnvelope taskModuleEnvelope = new TaskModuleResponseEnvelope
+            {
+                Task = new TaskModuleContinueResponse
+                {
+                    Type = "continue",
+                    Value =taskInfo
+                }
+            };
+
+            return Request.CreateResponse(HttpStatusCode.OK, taskModuleEnvelope);
         }
 
         private static async Task HandleConversationUpdate(Activity message)
@@ -166,7 +170,7 @@ namespace CrossVertical.Announcement.Controllers
             var channelData = message.GetChannelData<TeamsChannelData>();
 
             // Ensure that we have an entry for this tenant in the database
-            var tenant = await RootDialog.CheckAndAddTenantDetails(channelData.Team.Id);
+            var tenant = await RootDialog.CheckAndAddTenantDetails(channelData.Tenant.Id);
             await RootDialog.CheckAndAddUserDetails(message, channelData);
 
             // Treat 1:1 add/remove events as if they were add/remove of a team member
@@ -415,7 +419,7 @@ namespace CrossVertical.Announcement.Controllers
             var emailId = await RootDialog.GetUserEmailId(message);
             var tenatInfo = await Cache.Tenants.GetItemAsync(tid);
             Role role = Common.GetUserRole(emailId, tenatInfo);
-            var card = AdaptiveCardDesigns.GetWelcomeScreen(false, role);
+            var card = CardHelper.GetWelcomeScreen(false, role);
             foreach (var member in members)
             {
                 var userDetails = await Cache.Users.GetItemAsync(member.UserPrincipalName.ToLower());

@@ -289,7 +289,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Helpers\AdaptiveCardHelper.cs" />
-    <Compile Include="Helpers\AdaptiveCardDesigns.cs" />
+    <Compile Include="Helpers\CardHelper.cs" />
     <Compile Include="Helpers\AnnouncementScheduler.cs" />
     <Compile Include="Helpers\AnnouncementSender.cs" />
     <Compile Include="Helpers\ApplicationSettings.cs" />

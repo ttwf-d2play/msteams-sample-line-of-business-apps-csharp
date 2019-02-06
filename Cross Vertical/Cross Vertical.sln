@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationBot", "Notifica
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PollingBot", "PollingBot\PollingBot.csproj", "{45B6FECB-17FA-41F5-8AB7-A80C9FEEEEB6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Announcement", "Announcement\Announcement.csproj", "{E7A02B0D-A563-4CB8-AC6B-1D85272C5D7F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CompanyCommunicator", "CompanyCommunicator\CompanyCommunicator.csproj", "{E7A02B0D-A563-4CB8-AC6B-1D85272C5D7F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

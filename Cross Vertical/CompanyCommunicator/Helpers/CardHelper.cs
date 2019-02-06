@@ -11,7 +11,10 @@ using TaskModule;
 
 namespace CrossVertical.Announcement.Helpers
 {
-    public class AdaptiveCardDesigns
+    /// <summary>
+    /// Contains all the Adpative card designs
+    /// </summary>
+    public class CardHelper
     {
 
         public static Attachment GetWelcomeScreen(bool isChannelCard, Role role)
@@ -551,7 +554,6 @@ namespace CrossVertical.Announcement.Helpers
             return campaignAttachment;
         }
 
-
         public static Attachment GetCardWithoutAcknowledgementAction(Attachment campaignAttachment)
         {
             var campaign = campaignAttachment.Content as AdaptiveCard;
@@ -569,7 +571,7 @@ namespace CrossVertical.Announcement.Helpers
             }
         }
 
-        internal static Attachment GetAnnouncementBasicDetails(Campaign campaign)
+        public static Attachment GetAnnouncementBasicDetails(Campaign campaign)
         {
             var basicDetailsCard = new AdaptiveCard(new AdaptiveSchemaVersion("1.0"))
             {
@@ -616,6 +618,18 @@ namespace CrossVertical.Announcement.Helpers
                 },
             };
             return basicDetailsCard.ToAttachment();
+        }
+
+        public static ThumbnailCard GetGroupConfigurationCard()
+        {
+            return new ThumbnailCard
+            {
+                Text = @"Please go ahead and upload the excel file with Group details in following format:  
+                        <ol>
+                        <li><strong>Group Name</strong>: String eg: <pre>All Employees</pre></li>
+                        <li><strong>Members</strong>  : Comma separated user emails eg: <pre>user1@org.com, user2@org.com</pre></li></ol>
+                        </br> <strong>Note: Please keep first row header as described above. You can provide details for multiple teams row by row. Members/Channels columns can be empty.</strong>",
+            };
         }
     }
 }

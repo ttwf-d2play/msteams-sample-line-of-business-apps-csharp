@@ -27,6 +27,8 @@ namespace CrossVertical.Announcement.Helpers
         public const string ContactSender = "Contact Sender";
         public const string ShowWelcomeScreen = "ShowWelcomeScreen";
 
+        public const string ProfileKey = "profile";
+
         public static string HistoryTabDeeplink { get; set; } = $"https://teams.microsoft.com/l/entity/{ApplicationSettings.AppId}/com.contoso.Announcement.history?webUrl={HttpUtility.UrlEncode(ApplicationSettings.BaseUrl + "/history?tid={tid}")}&label=History";
 
     }
