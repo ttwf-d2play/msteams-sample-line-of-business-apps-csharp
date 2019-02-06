@@ -23,7 +23,6 @@ namespace CrossVertical.Announcement.Controllers
             }
 
             var adminUserDetails = JsonConvert.DeserializeObject<AdminUserDetails>(HttpUtility.UrlDecode(state));
-            var role = Role.Admin;
             var tenantDetails = await Cache.Tenants.GetItemAsync(tenant);
             tenantDetails.IsAdminConsented = true;
             tenantDetails.Admin = adminUserDetails.UserEmailId;
@@ -31,7 +30,7 @@ namespace CrossVertical.Announcement.Controllers
 
             var userDetails = await Cache.Users.GetItemAsync(adminUserDetails.UserEmailId);
 
-            await ProactiveMessageHelper.SendNotification(adminUserDetails.ServiceUrl, tenant, userDetails.BotConversationId, "Your app consent is successfully granted. Please go ahead and set groups." , null);
+            await ProactiveMessageHelper.SendNotification(adminUserDetails.ServiceUrl, tenant, userDetails.BotConversationId, "Your app consent is successfully granted. Please go ahead and set groups & moderators." , null);
 
             await ProactiveMessageHelper.SendNotification(adminUserDetails.ServiceUrl, tenant, userDetails.BotConversationId, null, CardHelper.GetGroupConfigurationCard().ToAttachment());
 

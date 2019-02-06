@@ -819,10 +819,6 @@ namespace CrossVertical.Announcement.Dialogs
             await context.PostAsync("Cache cleared.");
         }
 
-        private async Task ShowWelcomeScreen(IDialogContext context, Activity activity, Tenant tenant, User userDetails)
-        {
-        }
-
         private async Task RefreshProfilePhotos(IDialogContext context, Activity activity, Tenant tenant, User userDetails)
         {
             if (!tenant.IsAdminConsented)
@@ -926,13 +922,18 @@ namespace CrossVertical.Announcement.Dialogs
                             }
 
                             await Cache.Tenants.AddOrUpdateItemAsync(tenantData.Id, tenantData);
+
+                            await context.PostAsync($"Successfully updated Group details for your tenant.");
+
+                            var reply = context.MakeMessage();
+                            reply.Attachments.Add(CardHelper.GetWelcomeScreen(channelData.Team != null, Role.Admin));
+                            await context.PostAsync(reply);
                         }
                         else
                         {
                             await context.PostAsync($"Attachment received but unfortunately we are not able to read group details. Please make sure that all the colums are correct.");
                         }
 
-                        await context.PostAsync($"Successfully updated Group details for this tenant. ");
                         File.Delete(filePath);
                     }
                 }
