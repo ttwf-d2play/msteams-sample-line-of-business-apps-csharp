@@ -339,7 +339,7 @@ namespace CrossVertical.Announcement.Controllers
                     SubTitle = user.JobTitle ?? user.UserPrincipalName,
                 };
             }
-            else if (type == "channel")
+            else if (type == "channelAudiance")
             {
                 var teamId = Team.GetTeamId(userId);
                 var photo = await helper.GetTeamPhoto(tid, userId);
