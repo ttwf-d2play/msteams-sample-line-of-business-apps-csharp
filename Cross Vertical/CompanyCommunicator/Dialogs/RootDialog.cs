@@ -892,18 +892,39 @@ namespace CrossVertical.Announcement.Dialogs
                         if (groupDetails != null)
                         {
                             var tenantData = await CheckAndAddTenantDetails(channelData.Tenant.Id);
-                            // Clean up earlier group data
+
+                            List<Group> oldGroups = new List<Group>();
                             foreach (var groupId in tenantData.Groups)
                             {
-                                await Cache.Groups.DeleteItemAsync(groupId);
+                                var group = await Cache.Groups.GetItemAsync(groupId);
+                                if (group != null)
+                                    oldGroups.Add(group);
                             }
-                            tenantData.Groups.Clear();
 
                             foreach (var groupDetail in groupDetails)
                             {
+                                // Check if old group with same name exist, then replace user details.
+                                var oldGroup = oldGroups.FirstOrDefault(g => string.Equals(g.Name, groupDetail.Name, StringComparison.InvariantCultureIgnoreCase));
+                                if (oldGroup != null)
+                                {
+                                    groupDetail.Id = oldGroup.Id;
+                                    oldGroups.Remove(oldGroup);
+                                }
+
                                 await Cache.Groups.AddOrUpdateItemAsync(groupDetail.Id, groupDetail);
-                                tenantData.Groups.Add(groupDetail.Id);
+                                if (!tenantData.Groups.Contains(groupDetail.Id))
+                                    tenantData.Groups.Add(groupDetail.Id);
+
                             }
+
+                            // Clean the groups which are not added in new excel.
+                            foreach (var oldGroup in oldGroups)
+                            {
+                                await Cache.Groups.DeleteItemAsync(oldGroup.Id);
+                                if (tenantData.Groups.Contains(oldGroup.Id))
+                                    tenantData.Groups.Remove(oldGroup.Id);
+                            }
+
                             await Cache.Tenants.AddOrUpdateItemAsync(tenantData.Id, tenantData);
                         }
                         else
