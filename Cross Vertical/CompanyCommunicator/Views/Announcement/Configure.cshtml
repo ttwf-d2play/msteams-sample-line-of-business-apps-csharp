@@ -5,12 +5,8 @@
         <input type="radio" name="announcement" value="help" onclick="onClick();"> Help<br />
 
     </form>
-
-
-
     <script src="MicrosoftTeams.min.js"></script>
     <script type="text/javascript">
-
         microsoftTeams.initialize();
         microsoftTeams.settings.registerOnSaveHandler(function (saveEvent) {
 
@@ -29,15 +25,12 @@
                     contentUrl: "https://announcement.azurewebsites.net/help",
                     suggestedDisplayName: "Public Holidays",
                     websiteUrl: "https://announcement.azurewebsites.net/help"
-
                 });
-
             }
             saveEvent.notifySuccess();
         });
 
         function onClick() {
-
             microsoftTeams.settings.setValidityState(true);
         }
 

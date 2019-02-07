@@ -28,7 +28,6 @@ using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Dialogs.Internals;
 using Microsoft.Bot.Connector;
 using System;
-using System.Linq;
 using System.Configuration;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -62,7 +61,7 @@ namespace CrossVertical.Announcement
 
                 // To use CosmosDb or InMemory storage instead of the default table storage, uncomment the corresponding line below
                 // var store = new DocumentDbBotDataStore("cosmos db uri", "cosmos db key"); // requires Microsoft.BotBuilder.Azure Nuget package 
-                 //var store = new InMemoryDataStore(); // volatile in-memory store
+                // var store = new InMemoryDataStore(); // volatile in-memory store
 
                 builder.Register(c => store)
                 .Keyed<IBotDataStore<BotData>>(AzureModule.Key_DataStore)
@@ -72,7 +71,7 @@ namespace CrossVertical.Announcement
             });
         }
 
-        
+
 
         //in global.asax or global.asax.cs
         protected void Application_Error(object sender, EventArgs e)

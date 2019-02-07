@@ -1,36 +1,24 @@
 ﻿@model CrossVertical.Announcement.ViewModels.ListDetails
 
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
-
 <head>
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-  <link rel="stylesheet" href="~/Content/styles.css"/>
-
+    <link rel="stylesheet" href="~/Content/styles.css" />
 </head>
-@*onload="@(Model.Type)ReadAllPhotos(this);"*@
 <body>
 
     <div class="container">
         <br />
-
         @if (Model != null && Model.Items.Count != 0)
-
         {
-
             <table rules="none" style="width:100%;height:auto;">
-
                 @foreach (var item in Model.Items)
-
                 {
-
                     <tr style="border:2px solid white">
-
                         <td style="padding-top:6px;padding-left:6px;width:15%">
                             <img id="@(Model.Type)_ImageUrl_@(item.Id)" style="border-radius:50%;width:45px;height:45px"
                                  src="@item.ImageUrl" name="@(Model.Type)_ProfileImage" />
@@ -46,57 +34,37 @@
                                 <span id="@(Model.Type)_SubTitle_@(item.Id)" style="color:darkgrey;font-family:'Segoe UI'">@item.SubTitle.ToUpperInvariant()</span>
                             </td>
                         }
-
                         @if (item.EnableLikeButton)
-
                         {
-
                             <td style="padding:6px;"><img src="~/Resources/Like.PNG" class="imagestyle" /></td>
-
                             <td style="padding:6px;"><a target="_blank" href="@(item.ChatUrl)"><img src="~/Resources/chat.PNG" class="imagestyle1" /></a></td>
-
                         }
-
                         else if (!string.IsNullOrEmpty(item.ChatUrl) && !item.EnableLikeButton)
-
                         {
-
                             <td style="padding:6px;"><a target="_blank" href="@(item.ChatUrl)"><img src="~/Resources/chat.PNG" class="imagestyle1" /></a></td>
-
                         }
-
                         else if (!string.IsNullOrEmpty(item.DeepLinkUrl) && string.IsNullOrEmpty(item.ChatUrl) && !item.EnableLikeButton)
-
                         {
-
                             <td width="30%">
-
                                 <a target="_blank" href="@(item.DeepLinkUrl)">
                                     <button class="rectpage" style="width: 130px;">
                                         View Conversation
-
                                     </button>
                                 </a>
-
                             </td>
-
                         }
-
                     </tr>
-
                 }
-
             </table>
         }
         else
         {
             <p style="margin:5px;">User @(Model.Title)s will be shown here.</p>
         }
-
     </div>
     <script>
         function @(Model.Type)ReadAllPhotos(context) {
-                 //GEt all images.
+                 //GEt all profile photos images.
             var isProfileImage = @Json.Encode(Model.Type.Contains("person"));
             var images = document.getElementsByName("@(Model.Type)_ProfileImage");
 

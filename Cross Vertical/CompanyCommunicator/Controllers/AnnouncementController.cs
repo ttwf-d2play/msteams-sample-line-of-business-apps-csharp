@@ -55,13 +55,8 @@ namespace CrossVertical.Announcement.Controllers
             {
                 return HttpNotFound();
             }
-
             emailId = emailId.ToLower();
-
-            
-                var tenatInfo = await Cache.Tenants.GetItemAsync(tid);
-           
-               
+            var tenatInfo = await Cache.Tenants.GetItemAsync(tid);
             Role role = Common.GetUserRole(emailId, tenatInfo);
             var myTenantAnnouncements = await Common.GetMyAnnouncements(emailId, tenatInfo.Id);
 
@@ -80,7 +75,6 @@ namespace CrossVertical.Announcement.Controllers
                 var recipientCount = 0;
                 var groupsNames = new List<string>();
                 var channelNames = new List<string>();
-
 
                 // Get all group recipients
                 foreach (var group in announcement.Recipients.Groups)
@@ -140,7 +134,6 @@ namespace CrossVertical.Announcement.Controllers
                         recipientChannelNames += " +" + (channelNames.Count - i);
                         break;
                     }
-
                 }
                 post.RecipientCount = $"{recipientCount}";
                 post.Recipients = $"{recipientNames}";
@@ -244,11 +237,8 @@ namespace CrossVertical.Announcement.Controllers
                                 allReactionUsers.Add(user);
                             }
                         }
-
-
                     }
                 }
-
             }
 
             analyticsInfo.SelectFirstTab = page == "viewAckAnalytics";
@@ -259,8 +249,7 @@ namespace CrossVertical.Announcement.Controllers
 
         private static ViewModels.Item GetUserItem(string tid, GraphHelper helper, User userDetails)
         {
-            // Add thie insided  - analyticsInfo.FirstTab.Items
-
+            // Add this in view.
             return new ViewModels.Item()
             {
                 Id = userDetails.Id,
@@ -304,10 +293,9 @@ namespace CrossVertical.Announcement.Controllers
                         else
                             allUsers.Add(user.Id);
 
-                        
-                            var userDetails = await Cache.Users.GetItemAsync(user.Id);
+                        var userDetails = await Cache.Users.GetItemAsync(user.Id);
                         if (userDetails == null)
-                            return null;
+                            continue;
                         var item = GetUserItem(tid, helper, userDetails);
                         audianceInfo.FirstTab.Items.Add(item);
                     }
@@ -323,7 +311,7 @@ namespace CrossVertical.Announcement.Controllers
                     var channelDetails = team.Channels.FirstOrDefault(c => c.Id == channel.Channel.Id);
                     if (channelDetails == null)
                         continue;
-                    var photo = await helper.GetTeamPhoto(tid, team.Id);
+
                     audianceInfo.SecondTab.Items.Add(
                          new ViewModels.Item()
                          {

@@ -336,6 +336,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\msteams-16.css" />
+    <Content Include="Content\details.css" />
     <Content Include="Content\styles.css" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
