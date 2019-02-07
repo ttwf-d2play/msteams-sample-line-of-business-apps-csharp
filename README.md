@@ -2,7 +2,7 @@
 Along with enhancements around our extensibility platform, we are simultaneously targeting efforts to integrate our customer’s Line of Business (LoB) apps in Microsoft Teams. To realize the full potential of the platform, we have built a set of industry specific LoB apps to highlight the platform capabilities and provide a skeletal working code. Look at what these apps can do:
 
 
-## Airline
+## Airlines
 
 For the Airline industry, here are a collection of five bots that are crucial for everyday airline operations:
 
