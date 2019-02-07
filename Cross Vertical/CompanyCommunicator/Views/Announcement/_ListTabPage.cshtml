@@ -10,45 +10,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <style>
-        .container {
-            padding-right: 0;
-            padding-left: 0;
-        }
-
-        .imgstyle {
-            font-size: 14px;
-            height: 22px;
-            opacity: 0.8;
-            vertical-align: bottom;
-        }
-
-
-
-        .imgstyle1 {
-            font-size: 14px;
-            height: 20px;
-            opacity: 0.8;
-            vertical-align: bottom;
-            color: #6264A7;
-            cursor: pointer;
-        }
-
-
-
-        .rect {
-            padding: 6PX;
-            height: 34px;
-            color: #6264A7;
-            border: 1px solid #6264A7;
-            border-radius: 2px;
-            background-color: white;
-            box-shadow: 0 2px 4px -0.75px rgba(0,0,0,0.1);
-            font-family: "Segoe UI";
-            font-size: 14px;
-            margin-right: 0px;
-        }
-    </style>
+  <link rel="stylesheet" href="~/Content/styles.css"/>
 
 </head>
 @*onload="@(Model.Type)ReadAllPhotos(this);"*@
@@ -89,9 +51,9 @@
 
                         {
 
-                            <td style="padding:6px;"><img src="~/Resources/Like.PNG" class="imgstyle" /></td>
+                            <td style="padding:6px;"><img src="~/Resources/Like.PNG" class="imagestyle" /></td>
 
-                            <td style="padding:6px;"><a target="_blank" href="@(item.ChatUrl)"><img src="~/Resources/chat.PNG" class="imgstyle1" /></a></td>
+                            <td style="padding:6px;"><a target="_blank" href="@(item.ChatUrl)"><img src="~/Resources/chat.PNG" class="imagestyle1" /></a></td>
 
                         }
 
@@ -99,7 +61,7 @@
 
                         {
 
-                            <td style="padding:6px;"><a target="_blank" href="@(item.ChatUrl)"><img src="~/Resources/chat.PNG" class="imgstyle1" /></a></td>
+                            <td style="padding:6px;"><a target="_blank" href="@(item.ChatUrl)"><img src="~/Resources/chat.PNG" class="imagestyle1" /></a></td>
 
                         }
 
@@ -110,7 +72,7 @@
                             <td width="30%">
 
                                 <a target="_blank" href="@(item.DeepLinkUrl)">
-                                    <button class="rect" style="width: 130px;">
+                                    <button class="rectpage" style="width: 130px;">
                                         View Conversation
 
                                     </button>

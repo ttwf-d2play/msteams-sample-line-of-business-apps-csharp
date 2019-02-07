@@ -22,49 +22,7 @@
 
     <title>TabListView</title>
 
-    <style>
-        .tab {
-            overflow: hidden;
-            border: 1px solid white;
-        }
-
-            .tab button {
-                background-color: inherit;
-                float: left;
-                border: none;
-                outline: none;
-                cursor: pointer;
-                margin-left: 2px;
-                transition: 0.3s;
-                font-size: 14px;
-                font-family: 'Segoe UI';
-            }
-
-
-
-
-
-                .tab button:hover {
-                    border-bottom: 2px solid #6264A7;
-                }
-
-
-
-
-
-                .tab button.active {
-                    border-bottom: 3px solid #6264A7;
-                }
-
-
-
-
-
-        .tabcontent {
-            display: none;
-            border-top: none;
-        }
-    </style>
+    <link rel="stylesheet" href="~/Content/styles.css" />
 </head>
 <body onload="@(Model.FirstTab.Items.Count!=0? (Model.FirstTab.Type)+ "ReadAllPhotos(this);" : "")@(Model.SecondTab.Items.Count!=0? (Model.SecondTab.Type)+ "ReadAllPhotos(this)" : "")" style="padding:0 1.0rem;">
     <br />
