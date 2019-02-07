@@ -53,7 +53,7 @@
           "commands": [
             {
               "title": "help",
-              "description": "Disaplys options available with Company Communicator Bot"
+              "description": "Displays options available with Company Communicator Bot"
             }
           ]
         }

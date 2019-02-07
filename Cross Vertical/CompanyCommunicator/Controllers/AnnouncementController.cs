@@ -56,7 +56,7 @@ namespace CrossVertical.Announcement.Controllers
                 return HttpNotFound();
             }
             emailId = emailId.ToLower();
-            var tenatInfo = await Cache.Tenants.GetItemAsync(tid);
+            var tenatInfo = await Common.CheckAndAddTenantDetails(tid);
             Role role = Common.GetUserRole(emailId, tenatInfo);
             var myTenantAnnouncements = await Common.GetMyAnnouncements(emailId, tenatInfo.Id);
 

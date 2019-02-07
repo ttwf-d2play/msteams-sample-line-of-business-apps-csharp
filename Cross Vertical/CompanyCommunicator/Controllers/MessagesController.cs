@@ -192,7 +192,7 @@ namespace CrossVertical.Announcement.Controllers
             var channelData = message.GetChannelData<TeamsChannelData>();
 
             // Ensure that we have an entry for this tenant in the database
-            var tenant = await RootDialog.CheckAndAddTenantDetails(channelData.Tenant.Id);
+            var tenant = await Common.CheckAndAddTenantDetails(channelData.Tenant.Id);
             await RootDialog.CheckAndAddUserDetails(message, channelData);
 
             // Treat 1:1 add/remove events as if they were add/remove of a team member
