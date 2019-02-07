@@ -31,6 +31,9 @@ The Notification Bot will let the admin notify specific members on Teams across 
 **Employee Survey / Polling bot**<br>
 The bot lets the admin create and publish a survey to specific members within an organization. It also enables sending out reminders to select users who have not completed the survey. The survey results will be available for download in the form of a .csv file that can be used for reporting purposes. 
 
+**Company Communicator**<br>
+Reach your employees where they collaborate! The app arms your Microsoft Teams environment with corporate communication and group broadcast capabilities. Get messages out to an employee or a set of employees in one or more team channels or individually. The creators can define user groups, compose a rich message, send or schedule messages, deliver to one or more employees, track read acknowledgement and view engagement analytics for each message sent seamlessly in a single app.
+
 ## Manufacturing
 
 **Inventory Bot**<br>
