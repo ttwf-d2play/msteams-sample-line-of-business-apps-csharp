@@ -25,24 +25,24 @@ For the Airline industry, here are a collection of five bots that are crucial fo
 
 These are applications that can be used by employees, regardless of industry:
 
-**Notification Bot**<br>
-The Notification Bot will let the admin notify specific members on Teams across several functions. Examples include sending out notifications about weather changes (i.e Airline operations), operational delays in a manufacturing set up, and notifications for company events. 
+1. **Notification Bot**<br>
+    The Notification Bot will let the admin notify specific members on Teams across several functions. Examples include sending out notifications about weather changes (i.e Airline operations), operational delays in a manufacturing set up, and notifications for company events. 
 
-**Employee Survey / Polling bot**<br>
-The bot lets the admin create and publish a survey to specific members within an organization. It also enables sending out reminders to select users who have not completed the survey. The survey results will be available for download in the form of a .csv file that can be used for reporting purposes. 
+2. **Employee Survey / Polling bot**<br>
+    The bot lets the admin create and publish a survey to specific members within an organization. It also enables sending out reminders to select users who have not completed the survey. The survey results will be available for download in the form of a .csv file that can be used for reporting purposes. 
 
-**Company Communicator**<br>
-Reach your employees where they collaborate! The app arms your Microsoft Teams environment with corporate communication and group broadcast capabilities. Get messages out to an employee or a set of employees in one or more team channels or individually. The creators can define user groups, compose a rich message, send or schedule messages, deliver to one or more employees, track read acknowledgement and view engagement analytics for each message sent seamlessly in a single app.
+3. **Company Communicator**<br>
+    Reach your employees where they collaborate! The app arms your Microsoft Teams environment with corporate communication and group broadcast capabilities. Get messages out to an employee or a set of employees in one or more team channels or individually. The creators can define user groups, compose a rich message, send or schedule messages, deliver to one or more employees, track read acknowledgement and view engagement analytics for each message sent seamlessly in a single app.
 
 ## Manufacturing
 
-**Inventory Bot**<br>
-The inventory bot provides a view into available inventory across multiple products and locations. Additionally, it lets users view, block, and request for new inventory as needed.
+1. **Inventory Bot**<br>
+    The inventory bot provides a view into available inventory across multiple products and locations. Additionally, it lets users view, block, and request for new inventory as needed.
 
 ## Professional Services 
 
-**Employee Leave App**<br>
-The app has an employee and manager workflow with bot and tab capabilities. It enables an employee to raise a new vacation request, check leave balance status and public holidays. In addition, when an employee raises a new vacation request, the manager gets a notification and the approval / reject workflow can be completed from within the app on Teams.  
+1. **Employee Leave App**<br>
+    The app has an employee and manager workflow with bot and tab capabilities. It enables an employee to raise a new vacation request, check leave balance status and public holidays. In addition, when an employee raises a new vacation request, the manager gets a notification and the approval / reject workflow can be completed from within the app on Teams.  
 
 ## Experience the Apps in your Microsoft Teams client
 
