@@ -70,8 +70,9 @@ namespace CrossVertical.Announcement.Dialogs
             User userDetails = null;
             var channelData = context.Activity.GetChannelData<TeamsChannelData>();
             var emailId = await GetUserEmailId(activity);
-            var tenatInfo = await Cache.Tenants.GetItemAsync(channelData.Tenant.Id);
-            Role role = Common.GetUserRole(emailId, tenatInfo);
+
+            Tenant tenantData = await Common.CheckAndAddTenantDetails(channelData.Tenant.Id);
+            Role role = Common.GetUserRole(emailId, tenantData);
 
             if (context.ConversationData.ContainsKey(profileKey))
             {
@@ -83,7 +84,6 @@ namespace CrossVertical.Announcement.Dialogs
                 context.ConversationData.SetValue(profileKey, userDetails);
             }
 
-            Tenant tenantData = await CheckAndAddTenantDetails(channelData.Tenant.Id);
             if (!tenantData.IsAdminConsented)
             {
                 if (channelData.Team == null)
@@ -329,7 +329,7 @@ namespace CrossVertical.Announcement.Dialogs
         private static async Task SendAdminPanelCard(IDialogContext context, Activity activity, TeamsChannelData channelData)
         {
             var reply = activity.CreateReply();
-            Tenant tenantData = await CheckAndAddTenantDetails(channelData.Tenant.Id);
+            Tenant tenantData = await Common.CheckAndAddTenantDetails(channelData.Tenant.Id);
             reply.Attachments.Add(CardHelper.GetAdminPanelCard(string.Join(",", tenantData.Moderators)));
             await context.PostAsync(reply);
         }
@@ -661,7 +661,7 @@ namespace CrossVertical.Announcement.Dialogs
                 await context.PostAsync("Please set at least one moderator.");
                 return;
             }
-            Tenant tenantData = await CheckAndAddTenantDetails(channelData.Tenant.Id);
+            Tenant tenantData = await Common.CheckAndAddTenantDetails(channelData.Tenant.Id);
             tenantData.Moderators = moderatorList;
 
             await Cache.Tenants.AddOrUpdateItemAsync(tenantData.Id, tenantData);
@@ -872,7 +872,7 @@ namespace CrossVertical.Announcement.Dialogs
                 };
                 await Cache.Users.AddOrUpdateItemAsync(userDetails.Id, userDetails);
 
-                Tenant tenantData = await CheckAndAddTenantDetails(channelData.Tenant.Id);
+                Tenant tenantData = await Common.CheckAndAddTenantDetails(channelData.Tenant.Id);
                 if (!tenantData.Users.Contains(userDetails.Id))
                 {
                     tenantData.Users.Add(userDetails.Id);
@@ -909,7 +909,7 @@ namespace CrossVertical.Announcement.Dialogs
                         var groupDetails = ExcelHelper.GetAddTeamDetails(filePath);
                         if (groupDetails != null)
                         {
-                            var tenantData = await CheckAndAddTenantDetails(channelData.Tenant.Id);
+                            var tenantData = await Common.CheckAndAddTenantDetails(channelData.Tenant.Id);
 
                             List<Group> oldGroups = new List<Group>();
                             foreach (var groupId in tenantData.Groups)
@@ -960,22 +960,6 @@ namespace CrossVertical.Announcement.Dialogs
                     }
                 }
             }
-        }
-
-        internal static async Task<Tenant> CheckAndAddTenantDetails(string tenantId)
-        {
-            // Tenant not present in cached check DB
-            var tenantData = await Cache.Tenants.GetItemAsync(tenantId);
-            if (tenantData == null)
-            {
-                tenantData = new Tenant()
-                {
-                    Id = tenantId,
-                };
-                await Cache.Tenants.AddOrUpdateItemAsync(tenantData.Id, tenantData);
-            }
-
-            return tenantData;
         }
 
         private static string GetKey(IActivity activity, string key)

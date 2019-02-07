@@ -69,5 +69,20 @@ namespace CrossVertical.Announcement.Helpers
             return myTenantAnnouncements;
         }
 
+        internal static async Task<Tenant> CheckAndAddTenantDetails(string tenantId)
+        {
+            // Tenant not present in cached check DB
+            var tenantData = await Cache.Tenants.GetItemAsync(tenantId);
+            if (tenantData == null)
+            {
+                tenantData = new Tenant()
+                {
+                    Id = tenantId,
+                };
+                await Cache.Tenants.AddOrUpdateItemAsync(tenantData.Id, tenantData);
+            }
+
+            return tenantData;
+        }
     }
 }
