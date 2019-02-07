@@ -55,8 +55,7 @@ All these samples are deployed on Microsoft Azure and you can try it yourself by
 [Inventory Bot](Manufacturing/InventoryBot/Manifest/Inventory%20App%20Manifest.zip)<br>
 [Employee Leave](Professional%20Services/LeaveBot/Manifest/Leave%20App%20Manifest.zip)<br>
 [Company Communicator](Cross%20Vertical/CompanyCommunicatorApp/Manifest/CompanyCommunicator.zip)
-
-<br><br>
+<br>
 # Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a
