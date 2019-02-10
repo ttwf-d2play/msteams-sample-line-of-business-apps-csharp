@@ -1,8 +1,8 @@
-/* .html {
+﻿ .html {
   height: 732px;
   width: 1135px;
   background-color: #ffffff;
-} */
+} 
 
 img.thumbnail {
     border-radius: 50%;
@@ -19,9 +19,9 @@ img.thumbnail {
 
 .profile_info {
     padding: 37px 0px 10px;
-    width: 64%;
-    float: left;
-    margin-left: 20px;
+    /* width: 64%;
+  float: left;
+  margin-left: 20px; */
 }
 
     .profile_info h2 {
@@ -120,31 +120,39 @@ span.manager {
     position: absolute;
 }
 
-span.manager1 {
+span.bot {
     margin-left: 10px;
-    margin-top: 13px;
+    margin-right: 10px;
     flex-wrap: wrap;
     position: absolute;
+    font-size: small;
+}
+
+span.manager1 {
+    margin-left: 10px;
+    margin-top: 9px;
+    flex-wrap: wrap;
+    position: absolute;
+    font-size: small;
 }
 
 span#msg {
     position: absolute;
-    top: 45px;
+    top: 39px;
     right: 68%;
     color: rgba(37, 36, 36, 0.65);
     font-family: "Segoe UI";
-    left: 80px;
+    left: 71px;
     overflow-wrap: initial;
 }
 
-span#msg1 {
+div#msg1 {
     position: absolute;
-    top: 45px;
-    right: 68%;
+    top: 39px;
     color: rgba(37, 36, 36, 0.65);
     font-family: "Segoe UI";
-    left: 80px;
-    overflow-wrap: initial;
+    left: 71px;
+    font-size: small;
 }
 
 .footer {
@@ -159,9 +167,9 @@ span#msg1 {
     border-bottom: 10px;
 }
 
-i.far.fa-comment-alt {
-    margin-top: 12px;
-    margin-left: 20px;
+.footer_img {
+    margin-top: 7px;
+    margin-left: 16px;
 }
 
 .footer span {
@@ -376,46 +384,68 @@ i.far.fa-trash-alt.icon {
     margin-bottom: -61px;
 }
 
+i.fas.fa-chevron-down.icon {
+    display: none;
+}
+
+.mobile_comments {
+    display: none;
+}
+
+.mobile_view,
+.mobile_view1,
+.mobile_view2,
+.mobile_view3 {
+    display: none;
+}
+
+i.fas.fa-circle.icon1 {
+    display: none;
+}
+
 /* Media start */
 
 @media only screen and (min-width: 320px) {
-    .footer1 {
-        margin-top: -17px;
+    div#msg1 {
+        top: 58px;
+        left: 70px;
     }
 
-    span#msg1 {
-        top: 22px;
+    .content,
+    .content1 {
+        font-size: small;
+        padding: 10px;
+        margin-top: 6px;
+    }
+
+    .approved_by {
+        width: 40px;
+        height: 40px;
+    }
+
+    span.manager {
+        font-size: 12px;
     }
 }
 
 @media only screen and (max-width: 425px) {
-    span#msg1 {
-        position: relative;
-        font-size: small;
-        top: 10px;
-        left: 10px;
-    }
-
     .profile_info span {
         font-size: 12px;
         margin-left: 1px;
         position: relative;
-        top: 10px;
+        top: 13px;
     }
 
     span#msg {
         font-size: small;
     }
 
-    span.manager {
-        font-size: small;
+    div#msg1 {
+        top: 39px;
     }
 
-    .content,
-    .content1 {
+    span.manager {
         font-size: small;
-        padding: 2px;
-        margin-top: 13px;
     }
 
     .footer1 span,
@@ -424,35 +454,30 @@ i.far.fa-trash-alt.icon {
     }
 
     .card.card-accent.mb-3.card1 {
-        height: 197px;
-    }
-
-    .card.card-accent.mb-3.card2 {
-        width: 100vw;
+        height: 163px;
     }
 
     div#heading {
-        /* margin-top: 50px; */
-        /* margin-left: 16px; */
-        /* margin-bottom: -59px; */
         position: relative;
         top: -34px;
         float: left;
     }
 
     img.thumbnail {
-        height: 50%;
-        width: 33%;
+        height: 112px;
+        width: 116px;
     }
 
     input.favorite.styled {
         margin-top: 102px;
         margin-left: 16px;
+        padding-right: 15px;
+        padding-left: 15px;
     }
 
     .profile_info {
         position: absolute;
-        margin-left: 37%;
+        margin-left: 4%;
     }
 
     .left {
@@ -465,7 +490,6 @@ i.far.fa-trash-alt.icon {
 
     .card.card-accent-success.mb-3 {
         margin-top: 43px;
-        width: 100vw;
     }
 
     .table-responsive.top {
@@ -509,6 +533,7 @@ i.far.fa-trash-alt.icon {
 
     .heading {
         font-size: 16px;
+        margin-left: 0;
     }
 
     .table-responsive.top {
@@ -518,6 +543,96 @@ i.far.fa-trash-alt.icon {
     .col-sm-5.col-md-5.col-lg-3.gap {
         /* margin-bottom: -61px; */
         border-right: none;
+    }
+
+    .head-tab {
+        border-top: 2px solid #fff;
+    }
+
+    th {
+        font-weight: normal;
+    }
+
+    /* Hide */
+    td.used-leave.cent,
+    #hide,
+    td.count1.cent.hide,
+    td.allow.cent,
+    td.count1.cent.hide1,
+    #hide1,
+    td.msg,
+    td.count1.cent.hide3,
+    td.leave_report_col2,
+    i.fas.fa-pencil-alt.icon,
+    i.far.fa-trash-alt.icon,
+    td#approval,
+    td.approval1,
+    td#approval2,
+    span.reason-type {
+        display: none;
+    }
+
+    i.fas.fa-chevron-down.icon {
+        font-size: 10px;
+        position: relative;
+        top: 1px;
+        display: contents;
+        cursor: pointer;
+    }
+
+    .mobile_comments {
+        display: contents;
+        color: rgba(37, 36, 36, 0.75);
+        font-family: "Segoe UI";
+        font-size: smaller;
+        font-style: italic;
+    }
+
+    td.count.cent,
+    td.count1.cent {
+        text-align: left;
+    }
+
+    .mobile_view,
+    .mobile_view1,
+    .mobile_view2,
+    .mobile_view3 {
+        display: contents;
+    }
+
+    i.fas.fa-chevron-right.icon {
+        vertical-align: top;
+        float: right;
+        padding-left: 38%;
+        color: rgba(37, 36, 36, 0.65);
+    }
+
+    .mobile_view {
+        color: rgba(37, 36, 36, 0.75);
+        font-family: "Segoe UI";
+        font-size: 12px;
+    }
+
+    .mobile_view1 {
+        color: #ffc312;
+        font-family: "Segoe UI";
+        font-size: 12px;
+    }
+
+    .mobile_view2 {
+        color: #92c353;
+        font-family: "Segoe UI";
+        font-size: 12px;
+    }
+
+    .mobile_view3 {
+        color: #c4314b;
+        font-family: "Segoe UI";
+        font-size: 12px;
+    }
+
+    td#load-more {
+        height: 60px;
     }
 }
 
@@ -554,7 +669,7 @@ i.far.fa-trash-alt.icon {
 
     img.thumbnail {
         height: 100px;
-        width: 35%;
+        width: 105px;
     }
 
     span.manager {
@@ -565,7 +680,7 @@ i.far.fa-trash-alt.icon {
     span#msg1 {
         top: 42%;
         font-size: small;
-        left: 80px;
+        left: 70px;
     }
 
     .footer span,
@@ -573,7 +688,7 @@ i.far.fa-trash-alt.icon {
         font-size: 12px;
     }
 
-    i.far.fa-comment-alt {
+    .footer_img {
         margin-top: 10px;
     }
 
@@ -584,13 +699,13 @@ i.far.fa-trash-alt.icon {
     }
 
     .card.card-accent.mb-3.card1 {
-        height: 235px;
+        height: 186px;
     }
 
     span#msg {
         font-size: small;
         top: 39px;
-        left: 80px;
+        left: 71px;
     }
 
     .content {
@@ -645,9 +760,10 @@ i.far.fa-trash-alt.icon {
     }
 
     img.thumbnail {
-        height: 80px;
+        height: 86px;
         border: 6px solid rgba(230, 230, 232, 0.8);
-        width: 36%;
+        width: 40%;
+        margin-top: 27px;
     }
 
     .profile_info {
@@ -657,8 +773,8 @@ i.far.fa-trash-alt.icon {
     }
 
     .left {
-        margin-left: 100px;
-        margin-top: -20px;
+        margin-left: 109px;
+        margin-top: -26px;
         font-size: 11px;
     }
 
@@ -699,13 +815,20 @@ i.far.fa-trash-alt.icon {
         left: 71px;
     }
 
-    td.count.cent, td.allow.cent, td.used-leave.cent, td.count1.cent {
+    td.count.cent,
+    td.allow.cent,
+    td.used-leave.cent,
+    td.count1.cent {
         text-align: justify;
     }
 }
 
 @media only screen and (min-width : 1440px) {
-    td.count.cent, td.allow.cent, td.used-leave.cent, td.count1.cent {
+
+    td.count.cent,
+    td.allow.cent,
+    td.used-leave.cent,
+    td.count1.cent {
         text-align: left;
     }
 
@@ -713,8 +836,22 @@ i.far.fa-trash-alt.icon {
         margin-top: 50px;
     }
 
-    .header, .header1, .count, .count1, .used-leave, .allow, .msg, .leave_report_col1, .reason-type {
+    .header,
+    .header1,
+    .count,
+    .count1,
+    .used-leave,
+    .allow,
+    .msg,
+    .leave_report_col1,
+    .reason-type {
         font-size: 14px;
+    }
+
+    span#msg1 {
+        top: 29%;
+        font-size: small;
+        left: 70px;
     }
 }
 

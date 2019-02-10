@@ -99,10 +99,10 @@
                         <div class="profile_pic">
                             <img src="~/Resources/leaveicon.png" alt="..." class="thumbnail" />
                             @*<img src=@Model.Item1.PhotoPath  alt="..." class="thumbnail" >*@
-                            <div class="profile_info">
+                            <span class="profile_info">
                                 <h2>@Model.Item1.DisplayName</h2>
                                 <span id="ux">@(@Model.Item1.JobTitle ?? @Model.Item1.EmailId)</span>
-                            </div>
+                            </span>
                             <div class="left">
                                 <span id="days">@Model.Item1.Totalleaves</span> days OFF in
                                 <span id="month">@DateTime.Now.ToString("MM")</span> months
@@ -112,6 +112,8 @@
                             <input class="favorite styled" type="button" value="Apply Leave" onclick="submit('adaptivecard')" />
                         </div>
                     </div>
+                    <br />
+                    <br />
                     <div id="heading">
                         <h5>Notifications</h5>
                     </div>
@@ -137,8 +139,8 @@
                                 You can utilise the carried over leaves from last year for your recently applied leave....
                             </div>
                             @*<div class="footer1">
-                                    <span>Change leave type</span>
-                                </div>*@
+                    <span>Change leave type</span>
+                </div>*@
                         </div>
                     </div>
                     <div class="card card-accent mb-3 card2" style="max-width: 18rem;">
@@ -314,83 +316,83 @@
                             {
                                 for (int index = 0; index < ((showlength > Model.Item2.Count) ? Model.Item2.Count : showlength); index++, myId++)
                                 {
-                                <tr class="head-tab" id="@myId">
-                                <td class='leave_report_col1'>
-                                    @Model.Item2[index].startDay, @Model.Item2[index].StartDateval-@Model.Item2[index].EndDay, @Model.Item2[index].EndDateVal, @Model.Item2[index].EndDate.Date.Year<br>
-                                    <span class='leave-type'> @Model.Item2[index].LeaveType </span><i class="fas fa-circle icon"></i> <span class='reason-type'>
-                                        @Model.Item2[index].EmployeeComment
-                                    </span><i class="fas fa-chevron-right icon"></i>
-                                </td>
-                                <td class='leave_report_col2'>@Model.Item2[index].DaysDiff days OFF</td>
-                                @if (Model.Item2[index].Status == ProfessionalServices.LeaveBot.Models.LeaveStatus.Approved)
-                                {
-                                    <td class='approval1'>Approved</td>
-                                    <td></td>
-                                    <td></td>
-                                }
-                                else if (Model.Item2[index].Status == ProfessionalServices.LeaveBot.Models.LeaveStatus.Pending)
-                                {
-                                    <td id='approval'>@Model.Item2[index].Status</td>
-                                    <td> <a href="https://teams.microsoft.com/l/chat/0/0?users=28:@System.Web.Configuration.WebConfigurationManager.AppSettings["MicrosoftAppId"]" target="_blank"><img src="~/Resources/pencil.PNG" /></a></td>
-                                    <td> <a href="https://teams.microsoft.com/l/chat/0/0?users=28:@System.Web.Configuration.WebConfigurationManager.AppSettings["MicrosoftAppId"]" target="_blank"><img src="~/Resources/delete.PNG" /></a></td>
-                                }
-                                else if (Model.Item2[index].Status == ProfessionalServices.LeaveBot.Models.LeaveStatus.Rejected)
-                                {
-                                    <td id='approval2'>Declined</td>
-                                    <td></td>
-                                    <td></td>
-                                }
-                                 </tr>
+                                    <tr class="head-tab" id="@myId">
+                                        <td class='leave_report_col1'>
+                                            @Model.Item2[index].startDay, @Model.Item2[index].StartDateval-@Model.Item2[index].EndDay, @Model.Item2[index].EndDateVal, @Model.Item2[index].EndDate.Date.Year<br>
+                                            <span class='leave-type'> @Model.Item2[index].LeaveType </span><i class="fas fa-circle icon"></i> <span class='reason-type'>
+                                                @Model.Item2[index].EmployeeComment
+                                            </span><i class="fas fa-chevron-right icon"></i>
+                                        </td>
+                                        <td class='leave_report_col2'>@Model.Item2[index].DaysDiff days OFF</td>
+                                        @if (Model.Item2[index].Status == ProfessionalServices.LeaveBot.Models.LeaveStatus.Approved)
+                                        {
+                                            <td class='approval1'>Approved</td>
+                                            <td></td>
+                                            <td></td>
+                                        }
+                                        else if (Model.Item2[index].Status == ProfessionalServices.LeaveBot.Models.LeaveStatus.Pending)
+                                        {
+                                            <td id='approval'>@Model.Item2[index].Status</td>
+                                            <td> <a href="https://teams.microsoft.com/l/chat/0/0?users=28:@System.Web.Configuration.WebConfigurationManager.AppSettings["MicrosoftAppId"]" target="_blank"><img src="~/Resources/pencil.PNG" /></a></td>
+                                            <td> <a href="https://teams.microsoft.com/l/chat/0/0?users=28:@System.Web.Configuration.WebConfigurationManager.AppSettings["MicrosoftAppId"]" target="_blank"><img src="~/Resources/delete.PNG" /></a></td>
+                                        }
+                                        else if (Model.Item2[index].Status == ProfessionalServices.LeaveBot.Models.LeaveStatus.Rejected)
+                                        {
+                                            <td id='approval2'>Declined</td>
+                                            <td></td>
+                                            <td></td>
+                                        }
+                                    </tr>
                                 }
                                 for (int index = showlength; index < Model.Item2.Count; index++, myId++)
                                 {
-                                <tr id="@myId">
-                                    <td class='leave_report_col1'>
-                                        @Model.Item2[index].startDay, @Model.Item2[index].StartDateval-@Model.Item2[index].EndDay, @Model.Item2[index].EndDateVal, @Model.Item2[index].EndDate.Date.Year<br>
-                                        <span class='leave-type'>@Model.Item2[index].LeaveType</span><i class="fas fa-circle icon"></i> <span class='reason-type'>@Model.Item2[index].EmployeeComment</span>
-                                    </td>
-                                    <td class='leave_report_col2'> @Model.Item2[index].DaysDiff day OFF</td>
-                                    @if (Model.Item2[index].Status == ProfessionalServices.LeaveBot.Models.LeaveStatus.Approved)
-                                    {
-                                        <td class='approval1'>Approved</td>
-                                        <td></td>
-                                        <td></td>
-                                    }
-                                    else if (Model.Item2[index].Status == ProfessionalServices.LeaveBot.Models.LeaveStatus.Pending)
-                                    {
-                                        <td id='approval'>@Model.Item2[index].Status</td>
-                                        <td> <a href="https://teams.microsoft.com/l/chat/0/0?users=28:@System.Web.Configuration.WebConfigurationManager.AppSettings["MicrosoftAppId"]" target="_blank"><img src="~/Resources/pencil.PNG" /></a></td>
-                                        <td> <a href="https://teams.microsoft.com/l/chat/0/0?users=28:@System.Web.Configuration.WebConfigurationManager.AppSettings["MicrosoftAppId"]" target="_blank"><img src="~/Resources/delete.PNG" /></a></td>
-                                    }
-                                    else if (Model.Item2[index].Status == ProfessionalServices.LeaveBot.Models.LeaveStatus.Rejected)
-                                    {
-                                        <td id='approval2'>Declined</td>
-                                        <td></td>
-                                        <td></td>
-                                    }
+                                    <tr id="@myId">
+                                        <td class='leave_report_col1'>
+                                            @Model.Item2[index].startDay, @Model.Item2[index].StartDateval-@Model.Item2[index].EndDay, @Model.Item2[index].EndDateVal, @Model.Item2[index].EndDate.Date.Year<br>
+                                            <span class='leave-type'>@Model.Item2[index].LeaveType</span><i class="fas fa-circle icon"></i> <span class='reason-type'>@Model.Item2[index].EmployeeComment</span>
+                                        </td>
+                                        <td class='leave_report_col2'> @Model.Item2[index].DaysDiff day OFF</td>
+                                        @if (Model.Item2[index].Status == ProfessionalServices.LeaveBot.Models.LeaveStatus.Approved)
+                                        {
+                                            <td class='approval1'>Approved</td>
+                                            <td></td>
+                                            <td></td>
+                                        }
+                                        else if (Model.Item2[index].Status == ProfessionalServices.LeaveBot.Models.LeaveStatus.Pending)
+                                        {
+                                            <td id='approval'>@Model.Item2[index].Status</td>
+                                            <td> <a href="https://teams.microsoft.com/l/chat/0/0?users=28:@System.Web.Configuration.WebConfigurationManager.AppSettings["MicrosoftAppId"]" target="_blank"><img src="~/Resources/pencil.PNG" /></a></td>
+                                            <td> <a href="https://teams.microsoft.com/l/chat/0/0?users=28:@System.Web.Configuration.WebConfigurationManager.AppSettings["MicrosoftAppId"]" target="_blank"><img src="~/Resources/delete.PNG" /></a></td>
+                                        }
+                                        else if (Model.Item2[index].Status == ProfessionalServices.LeaveBot.Models.LeaveStatus.Rejected)
+                                        {
+                                            <td id='approval2'>Declined</td>
+                                            <td></td>
+                                            <td></td>
+                                        }
 
-                                </tr>
+                                    </tr>
                                 }
                             }
-                               
-                            </table>
-                        @if(showlength<Model.Item2.Count)
+
+                        </table>
+                        @if (showlength < Model.Item2.Count)
                         {
                             <a href="#" id="load-more" onclick="myFunction(@Model.Item2.Count)">Load More</a>
                         }
-                        </div>
                     </div>
-
                 </div>
+
             </div>
-                                    }
-                                    else
-                                    {
-                            <p style="font-weight:700;font-size:14px;">User details not found. Please go to bot</p>
-                            }
+        </div>
+    }
+    else
+    {
+        <p style="font-weight:700;font-size:14px;">User details not found. Please go to bot</p>
+    }
 
 
 
-                        </body>
+</body>
 
-                    </html>
+</html>
