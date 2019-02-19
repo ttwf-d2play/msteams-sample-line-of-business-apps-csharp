@@ -36,14 +36,14 @@ namespace CrossVertical.PollingBot
         {
             var activity = await argument as Activity;
             bool IsAdmin = false;
-            var message = string.Empty; ;
+            var message = string.Empty;
             var userAdmin = await DocumentDBRepository.GetItemsAsync<Admin>(a => a.Type == "Admin");
             var userAdminData = new Admin();
             var useremailId = await GetUserEmailId(activity);
             if (userAdmin != null && userAdmin.Count() > 0)
             {
                 userAdminData = userAdmin.FirstOrDefault();
-                if (userAdminData.EmailId == useremailId)
+                if (userAdminData.EmailId.ToLower() == useremailId.ToLower())
                     IsAdmin = true;
             }
             else
@@ -336,7 +336,7 @@ namespace CrossVertical.PollingBot
 
                     foreach (var emailid in questionbank.EmailIds)
                     {
-                        var userData = await DocumentDBRepository.GetItemsAsync<UserDetails>(u => u.EmaildId == emailid);
+                        var userData = await DocumentDBRepository.GetItemsAsync<UserDetails>(u => u.EmaildId.ToLower() == emailid.ToLower());
                         var usersData = userData.FirstOrDefault();
                         if (userData.Count()>0)
                         {
@@ -390,7 +390,7 @@ namespace CrossVertical.PollingBot
             // Fetch the members in the current conversation
             ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
             var members = await connector.Conversations.GetConversationMembersAsync(activity.Conversation.Id);
-            return members.Where(m => m.Id == activity.From.Id).First().AsTeamsChannelAccount().Email;
+            return members.Where(m => m.Id == activity.From.Id).First().AsTeamsChannelAccount().UserPrincipalName;
         }
 
         private static async Task<string> GetUserName(Activity activity)

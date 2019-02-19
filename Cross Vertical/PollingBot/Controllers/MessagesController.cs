@@ -34,7 +34,7 @@ namespace CrossVertical.PollingBot.Controllers
             // Fetch the members in the current conversation
             ConnectorClient connector = new ConnectorClient(new Uri(serviceUrl));
             var members = await connector.Conversations.GetConversationMembersAsync(TeamorConversationId);
-            return members.Where(m => m.Id == userId).First().AsTeamsChannelAccount().Email;
+            return members.Where(m => m.Id == userId).First().AsTeamsChannelAccount().UserPrincipalName;
 
         }
         private async Task<string> GetUserName(string userId, string serviceUrl, string TeamorConversationId)
