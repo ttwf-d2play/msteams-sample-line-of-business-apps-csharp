@@ -148,9 +148,9 @@ namespace ProfessionalServices.LeaveBot.Controllers
 
                         item.mgrDaysdiff = Convert.ToInt32(diff1.TotalDays);
 
-                        item.mgrstartDay = item.StartDate.Date.ToString("dddd");
+                        item.mgrstartDay = item.StartDate.Date.ToString("ddd");
 
-                        item.mgrEndDay = item.EndDate.Date.ToString("dddd");
+                        item.mgrEndDay = item.EndDate.Date.ToString("ddd");
 
                         item.mgrStartDateval = item.StartDate.Date.ToString("MMM d");
 
@@ -235,7 +235,15 @@ namespace ProfessionalServices.LeaveBot.Controllers
             return View();
 
         }
+        [Route("simpleend")]
 
+        public ActionResult SimpleEnd()
+
+        {
+
+            return View();
+
+        }
 
 
         [Route("GetEditCard")]
