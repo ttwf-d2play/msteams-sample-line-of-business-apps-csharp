@@ -13,15 +13,17 @@
     <script type="text/javascript">
        
         microsoftTeams.initialize();
+        
         microsoftTeams.settings.registerOnSaveHandler(function (saveEvent) {
-            
             var radios = document.getElementsByName("leavebot");
             if (radios[0].checked) {
                 microsoftTeams.settings.setSettings({
                     entityId: "com.contoso.LeaveBot.leaveboard",
-                    contentUrl: "https://leavebotdemo.azurewebsites.net/?Emailid={loginHint}",
+                    contentUrl:"https://d6ee32b5.ngrok.io/?EmailId={upn}",
                     suggestedDisplayName: "Leave Board",
-                    websiteUrl: "https://leavebotdemo.azurewebsites.net/?Emailid={loginHint}"
+                    websiteUrl: "https://d6ee32b5.ngrok.io",
+                    removeUrl: "https://d6ee32b5.ngrok.io/remove.html",
+                   
 
                 });
             } else if (radios[1].checked) {
@@ -29,7 +31,8 @@
                     entityId: "com.contoso.LeaveBot.holidays",
                     contentUrl: "https://leavebotdemo.azurewebsites.net/First",
                     suggestedDisplayName: "Public Holidays",
-                    websiteUrl: "https://leavebotdemo.azurewebsites.net/First"
+                    websiteUrl: "https://leavebotdemo.azurewebsites.net/First",
+                    removeUrl:"https://d6ee32b5.ngrok.io/remove.html",
 
                 });
 
@@ -39,13 +42,14 @@
                     entityId: "com.contoso.LeaveBot.help",
                     contentUrl: "https://leavebotdemo.azurewebsites.net/Second",
                     suggestedDisplayName: "Help",
-                    websiteUrl: "https://leavebotdemo.azurewebsites.net/Second"
+                    websiteUrl: "https://leavebotdemo.azurewebsites.net/Second",
+                    removeUrl:"https://d6ee32b5.ngrok.io/remove.html",
 
                 });
 
             }
 
-
+           
             saveEvent.notifySuccess();
         });
 

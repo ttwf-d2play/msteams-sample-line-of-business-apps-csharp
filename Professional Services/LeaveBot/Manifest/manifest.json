@@ -11,7 +11,7 @@
     "termsOfUseUrl": "https://www.microsoft.com/termsofuse"
   },
   "name": {
-    "short": "Leave",
+    "short": " Debug Leave",
     "full": "Leave App for Microsoft Teams"
   },
   "description": {
@@ -25,7 +25,7 @@
   "accentColor": "#60A18E",
   "configurableTabs": [
     {
-      "configurationUrl": "https://leavebotdemo.azurewebsites.net/configure",
+      "configurationUrl": "https://d6ee32b5.ngrok.io/configure",
       "canUpdateConfiguration": true,
       "scopes": [ "team", "groupchat" ]
     }
@@ -34,8 +34,8 @@
     {
       "entityId": "com.contoso.LeaveBot.leaveboard",
       "name": "Leave Board",
-      "contentUrl": "https://leavebotdemo.azurewebsites.net?EmailId={loginHint}",
-      "websiteUrl": "https://leavebotdemo.azurewebsites.net?EmailId={loginHint}",
+      "contentUrl": "https://d6ee32b5.ngrok.io/?EmailId={loginHint}",
+      "websiteUrl": "https://d6ee32b5.ngrok.io",
       "scopes": [
         "personal"
       ]
