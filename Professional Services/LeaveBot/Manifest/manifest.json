@@ -25,7 +25,7 @@
   "accentColor": "#60A18E",
   "configurableTabs": [
     {
-      "configurationUrl": "https://d6ee32b5.ngrok.io/configure",
+      "configurationUrl": "https://leavebotdemo.azurewebsites.net/configure",
       "canUpdateConfiguration": true,
       "scopes": [ "team", "groupchat" ]
     }
@@ -34,8 +34,8 @@
     {
       "entityId": "com.contoso.LeaveBot.leaveboard",
       "name": "Leave Board",
-      "contentUrl": "https://d6ee32b5.ngrok.io/?EmailId={loginHint}",
-      "websiteUrl": "https://d6ee32b5.ngrok.io",
+      "contentUrl": "https://leavebotdemo.azurewebsites.net/?EmailId={loginHint}",
+      "websiteUrl": "https://leavebotdemo.azurewebsites.net",
       "scopes": [
         "personal"
       ]
