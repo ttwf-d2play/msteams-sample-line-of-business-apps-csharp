@@ -11,7 +11,7 @@
     "termsOfUseUrl": "https://www.microsoft.com/termsofuse"
   },
   "name": {
-    "short": " Debug Leave",
+    "short": "Leave",
     "full": "Leave App for Microsoft Teams"
   },
   "description": {
@@ -76,7 +76,7 @@
           "commands": [
             {
               "title": "help",
-              "description": "Disaplys options available with Leave Bot"
+              "description": "Displays options available with Leave Bot"
             },
             {
               "title": "set manager",
