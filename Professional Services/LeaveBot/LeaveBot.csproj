@@ -287,7 +287,6 @@
     <Content Include="Content\Site.css" />
     <Content Include="Manifest\color.png" />
     <Content Include="Manifest\outline.png" />
-    <Content Include="remove.html" />
     <Content Include="Resources\-g-Leave balance-01.png" />
     <Content Include="Resources\-g-Public holidays-01.png" />
     <Content Include="Resources\color.png" />
@@ -338,6 +337,7 @@
     <Content Include="Views\Home\_LeaveRight.cshtml" />
     <Content Include="Views\Home\_LeaveLeft.cshtml" />
     <Content Include="Views\Home\SimpleEnd.cshtml" />
+    <Content Include="Views\Home\Remove.cshtml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

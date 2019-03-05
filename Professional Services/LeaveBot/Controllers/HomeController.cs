@@ -244,7 +244,15 @@ namespace ProfessionalServices.LeaveBot.Controllers
             return View();
 
         }
+        [Route("remove")]
 
+        public ActionResult Remove()
+
+        {
+
+            return View();
+
+        }
 
         [Route("GetEditCard")]
 
