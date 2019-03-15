@@ -18,6 +18,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Airline.FlightInfoBot", "Fl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Airline.FleetInfoBot", "FleetInfoBot\Airline.FleetInfoBot.csproj", "{54D2B6F3-7FB3-400F-BA90-D456DA511AA9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XAirlines", "XAirlines\XAirlines.csproj", "{190E18AB-844D-47AB-8A97-AE47ADCEE0F0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,12 +46,16 @@ Global
 		{54D2B6F3-7FB3-400F-BA90-D456DA511AA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{54D2B6F3-7FB3-400F-BA90-D456DA511AA9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{54D2B6F3-7FB3-400F-BA90-D456DA511AA9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{190E18AB-844D-47AB-8A97-AE47ADCEE0F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{190E18AB-844D-47AB-8A97-AE47ADCEE0F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{190E18AB-844D-47AB-8A97-AE47ADCEE0F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{190E18AB-844D-47AB-8A97-AE47ADCEE0F0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {198B8C49-4263-42CD-857C-04463EE76D69}
 		EnterpriseLibraryConfigurationToolBinariesPathV6 = packages\EnterpriseLibrary.TransientFaultHandling.6.0.1304.0\lib\portable-net45+win+wp8
+		SolutionGuid = {198B8C49-4263-42CD-857C-04463EE76D69}
 	EndGlobalSection
 EndGlobal
