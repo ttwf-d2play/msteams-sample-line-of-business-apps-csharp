@@ -229,10 +229,13 @@
         }
     ],
     "actions": [
-        {
-            "type": "Action.Submit",
-            "title": "Weather Report"
-        },
+      {
+        "type": "Action.Submit",
+        "title": "Weather Report",
+        "DataJson": " \"{\\\"Action\\\" : \\\"ShowWeather\\\" , \\\"City\\\" : \\\"BLR\\\"}\""
+
+
+      },
         {
             "type": "Action.Submit",
             "title": "Currency Details"

@@ -25,10 +25,10 @@
   "accentColor": "#60A18E",
   "staticTabs": [
     {
-      "entityId": "com.contoso.Announcement.history",
-      "name": "My Messages",
-      "contentUrl": "https://announcement.azurewebsites.net/history?tid={tid}&emailId={loginHint}",
-      "websiteUrl": "https://announcement.azurewebsites.net/history",
+      "entityId": "com.contoso.Airlines.portal",
+      "name": "Portal",
+      "contentUrl": "https://26488e2a.ngrok.io/portal",
+      "websiteUrl": "https://26488e2a.ngrok.io/portal",
       "scopes": [
         "personal"
       ]
@@ -39,7 +39,6 @@
       "botId": "9b553938-8f05-4ee6-a5b9-d6eb5010ba14",
       "needsChannelSelector": false,
       "isNotificationOnly": false,
-      "supportsFiles": true,
       "scopes": [
         "personal",
         "team"
@@ -57,11 +56,11 @@
             },
             {
               "title": "my next week roster",
-              "description": "Displays options available with Airlines Bot"
+              "description": "Displays the next week roster"
             },
             {
               "title": "my next month roster",
-              "description": "Displays options available with Airlines Bot"
+              "description": "Displays the next month roster"
             }
           ]
         }

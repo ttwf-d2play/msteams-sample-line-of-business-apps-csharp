@@ -13,5 +13,11 @@ namespace Airlines.XAirlines.Controllers
         {
             return View();
         }
+        [Route("portal")]
+        public ActionResult Portal()
+        {
+            return View();
+        }
+
     }
 }
