@@ -53,7 +53,7 @@ namespace Airlines.XAirlines.Dialogs
                         card = await CardHelper.GetDetailedRoster(activity);
                         break;
                     default:
-                        //card = await CardHelper.GetUpdateScreen();
+                        
                         card = await CardHelper.GetWelcomeScreen(userName);
                         break;
                 }
@@ -90,7 +90,10 @@ namespace Airlines.XAirlines.Dialogs
                 case Constants.WeatherCard:
                     var DesLocation = JsonConvert.DeserializeObject<WeatherActionDetails>(activity.Value.ToString());
                     WeatherInfo weatherinfo = weather.GetWeatherInfo(DesLocation.City);
-                    card = await CardHelper.GetWeatherCard(weatherinfo);
+                    card = await CardHelper.GetWeatherCard(DesLocation.City);
+                    break;
+                case Constants.CurrencyCard:
+                    card = await CardHelper.GetCurrencyCard();
                     break;
 
             }

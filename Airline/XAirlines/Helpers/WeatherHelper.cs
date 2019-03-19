@@ -17,7 +17,10 @@ namespace Airlines.XAirlines.Helpers
 
             using (WebClient client = new WebClient())
             {
-                string json = client.DownloadString(url);
+                
+                
+                    string json = client.DownloadString(url);
+               
                 WeatherInfo weatherinfo = (new JavaScriptSerializer().Deserialize<WeatherInfo>(json));
                 return weatherinfo;
             }

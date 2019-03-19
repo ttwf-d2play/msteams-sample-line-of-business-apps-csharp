@@ -310,6 +310,7 @@
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\msteams-16.css" />
+    <Content Include="Content\responsive-calendar.css" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
@@ -321,18 +322,24 @@
     <Content Include="Manifest\outline.png" />
     <Content Include="Resources\clipboard.PNG" />
     <Content Include="Resources\Flight.png" />
+    <Content Include="Resources\flighticon.png" />
     <Content Include="Resources\Home.png" />
+    <Content Include="Resources\homeicon.png" />
     <Content Include="Resources\Vacation.png" />
+    <Content Include="Resources\vacationicon.png" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
     <None Include="Scripts\jquery.validate-vsdoc.js" />
+    <Content Include="Scripts\jquery.js" />
     <Content Include="Scripts\jquery.validate.js" />
     <Content Include="Scripts\jquery.validate.min.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
     <Content Include="Scripts\modernizr-2.6.2.js" />
+    <Content Include="Scripts\responsive-calendar-min.js" />
+    <Content Include="Scripts\responsive-calendar.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -348,6 +355,7 @@
     <Content Include="Views\Airlines\Portal.cshtml" />
     <Content Include="Views\Web.config" />
     <Content Include="TestData\1.json" />
+    <Content Include="Scripts\responsive-calendar.coffee" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
