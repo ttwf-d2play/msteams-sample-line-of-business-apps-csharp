@@ -34,10 +34,10 @@ namespace Airlines.XAirlines.Helpers
                 var item = new Item();
                 item.id = i.flightDetails.flightStartDate;
                 item.type = "resultItem";
-                item.icon = i.vacationPlan==true?ApplicationSettings.BaseUrl + "/Resources/vacationicon.png": ApplicationSettings.BaseUrl + "/Resources/flighticon.png";
-                item.title = i.flightDetails.flightStartDate + "-" + i.flightDetails.flightEndDate;
-                item.subtitle = i.flightDetails.sourceCode + "-" + i.flightDetails.destinationCode;
-                item.tap = new Tap()
+                item.icon = i.vacationPlan==true?ApplicationSettings.BaseUrl + "/Resources/vacationicon.png": i.isDayOff==true?ApplicationSettings.BaseUrl + "/Resources/homeicon.png": ApplicationSettings.BaseUrl + "/Resources/flighticon.png";
+                item.title = i.vacationPlan==true?i.vacationDate:i.isDayOff==true?i.flightDetails.flightStartDate:i.flightDetails.flightStartDate + "-" + i.flightDetails.flightEndDate;
+                item.subtitle = i.vacationPlan==true?i.vacationReason:i.isDayOff==true?"Day Off":i.flightDetails.sourceCode + "-" + i.flightDetails.destinationCode;
+                item.tap = i.vacationPlan==true?null:i.isDayOff==true?null:new Tap()
                 {
                     type = ActionTypes.MessageBack,
                     title = "Id",
@@ -309,7 +309,8 @@ namespace Airlines.XAirlines.Helpers
                                             {
                                                 Size=AdaptiveTextSize.Small,
                                                 Weight=AdaptiveTextWeight.Lighter,
-                                                Text=datePlan.flightDetails.source//Need to change
+                                                Text=datePlan.flightDetails.sourceFlightCode+"-"+datePlan.flightDetails.source
+
                                             },
                                             new AdaptiveTextBlock()
                                             {
@@ -330,7 +331,7 @@ namespace Airlines.XAirlines.Helpers
                                         HorizontalAlignment=AdaptiveHorizontalAlignment.Right,
                                         Size=AdaptiveTextSize.Small,
                                         Weight=AdaptiveTextWeight.Lighter,
-                                        Text=datePlan.flightDetails.destination//Need to change
+                                        Text=datePlan.flightDetails.destinationFlightCode+"-"+datePlan.flightDetails.destination//Need to change
                                     
                                     },
                                     new AdaptiveTextBlock()
@@ -494,7 +495,7 @@ namespace Airlines.XAirlines.Helpers
                                          Width=AdaptiveColumnWidth.Auto,
                                          Items=new List<AdaptiveElement>()
                                          {
-                                             new AdaptiveImage(){Url=new Uri(ApplicationSettings.BaseUrl + "/Resources/clipboard.PNG"),Size=AdaptiveImageSize.Auto}
+                                             new AdaptiveImage(){Url=new Uri(ApplicationSettings.BaseUrl + "/Resources/clipboard.PNG"),Id="abc"}
                                          }
                                     },
                                 }
@@ -561,7 +562,34 @@ namespace Airlines.XAirlines.Helpers
                                             new AdaptiveImage()
                                             {
                                                 HorizontalAlignment=AdaptiveHorizontalAlignment.Right,
-                                                Url=new Uri("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSG-vkjeuIlD-up_-VHCKgcREhFGp27lDErFkveBLQBoPZOHwMbjw")
+                                                Url=new Uri(ApplicationSettings.BaseUrl+"/Resources/Sunny-cloudy-weather.png")
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            new AdaptiveColumnSet()
+                            {
+                                Columns=new List<AdaptiveColumn>()
+                                {
+                                    new AdaptiveColumn()
+                                    {
+                                        Items=new List<AdaptiveElement>()
+                                        {
+                                            new AdaptiveImage()
+                                            {
+                                                Url=new Uri(ApplicationSettings.BaseUrl+"/Resources/Sunny and cloudy.png")
+                                            }
+                                        }
+                                    },
+                                    new AdaptiveColumn()
+                                    {
+                                        Items=new List<AdaptiveElement>()
+                                        {
+                                            new AdaptiveTextBlock()
+                                            {
+                                                Text="Mostly cloudy",
+                                               
                                             }
                                         }
                                     }
@@ -686,7 +714,7 @@ namespace Airlines.XAirlines.Helpers
                                                 Separator=true,
                                                 Weight=AdaptiveTextWeight.Bolder,
                                                 Text="Here are the currency details for Bangalore",
-                                               
+
                                             }
                                         }
                                     }
@@ -748,11 +776,6 @@ namespace Airlines.XAirlines.Helpers
                 }
 
             };
-            Card.Actions.Add(new AdaptiveSubmitAction()
-            {
-                Title = "View Crew Portal",
-                Data = new ActionDetails() { ActionType = Constants.NextWeekRoster }
-            });
             return new Attachment()
             {
                 ContentType = AdaptiveCard.ContentType,

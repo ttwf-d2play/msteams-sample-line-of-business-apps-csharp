@@ -35,7 +35,7 @@ namespace Airlines.XAirlines.Dialogs
             Attachment card = null;
             string message = string.Empty;
             var userName = await GetUserEmailId(activity);
-            if (activity.Text != null)
+            if (!string.IsNullOrEmpty(activity.Text))
             {
                 message = Microsoft.Bot.Connector.Teams.ActivityExtensions.GetTextWithoutMentions(activity).ToLowerInvariant();
 
@@ -52,6 +52,10 @@ namespace Airlines.XAirlines.Dialogs
                     case Constants.ShowDetailedRoster:
                         card = await CardHelper.GetDetailedRoster(activity);
                         break;
+                    case Constants.UpdateCard:
+                        card = await CardHelper.GetUpdateScreen();
+                        break;
+
                     default:
                         
                         card = await CardHelper.GetWelcomeScreen(userName);
@@ -89,7 +93,7 @@ namespace Airlines.XAirlines.Dialogs
                     break;
                 case Constants.WeatherCard:
                     var DesLocation = JsonConvert.DeserializeObject<WeatherActionDetails>(activity.Value.ToString());
-                    WeatherInfo weatherinfo = weather.GetWeatherInfo(DesLocation.City);
+                   // WeatherInfo weatherinfo = weather.GetWeatherInfo(DesLocation.City);
                     card = await CardHelper.GetWeatherCard(DesLocation.City);
                     break;
                 case Constants.CurrencyCard:

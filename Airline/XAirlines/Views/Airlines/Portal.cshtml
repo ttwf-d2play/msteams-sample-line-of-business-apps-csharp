@@ -1,64 +1,387 @@
 ﻿@{ 
     Layout = null;
 }
-<!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="utf-8">
-    <title></title>
-    <meta name="distributor" content="Global" />
-    <meta itemprop="contentRating" content="General" />
-    <meta name="robots" content="All" />
-    <meta name="revisit-after" content="7 days" />
-    <meta name="description" content="The source of truly unique and awesome jquery plugins." />
-    <meta name="keywords" content="slider, carousel, responsive, swipe, one to one movement, touch devices, jquery, plugin, bootstrap compatible, html5, css3" />
-    <meta name="author" content="w3widgets.com">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href='http://fonts.googleapis.com/css?family=Economica' rel='stylesheet' type='text/css'>
-    <!-- Bootstrap -->
-    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
-    <!-- Respomsive slider -->
-    <link href="~/Content/responsive-calendar.css" rel="stylesheet">
-    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <style>
+                html, body {
+                    margin: 0;
+                    padding: 0;
+                }
+
+                table {
+                    border-collapse: collapse;
+                    font-family: Georgia, Times, serif;
+                }
+
+                th {
+                    /*border: 1px solid #A8A8A8;*/
+                    vertical-align: top;
+                }
+
+                td {
+                    padding: 6%;
+                    border-bottom: 1px solid #A8A8A8;
+                    vertical-align: top;
+                }
+
+                .divcalendar {
+                    padding: 7%;
+                    float: left;
+                    /*background-color: #FFCC00;*/
+                }
+
+                /* Wrapper div. That makes the inner div into an inline element that can be centered with text-align.*/
+                #calendaroverallcontrols {
+                    text-align: center;
+                }
+
+                /* This is a fluid div as width will be changing */
+                #calendarmonthcontrols {
+                    display: inline-block;
+                    /*background-color: #FF0000;*/
+                }
+
+                    #calendarmonthcontrols > div, #calendarmonthcontrols > a {
+                        display: inline-block;
+                    }
+
+                #btnPrevYr {
+                    text-decoration: none;
+                    font-size: 35px;
+                    vertical-align: middle;
+                    /*background: #00FFCC;*/
+                }
+
+                #btnPrev {
+                    text-decoration: none;
+                    font-size: 35px;
+                    margin-left: 20px;
+                    vertical-align: middle;
+                    /*background: #00FFCC;*/
+                }
+                #monthandyearspan {
+                    width: 50px;
+                    font-size: 25px;
+                    font-weight: bold;
+                    margin-left: 20px;
+                    margin-right: 20px;
+                    vertical-align: middle;
+                    /*background: #00FFCC;*/
+                }
+
+                #monthandyear {
+                    vertical-align: middle;
+                }
+
+                #btnNext {
+                    text-decoration: none;
+                    font-size: 35px;
+                    margin-right: 20px;
+                    vertical-align: middle;
+                    /*background: #00FFCC;*/
+                }
+
+                #btnNextYr {
+                    text-decoration: none;
+                    font-size: 35px;
+                    vertical-align: middle;
+                    /*background: #00FFCC;*/
+                }
+
+                #divcalendartable {
+                    clear: both;
+                }
+
+                .daysheader {
+                    background: #F5F5F5;
+                    height: auto;
+                    text-align: center;
+                    padding:2%;
+                }
+
+                #prevmonthdates {
+                    background-color: #E0E0E0;
+                }
+
+                #nextmonthdates {
+                    background-color: #E0E0E0;
+                }
+
+                #currentmonthdates {
+                    background-color: #FFFFFF;
+                }
+
+                #cellvaluespan {
+                    background: #FF0000;
+                }
+
+                #cellvaluelist {
+                    background: #FFCC00;
+                }
+
+                .swim {
+                    font-family: Arial, Helvetica, sans-serif;
+                    font-size: 80%;
+                    text-align: center;
+                    background: #445511;
+                    color: #F5F5F5;
+                    margin-bottom: 5px;
+                    padding: 5px;
+                }
+
+                .chrono {
+                    font-family: Arial, Helvetica, sans-serif;
+                    font-size: 80%;
+                    text-align: center;
+                    background: #778899;
+                    color: #F5F5F5;
+                    margin-bottom: 5px;
+                    padding: 5px;
+                }
+    </style>
+    <script>
+        var Calendar = function (o) {
+            //Store div id
+            this.divId = o.ParentID;
+
+            // Days of week, starting on Sunday
+            this.DaysOfWeek = o.DaysOfWeek;
+            // Months, stating on January
+            this.Months = o.Months;
+            // Set the current month, year
+            var d = new Date();
+            this.CurrentMonth = d.getMonth();
+            this.CurrentYear = d.getFullYear();
+
+            var f = o.Format;
+
+            if (typeof (f) == 'string') {
+                this.f = f.charAt(0).toUpperCase();
+            } else {
+                this.f = 'M';
+            }
+
+        };
+
+        // Goes to next month
+        Calendar.prototype.nextMonth = function () {
+
+            if (this.CurrentMonth == 11) {
+
+                this.CurrentMonth = 0;
+                this.CurrentYear = this.CurrentYear + 1;
+
+            } else {
+
+                this.CurrentMonth = this.CurrentMonth + 1;
+
+            }
+
+            this.showCurrent();
+        };
+
+        // Goes to previous month
+        Calendar.prototype.previousMonth = function () {
+
+            if (this.CurrentMonth == 0) {
+
+                this.CurrentMonth = 11;
+                this.CurrentYear = this.CurrentYear - 1;
+
+            } else {
+
+                this.CurrentMonth = this.CurrentMonth - 1;
+
+            }
+
+            this.showCurrent();
+        };
+
+        //
+        Calendar.prototype.previousYear = function () {
+
+            this.CurrentYear = this.CurrentYear - 1;
+
+            this.showCurrent();
+        }
+
+        //
+        Calendar.prototype.nextYear = function () {
+            console.log(" ");
+
+            console.log("Calendar.prototype.nextYear = function() {");
+
+            console.log("this.CurrentYear == " + this.CurrentYear);
+
+            this.CurrentYear = this.CurrentYear + 1;
+
+            console.log("this.CurrentYear - 1 i.e. this.CurrentYear == " + this.CurrentYear);
+
+            this.showCurrent();
+        }
+
+        // Show current month
+        Calendar.prototype.showCurrent = function () {
+
+            this.Calendar(this.CurrentYear, this.CurrentMonth);
+
+        };
+
+        // Show month (year, month)
+        Calendar.prototype.Calendar = function (y, m) {
+
+            typeof (y) == 'number' ? this.CurrentYear = y : null;
+
+            typeof (y) == 'number' ? this.CurrentMonth = m : null;
+
+
+            // 1st day of the selected month
+            var firstDayOfCurrentMonth = new Date(y, m, 1).getDay();
+
+            // Last date of the selected month
+            var lastDateOfCurrentMonth = new Date(y, m + 1, 0).getDate();
+
+            // Last day of the previous month
+            var lastDateOfLastMonth = m == 0 ? new Date(y - 1, 11, 0).getDate() : new Date(y, m, 0).getDate();
+
+            // Write selected month and year. This HTML goes into <div id="month"></div>
+            var monthandyearhtml = '<span id="monthandyearspan">' + this.Months[m]  + '</span>';
+
+            var html = '<table>';
+
+            // Write the header of the days of the week
+            html += '<tr>';
+
+            for (var i = 0; i < 7; i++) {
+
+                html += '<th class="daysheader">' + this.DaysOfWeek[i] + '</th>';
+            }
+
+            html += '</tr>';
+
+
+
+
+            var p = dm = this.f == 'M' ? 1 : firstDayOfCurrentMonth == 0 ? -5 : 2;
+
+            var cellvalue;
+
+            for (var d, i = 0, z0 = 0; z0 < 6; z0++) {
+                html += '<tr>';
+
+                for (var z0a = 0; z0a < 7; z0a++) {
+
+                    d = i + dm - firstDayOfCurrentMonth;
+
+                    // Dates from prev month
+                    if (d < 1) {
+
+                        cellvalue = lastDateOfLastMonth - firstDayOfCurrentMonth + p++;
+
+                        html += '<td id="prevmonthdates">' + (cellvalue) +
+
+                            '</td>';
+
+                        // Dates from next month
+                    } else if (d > lastDateOfCurrentMonth) {
+
+                        html += '<td id="nextmonthdates">' + (p++) + '</td>';
+
+                        // Current month dates
+                    } else {
+                        html += '<td id="currentmonthdates">' + (d) + '</td>';
+
+                        p = 1;
+
+                    }
+
+                    if (i % 7 == 6 && d >= lastDateOfCurrentMonth) {
+
+                        z0 = 10; // no more rows
+                    }
+
+                    i++;
+
+                }
+
+                html += '</tr>';
+            }
+
+            // Closes table
+            html += '</table>';
+
+
+            document.getElementById("monthandyear").innerHTML = monthandyearhtml;
+
+            document.getElementById(this.divId).innerHTML = html;
+        };
+
+        // On Load of the window
+        window.onload = function () {
+
+            // Start calendar
+            var c = new Calendar({
+                ParentID: "divcalendartable",
+
+                DaysOfWeek: [
+                    'MON',
+                    'TUE',
+                    'WED',
+                    'THU',
+                    'FRI',
+                    'SAT',
+                    'SUN'
+                ],
+
+                Months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+
+                Format: 'dd/mm/yyyy'
+            });
+
+            c.showCurrent();
+
+            // Bind next and previous button clicks
+            getId('btnPrev').onclick = function () {
+                c.previousMonth();
+            };
+
+            getId('btnPrevYr').onclick = function () {
+                c.previousYear();
+            };
+
+            getId('btnNext').onclick = function () {
+                c.nextMonth();
+            };
+
+            getId('btnNextYr').onclick = function () {
+                c.nextYear();
+            };
+        }
+
+        // Get element by id
+        function getId(id) {
+            return document.getElementById(id);
+        }</script>
 </head>
 <body>
-    <div class="container">
-        <!-- Responsive calendar - START -->
-        <div class="responsive-calendar">
-            <div class="controls">
-                <h4><span data-head-year></span> <span data-head-month></span></h4>
+    <div class="divcalendar">
 
-                <a class="pull-left" data-go="prev"><div class="btn btn-primary">Prev</div></a>
-                <a class="pull-right" data-go="next"><div class="btn btn-primary">Next</div></a>
-            </div><hr />
-            <div class="day-headers">
-                <div class="day header">Mon</div>
-                <div class="day header">Tue</div>
-                <div class="day header">Wed</div>
-                <div class="day header">Thu</div>
-                <div class="day header">Fri</div>
-                <div class="day header">Sat</div>
-                <div class="day header">Sun</div>
-            </div>
-            <div class="days" data-group="days">
+        <div id="calendaroverallcontrols">
+
+
+            <div id="calendarmonthcontrols">
+
+
+
+                <div id="monthandyear"></div>
+
+
+
 
             </div>
         </div>
-       
-    </div>
-    <script src="~/Scripts/jquery.js"></script>
-   
-    <script src="~/Scripts/responsive-calendar.js"></script>
-    <script type="text/javascript">
-        $(document).ready(function () {
-        $(".responsive-calendar").responsiveCalendar({
-          time: '2019-04',
-          events: {
-            "2019-04-30": {"number": 5, "url": "http://w3widgets.com/responsive-slider"},
-            "2019-04-6": {"number": 1, "url": "http://w3widgets.com"},
-            "2019-04-3":{"number": 1},
-            "2019-04-2": {}}
-        });
-      });</script>
+
+        <div id="divcalendartable"></div>
 </body>
 </html>

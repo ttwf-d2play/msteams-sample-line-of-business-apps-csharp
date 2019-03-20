@@ -35,6 +35,9 @@ namespace Airlines.XAirlines.Models
         public string day { get; set; }
         public DateTime date { get; set; }
         public bool vacationPlan { get; set; }
+        public string vacationDate { get; set; }
+        public string vacationReason { get; set; }
+        public bool isDayOff { get; set; }
         public bool halt { get; set; }
         public string lastUpdated { get; set; }
         public FlightDetails flightDetails { get; set; }
@@ -45,6 +48,9 @@ namespace Airlines.XAirlines.Models
         public string day { get; set; }
         public string date { get; set; }
         public bool vacationPlan { get; set; }
+        public string vacationDate { get; set; }
+        public string vacationReason { get; set; }
+        public bool isDayOff { get; set; }
         public bool halt { get; set; }
         public string lastUpdated { get; set; }
         public FlightDetails flightDetails { get; set; }
@@ -55,9 +61,11 @@ namespace Airlines.XAirlines.Models
         public string flightStartDate { get; set; }
         public string source { get; set; }
         public string sourceCode { get; set; }
+        public string sourceFlightCode { get; set; }
         public string flightDepartueTime { get; set; }
         public string destination { get; set; }
         public string destinationCode { get; set; }
+        public string destinationFlightCode { get; set; }
         public string flightEndDate { get; set; }
         public string flightArrivalTime { get; set; }
         public string layOVer { get; set; }
