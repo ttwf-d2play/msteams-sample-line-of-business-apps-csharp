@@ -331,7 +331,7 @@ namespace Airlines.XAirlines.Helpers
                                         HorizontalAlignment=AdaptiveHorizontalAlignment.Right,
                                         Size=AdaptiveTextSize.Small,
                                         Weight=AdaptiveTextWeight.Lighter,
-                                        Text=datePlan.flightDetails.destinationFlightCode+"-"+datePlan.flightDetails.destination//Need to change
+                                        Text=datePlan.flightDetails.destinationFlightCode+"-"+datePlan.flightDetails.destination
                                     
                                     },
                                     new AdaptiveTextBlock()
@@ -508,7 +508,7 @@ namespace Airlines.XAirlines.Helpers
             };
             Card.Actions.Add(new AdaptiveSubmitAction()
             {
-                Title = "View Crew Portal",
+                Title = "Acknowledge and view portal",
                 Data=new ActionDetails() { ActionType=Constants.NextWeekRoster}
             });
             return new Attachment()
@@ -554,9 +554,7 @@ namespace Airlines.XAirlines.Helpers
                                              new AdaptiveTextBlock(){Text="Sun,24 Nov",Weight=AdaptiveTextWeight.Bolder}
                                          },
 
-                                             new AdaptiveTextBlock(){Text="Date of Arrival",HorizontalAlignment=AdaptiveHorizontalAlignment.Left},
-                                             new AdaptiveTextBlock(){Text="Sun,24 Nov",Weight=AdaptiveTextWeight.Bolder}
-                                         },
+                                            
 
                                     },
                                     new AdaptiveColumn()
@@ -599,7 +597,7 @@ namespace Airlines.XAirlines.Helpers
                                     }
                                 }
                             },
-                            new AdaptiveColumnSet()
+                           new AdaptiveColumnSet()
                             {
                                 Spacing=AdaptiveSpacing.Small,
                                 Columns=new List<AdaptiveColumn>()
@@ -619,13 +617,6 @@ namespace Airlines.XAirlines.Helpers
                                             }
                                         }
                                     },
-                                }
-                            },
-                            new AdaptiveColumnSet()
-                            {
-                                Separator=true,
-                                Columns=new List<AdaptiveColumn>()
-                                {
                                     new AdaptiveColumn()
                                     {
                                         Items=new List<AdaptiveElement>()
@@ -643,6 +634,7 @@ namespace Airlines.XAirlines.Helpers
                                     },
                                 }
                             },
+                            
                             new AdaptiveColumnSet()
                             {
                                 Separator=true,
@@ -660,7 +652,7 @@ namespace Airlines.XAirlines.Helpers
                                                     {
                                                         Size=AdaptiveTextSize.Medium,
                                                         Weight=AdaptiveTextWeight.Bolder,
-                                                        Text="26 C"
+                                                         Text=Math.Round(wInfo.main.temp_min-273).ToString()
                                                     }
                                                 }
                                             }
