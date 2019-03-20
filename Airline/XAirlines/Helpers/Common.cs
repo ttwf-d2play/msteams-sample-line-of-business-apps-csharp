@@ -16,7 +16,7 @@ namespace Airlines.XAirlines.Helpers
             return random.Next(min, max);
         }
 
-        public Crew ReadJson()
+        public static Crew ReadJson()
         {
             int filenumber = GenrateRandomNumber(1, 10);
             string location = ApplicationSettings.BaseUrl;
@@ -29,13 +29,26 @@ namespace Airlines.XAirlines.Helpers
                 {
                     data = reader.ReadToEnd();
                     Crew crews = (new JavaScriptSerializer().Deserialize<Crew>(data));
-                    return crews;
+                    return crews;                    
                 }
             }
             else
                 return null;
         }
+
+        public static List<Plan> WeeksPlan()
+        {
+            Crew crew = Common.ReadJson();
+            DateTime today = DateTime.Today;
+            DateTime weekafter = today.AddDays(6);
+            List<Plan> weekplan = crew.plan.Where(c => c.date >= today && c.date <= weekafter).ToList();
+            return weekplan;
+
+        }
     }
+
+
+
 }
         //public Crew GetWeeksData()
         //{

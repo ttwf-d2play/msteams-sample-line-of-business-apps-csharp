@@ -20,5 +20,7 @@ namespace Airlines.XAirlines.Models
     public class WeatherActionDetails:ActionDetails
     {
         public string City { get; set; }
+        public string sourceCurrencyCode { get; set; }
+        public string destinationCurrencyCode { get; set; }
     }
 }

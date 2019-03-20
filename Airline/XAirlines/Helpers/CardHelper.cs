@@ -20,11 +20,11 @@ namespace Airlines.XAirlines.Helpers
     {
         public static async Task<Attachment> GetWeeklyRosterCard()
         {
-            Common crewdata = new Common();
-            Crew crew = crewdata.ReadJson();
-            DateTime today = DateTime.Today;
-            DateTime weekafter = today.AddDays(6);
-            var weekplan = crew.plan.Where(c => c.date >= today && c.date <= weekafter);
+            //Common crewdata = new Common();
+            List<Plan> weekplan = Common.WeeksPlan();
+            //DateTime today = DateTime.Today;
+            //DateTime weekafter = today.AddDays(6);
+            //var weekplan = crew.plan.Where(c => c.date >= today && c.date <= weekafter);
             var listCard = new ListCard();
             listCard.content = new Content();
             listCard.content.title = "Here is your next week's roster";
@@ -171,8 +171,8 @@ namespace Airlines.XAirlines.Helpers
         public static async Task<Attachment> GetDetailedRoster(Activity activity)
         {
             var details = JsonConvert.DeserializeObject<AirlineActionDetails>(activity.Value.ToString());
-            Common crewdata = new Common();
-            Crew crew = crewdata.ReadJson();
+            //Common crewdata = new Common();
+            Crew crew = Common.ReadJson();
             var datePlan = crew.plan.Where(c => c.flightDetails.flightStartDate == details.Id).FirstOrDefault();
             var Card = new AdaptiveCard(new AdaptiveSchemaVersion("1.0"))
             {
@@ -195,7 +195,7 @@ namespace Airlines.XAirlines.Helpers
                                         Separator=true,
                                         Weight=AdaptiveTextWeight.Bolder,
                                         Color=AdaptiveTextColor.Attention,
-                                        Text="E0370",
+                                        Text=datePlan.flightDetails.code,
                                         MaxLines=1
                                     }
                                 },
@@ -401,14 +401,14 @@ namespace Airlines.XAirlines.Helpers
                                     {
                                         HorizontalAlignment=AdaptiveHorizontalAlignment.Right,
                                         Weight=AdaptiveTextWeight.Bolder,
-                                        Text="12h 36 m"//Hard coded
+                                        Text=datePlan.flightDetails.blockhours
 
                                     },
                                     new AdaptiveTextBlock()
                                     {
                                         HorizontalAlignment=AdaptiveHorizontalAlignment.Right,
                                         Weight=AdaptiveTextWeight.Bolder,
-                                        Text="05:00,23 Sep"//Hard coded
+                                        Text=datePlan.flightDetails.awayfromBase
 
                                     },
                                     new AdaptiveTextBlock()
@@ -442,7 +442,7 @@ namespace Airlines.XAirlines.Helpers
                     new AdaptiveSubmitAction()
                     {
                         Title="Currency Details",
-                        Data=new ActionDetails(){ActionType=Constants.NextMonthRoster}
+                        Data=new WeatherActionDetails(){sourceCurrencyCode=datePlan.flightDetails.sourceCurrencyCode, destinationCurrencyCode=datePlan.flightDetails.destinationCurrencyCode, City=datePlan.flightDetails.destination,ActionType=Constants.CurrencyCard}
                     }
                 }
             };
@@ -529,7 +529,7 @@ namespace Airlines.XAirlines.Helpers
 
 
         }
-        public static async Task<Attachment> GetWeatherCard(WeatherInfo weather)
+        public static async Task<Attachment> GetWeatherCard(WeatherInfo wInfo)
         {
 
             DateTime dateTime;
@@ -547,7 +547,7 @@ namespace Airlines.XAirlines.Helpers
                                     {
                                       Size=AdaptiveTextSize.Medium,
                                       Weight=AdaptiveTextWeight.Bolder,
-                                      Text="Your monthly roster"
+                                      Text="Here is the weather report for "+wInfo.name
                                     },
                             new AdaptiveColumnSet()
                             {
@@ -556,22 +556,101 @@ namespace Airlines.XAirlines.Helpers
 
                                     new AdaptiveColumn()
                                     {
-                                         Width=AdaptiveColumnWidth.Auto,
+
                                          Items=new List<AdaptiveElement>()
                                          {
-
-                                             new AdaptiveTextBlock(){Text="New roster for the month of "+DateTime.Now.ToString("MMMM")+" has been released.Please acknowledge to view your new roster",Wrap=true}
+                                             //Date of arrival - get it from Test json
+                                             new AdaptiveTextBlock(){Text= "Date of Arrival",HorizontalAlignment=AdaptiveHorizontalAlignment.Left},
+                                             new AdaptiveTextBlock(){Text="Sun,24 Nov",Weight=AdaptiveTextWeight.Bolder}
                                          },
 
                                     },
                                     new AdaptiveColumn()
                                     {
-                                         Width=AdaptiveColumnWidth.Auto,
-                                         Items=new List<AdaptiveElement>()
-                                         {
-                                             new AdaptiveImage(){Url=new Uri(ApplicationSettings.BaseUrl + "/Resources/clipboard.PNG"),Size=AdaptiveImageSize.Auto}
-                                         }
+                                        Items=new List<AdaptiveElement>()
+                                        {
+                                            new AdaptiveImage()
+                                            {
+                                                HorizontalAlignment=AdaptiveHorizontalAlignment.Right,
+                                                Url=new Uri("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSG-vkjeuIlD-up_-VHCKgcREhFGp27lDErFkveBLQBoPZOHwMbjw")
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            new AdaptiveColumnSet()
+                            {
+                                Spacing=AdaptiveSpacing.Small,
+                                Columns=new List<AdaptiveColumn>()
+                                {
+                                    new AdaptiveColumn()
+                                    {
+                                        Items=new List<AdaptiveElement>()
+                                        {
+                                            new AdaptiveTextBlock()
+                                            {
+                                                HorizontalAlignment=AdaptiveHorizontalAlignment.Left,
+                                                Spacing=AdaptiveSpacing.Small,
+                                                Separator=true,
+                                                Weight=AdaptiveTextWeight.Lighter,
+                                                Text="Minimum",
+                                                MaxLines=1
+                                            }
+                                        }
                                     },
+                                    new AdaptiveColumn()
+                                    {
+                                        Items=new List<AdaptiveElement>()
+                                        {
+                                            new AdaptiveTextBlock()
+                                            {
+                                                HorizontalAlignment=AdaptiveHorizontalAlignment.Right,
+                                                Spacing=AdaptiveSpacing.Small,
+                                                Separator=true,
+                                                Weight=AdaptiveTextWeight.Lighter,
+                                                Text="Maximum",
+
+                                            }
+                                        }
+                                    },
+                                }
+                            },
+                            new AdaptiveColumnSet()
+                            {
+                                Separator=true,
+                                Columns=new List<AdaptiveColumn>()
+                                {
+                                    new AdaptiveColumn()
+                                    {
+                                        Items=new List<AdaptiveElement>()
+                                        {
+                                            new AdaptiveContainer()
+                                            {
+                                                Items=new List<AdaptiveElement>()
+                                                {
+                                                    new AdaptiveTextBlock()
+                                                    {
+                                                        Size=AdaptiveTextSize.Medium,
+                                                        Weight=AdaptiveTextWeight.Bolder,
+                                                        Text=Math.Round(wInfo.main.temp_min-273).ToString()
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    },
+                                    new AdaptiveColumn()
+                                    {
+                                        Items=new List<AdaptiveElement>()
+                                        {
+                                            new AdaptiveTextBlock()
+                                            {
+                                                HorizontalAlignment=AdaptiveHorizontalAlignment.Right,
+                                                Size=AdaptiveTextSize.Medium,
+                                                Weight=AdaptiveTextWeight.Bolder,
+                                                Text=Math.Round(wInfo.main.temp_max-273).ToString()
+                                            }
+                                        }
+                                    }
                                 }
                             }
 
@@ -580,11 +659,6 @@ namespace Airlines.XAirlines.Helpers
                 }
 
             };
-            Card.Actions.Add(new AdaptiveSubmitAction()
-            {
-                Title = "View Crew Portal",
-                Data = new ActionDetails() { ActionType = Constants.NextWeekRoster }
-            });
             return new Attachment()
             {
                 ContentType = AdaptiveCard.ContentType,
@@ -593,10 +667,18 @@ namespace Airlines.XAirlines.Helpers
 
 
         }
-        public static async Task<Attachment> GetCurrencyCard()
-        {
 
+        
+        public static async Task<Attachment> GetCurrencyCard(CurrencyInfo cInfo, string desCity, string desCurrencyCode)
+        {
             DateTime dateTime;
+            string desCode = cInfo.source + desCurrencyCode;
+            var desCurrency = Math.Round(cInfo.quotes.USDINR); //change is to dynamic
+            
+
+
+
+
             var Card = new AdaptiveCard(new AdaptiveSchemaVersion("1.0"))
             {
 
@@ -607,48 +689,83 @@ namespace Airlines.XAirlines.Helpers
                     {
                         Items=new List<AdaptiveElement>()
                         {
-                             new AdaptiveTextBlock()
-                                    {
-                                      Size=AdaptiveTextSize.Medium,
-                                      Weight=AdaptiveTextWeight.Bolder,
-                                      Text="Your monthly roster"
-                                    },
-                            new AdaptiveColumnSet()
+                             new AdaptiveColumnSet()
                             {
+                                Spacing=AdaptiveSpacing.Small,
                                 Columns=new List<AdaptiveColumn>()
                                 {
-
                                     new AdaptiveColumn()
                                     {
-                                         Width=AdaptiveColumnWidth.Auto,
-                                         Items=new List<AdaptiveElement>()
-                                         {
-
-                                             new AdaptiveTextBlock(){Text="New roster for the month of "+DateTime.Now.ToString("MMMM")+" has been released.Please acknowledge to view your new roster",Wrap=true}
-                                         },
-
+                                        Items=new List<AdaptiveElement>()
+                                        {
+                                            new AdaptiveTextBlock()
+                                            {
+                                                HorizontalAlignment=AdaptiveHorizontalAlignment.Left,
+                                                Spacing=AdaptiveSpacing.Small,
+                                                Separator=true,
+                                                Weight=AdaptiveTextWeight.Bolder,
+                                                Text="Here are the currency details for " + desCity,
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            new AdaptiveColumnSet()
+                            {
+                                Separator=true,
+                                Columns=new List<AdaptiveColumn>()
+                                {
+                                    new AdaptiveColumn()
+                                    {
+                                        Items=new List<AdaptiveElement>()
+                                        {
+                                            new AdaptiveContainer()
+                                            {
+                                                Items=new List<AdaptiveElement>()
+                                                {
+                                                    new AdaptiveTextBlock()
+                                                    {
+                                                        Size=AdaptiveTextSize.Medium,
+                                                        Weight=AdaptiveTextWeight.Lighter,
+                                                        Text=cInfo.source
+                                                    },
+                                                    new AdaptiveTextBlock()
+                                                    {
+                                                        Size=AdaptiveTextSize.Medium,
+                                                        Weight=AdaptiveTextWeight.Lighter,
+                                                        Text=desCurrencyCode
+                                                    },
+                                                }
+                                            }
+                                        }
                                     },
                                     new AdaptiveColumn()
                                     {
-                                         Width=AdaptiveColumnWidth.Auto,
-                                         Items=new List<AdaptiveElement>()
-                                         {
-                                             new AdaptiveImage(){Url=new Uri(ApplicationSettings.BaseUrl + "/Resources/clipboard.PNG"),Size=AdaptiveImageSize.Auto}
-                                         }
-                                    },
+                                        Items=new List<AdaptiveElement>()
+                                        {
+                                            new AdaptiveTextBlock()
+                                            {
+                                                HorizontalAlignment=AdaptiveHorizontalAlignment.Right,
+                                                Size=AdaptiveTextSize.Medium,
+                                                Weight=AdaptiveTextWeight.Bolder,
+                                                Text="1 " + cInfo.source
+                                            },
+                                            new AdaptiveTextBlock()
+                                            {
+                                                HorizontalAlignment=AdaptiveHorizontalAlignment.Right,
+                                                Size=AdaptiveTextSize.Medium,
+                                                Weight=AdaptiveTextWeight.Bolder,
+                                                Text=desCurrency + " " + desCurrencyCode
+                                            }
+                                        }
+                                    }
                                 }
                             }
-
                         }
                     }
                 }
 
             };
-            Card.Actions.Add(new AdaptiveSubmitAction()
-            {
-                Title = "View Crew Portal",
-                Data = new ActionDetails() { ActionType = Constants.NextWeekRoster }
-            });
             return new Attachment()
             {
                 ContentType = AdaptiveCard.ContentType,
