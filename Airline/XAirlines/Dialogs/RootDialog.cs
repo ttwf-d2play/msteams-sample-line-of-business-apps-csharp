@@ -53,7 +53,7 @@ namespace Airlines.XAirlines.Dialogs
                         card = await CardHelper.GetDetailedRoster(activity);
                         break;
                     default:
-                        //card = await CardHelper.GetUpdateScreen();
+                        
                         card = await CardHelper.GetWelcomeScreen(userName);
                         break;
                 }

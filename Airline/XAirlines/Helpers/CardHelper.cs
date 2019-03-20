@@ -34,7 +34,7 @@ namespace Airlines.XAirlines.Helpers
                 var item = new Item();
                 item.id = i.flightDetails.flightStartDate;
                 item.type = "resultItem";
-                item.icon = ApplicationSettings.BaseUrl + "/Resources/Flight.png";
+                item.icon = i.vacationPlan==true?ApplicationSettings.BaseUrl + "/Resources/vacationicon.png": ApplicationSettings.BaseUrl + "/Resources/flighticon.png";
                 item.title = i.flightDetails.flightStartDate + "-" + i.flightDetails.flightEndDate;
                 item.subtitle = i.flightDetails.sourceCode + "-" + i.flightDetails.destinationCode;
                 item.tap = new Tap()
@@ -127,9 +127,9 @@ namespace Airlines.XAirlines.Helpers
                                          {
                                              new AdaptiveTextBlock(){Text="View Weekly roster",Color=AdaptiveTextColor.Accent,Size=AdaptiveTextSize.Medium, Spacing=AdaptiveSpacing.None, HorizontalAlignment=AdaptiveHorizontalAlignment.Center}
                                          },
-                                           SelectAction = new AdaptiveSubmitAction()
+                                          SelectAction = new AdaptiveSubmitAction()
                                          {
-                                            Data=new ActionDetails(){ActionType=Constants.NextWeekRoster}
+                                             DataJson=@"{'ActionType':'" + Constants.NextWeekRoster+"'}", Title="Next Week roster"
                                          }
                                     }
                                 }
@@ -147,9 +147,9 @@ namespace Airlines.XAirlines.Helpers
                                          {
                                              new AdaptiveTextBlock(){Text="View Monthly Roster",Color=AdaptiveTextColor.Accent,Size=AdaptiveTextSize.Medium,HorizontalAlignment=AdaptiveHorizontalAlignment.Center,Spacing=AdaptiveSpacing.None }
                                          },
-                                           SelectAction = new AdaptiveSubmitAction()
+                                          SelectAction = new AdaptiveSubmitAction()
                                          {
-                                              Data=new ActionDetails(){ActionType=Constants.NextMonthRoster}
+                                                DataJson=@"{'ActionType':'" + Constants.NextMonthRoster+"'}", Title="Next Week roster"
                                          }
                                     }
                                 }
@@ -453,18 +453,7 @@ namespace Airlines.XAirlines.Helpers
                 Content = Card
             };
         }
-        //public static async Task<Attachment> GetDetailedRoster()
-        //{
-        //    // Parse the JSON 
-        //    AdaptiveCardParseResult result = AdaptiveCard.FromJson(GetAdaptiveCardJson());
-
-        //    return new Attachment()
-        //    {
-        //        ContentType = AdaptiveCard.ContentType,
-        //        Content = result.Card
-
-        //    };
-        //}
+     
         public static async Task<Attachment> GetUpdateScreen()
         {
 

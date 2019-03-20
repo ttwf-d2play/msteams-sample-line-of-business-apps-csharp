@@ -1,67 +1,64 @@
-﻿@{
+﻿@{ 
     Layout = null;
 }
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <title>Demo of Calendar for the present month in JavaScript</title>
+    <meta charset="utf-8">
+    <title></title>
+    <meta name="distributor" content="Global" />
+    <meta itemprop="contentRating" content="General" />
+    <meta name="robots" content="All" />
+    <meta name="revisit-after" content="7 days" />
+    <meta name="description" content="The source of truly unique and awesome jquery plugins." />
+    <meta name="keywords" content="slider, carousel, responsive, swipe, one to one movement, touch devices, jquery, plugin, bootstrap compatible, html5, css3" />
+    <meta name="author" content="w3widgets.com">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href='http://fonts.googleapis.com/css?family=Economica' rel='stylesheet' type='text/css'>
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
+    <!-- Respomsive slider -->
+    <link href="~/Content/responsive-calendar.css" rel="stylesheet">
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
 </head>
 <body>
+    <div class="container">
+        <!-- Responsive calendar - START -->
+        <div class="responsive-calendar">
+            <div class="controls">
+                <h4><span data-head-year></span> <span data-head-month></span></h4>
+
+                <a class="pull-left" data-go="prev"><div class="btn btn-primary">Prev</div></a>
+                <a class="pull-right" data-go="next"><div class="btn btn-primary">Next</div></a>
+            </div><hr />
+            <div class="day-headers">
+                <div class="day header">Mon</div>
+                <div class="day header">Tue</div>
+                <div class="day header">Wed</div>
+                <div class="day header">Thu</div>
+                <div class="day header">Fri</div>
+                <div class="day header">Sat</div>
+                <div class="day header">Sun</div>
+            </div>
+            <div class="days" data-group="days">
+
+            </div>
+        </div>
+       
+    </div>
+    <script src="~/Scripts/jquery.js"></script>
+   
+    <script src="~/Scripts/responsive-calendar.js"></script>
     <script type="text/javascript">
-        var dt = new Date();
-        var month = dt.getMonth(); // read the current month
-        var year = dt.getFullYear(); // read the current year
-
-        dt = new Date(year, month, 01);//Year , month,date format
-
-        var first_day = dt.getDay(); //, first day of present month
-
-
-        dt.setMonth(month + 1, 0); // Set to next month and one day backward.
-        var last_date = dt.getDate(); // Last date of present month
-
-
-        var dy = 1; // day variable for adjustment of starting date.
-        document.write("<table><tr><td>Su</td><td>Mon</td><td>Tue</td><td>Wed</td><td>Thu</td><td>Fri</td><td>Sat</td>");
-
-        for (i = 0; i <= 41; i++) {
-            if ((i % 7) == 0) { document.write("</tr><tr>"); } // if week is over then start a new line
-            if ((i >= first_day) && (dy <= last_date)) {
-                document.write("<td>" + dy + "</td>");
-                dy = dy + 1;
-            } else { document.write("<td> </td>"); } // Blank dates.
-        } // end of for loop
-
-        document.write("</tr></table>");
-
-
-
-        var dt = new Date();
-        var month = dt.getMonth() + 1; // read the current month
-        var year = dt.getFullYear(); // read the current year
-
-        dt = new Date(year, month, 01);//Year , month,date format
-
-        var first_day = dt.getDay(); //, first day of present month
-
-
-        dt.setMonth(month + 1, 0); // Set to next month and one day backward.
-        var last_date = dt.getDate(); // Last date of present month
-
-
-        var dy = 1; // day variable for adjustment of starting date.
-        document.write("<table><tr><td>Su</td><td>Mon</td><td>Tue</td><td>Wed</td><td>Thu</td><td>Fri</td><td>Sat</td>");
-
-        for (i = 0; i <= 41; i++) {
-            if ((i % 7) == 0) { document.write("</tr><tr>"); } // if week is over then start a new line
-            if ((i >= first_day) && (dy <= last_date)) {
-                document.write("<td>" + dy + "</td>");
-                dy = dy + 1;
-            } else { document.write("<td> </td>"); } // Blank dates.
-        } // end of for loop
-
-        document.write("</tr></table>")
-    </script>
-
+        $(document).ready(function () {
+        $(".responsive-calendar").responsiveCalendar({
+          time: '2019-04',
+          events: {
+            "2019-04-30": {"number": 5, "url": "http://w3widgets.com/responsive-slider"},
+            "2019-04-6": {"number": 1, "url": "http://w3widgets.com"},
+            "2019-04-3":{"number": 1},
+            "2019-04-2": {}}
+        });
+      });</script>
 </body>
 </html>
-
