@@ -63,6 +63,8 @@ namespace Airlines.XAirlines.Dialogs
                 }
                 reply.Attachments.Add(card);
                 await context.PostAsync(reply);
+
+
             }
             else if (activity.Value != null)
             {
@@ -77,7 +79,14 @@ namespace Airlines.XAirlines.Dialogs
             WeatherHelper weather = new WeatherHelper();
             var reply = context.MakeMessage();
             var details = JsonConvert.DeserializeObject<ActionDetails>(activity.Value.ToString());
-           
+
+            CurrencyHelper currency = new CurrencyHelper();
+         
+                var desLocationInfo = JsonConvert.DeserializeObject<WeatherActionDetails>(activity.Value.ToString());
+                //WeatherInfo weatherinfo = weather.GetWeatherInfo(desLocationInfo.City);
+          
+            
+
             var type = details.ActionType;
             Attachment card = null;
             switch (type)
@@ -92,12 +101,14 @@ namespace Airlines.XAirlines.Dialogs
                     card = await CardHelper.GetMonthlyRosterCard();
                     break;
                 case Constants.WeatherCard:
-                    var DesLocation = JsonConvert.DeserializeObject<WeatherActionDetails>(activity.Value.ToString());
-                   // WeatherInfo weatherinfo = weather.GetWeatherInfo(DesLocation.City);
-                    card = await CardHelper.GetWeatherCard(DesLocation.City);
+                    //var desLocationInfo = JsonConvert.DeserializeObject<WeatherActionDetails>(activity.Value.ToString());
+                    WeatherInfo weatherinfo = weather.GetWeatherInfo(desLocationInfo.City);
+                    card = await CardHelper.GetWeatherCard(weatherinfo);
                     break;
                 case Constants.CurrencyCard:
-                    card = await CardHelper.GetCurrencyCard();
+                    var desCurrency = JsonConvert.DeserializeObject<WeatherActionDetails>(activity.Value.ToString());
+                    CurrencyInfo currencyinfo = currency.GetCurrencyInfo();
+                    card = await CardHelper.GetCurrencyCard(currencyinfo, desLocationInfo.City, desLocationInfo.destinationCurrencyCode);
                     break;
 
             }

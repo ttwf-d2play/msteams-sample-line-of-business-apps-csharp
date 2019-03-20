@@ -20,11 +20,11 @@ namespace Airlines.XAirlines.Helpers
     {
         public static async Task<Attachment> GetWeeklyRosterCard()
         {
-            Common crewdata = new Common();
-            Crew crew = crewdata.ReadJson();
-            DateTime today = DateTime.Today;
-            DateTime weekafter = today.AddDays(6);
-            var weekplan = crew.plan.Where(c => c.date >= today && c.date <= weekafter);
+            //Common crewdata = new Common();
+            List<Plan> weekplan = Common.WeeksPlan();
+            //DateTime today = DateTime.Today;
+            //DateTime weekafter = today.AddDays(6);
+            //var weekplan = crew.plan.Where(c => c.date >= today && c.date <= weekafter);
             var listCard = new ListCard();
             listCard.content = new Content();
             listCard.content.title = "Here is your next week's roster";
@@ -171,8 +171,8 @@ namespace Airlines.XAirlines.Helpers
         public static async Task<Attachment> GetDetailedRoster(Activity activity)
         {
             var details = JsonConvert.DeserializeObject<AirlineActionDetails>(activity.Value.ToString());
-            Common crewdata = new Common();
-            Crew crew = crewdata.ReadJson();
+            //Common crewdata = new Common();
+            Crew crew = Common.ReadJson();
             var datePlan = crew.plan.Where(c => c.flightDetails.flightStartDate == details.Id).FirstOrDefault();
             var Card = new AdaptiveCard(new AdaptiveSchemaVersion("1.0"))
             {
@@ -195,7 +195,7 @@ namespace Airlines.XAirlines.Helpers
                                         Separator=true,
                                         Weight=AdaptiveTextWeight.Bolder,
                                         Color=AdaptiveTextColor.Attention,
-                                        Text="E0370",
+                                        Text=datePlan.flightDetails.code,
                                         MaxLines=1
                                     }
                                 },
@@ -402,14 +402,14 @@ namespace Airlines.XAirlines.Helpers
                                     {
                                         HorizontalAlignment=AdaptiveHorizontalAlignment.Right,
                                         Weight=AdaptiveTextWeight.Bolder,
-                                        Text="12h 36 m"//Hard coded
+                                        Text=datePlan.flightDetails.blockhours
 
                                     },
                                     new AdaptiveTextBlock()
                                     {
                                         HorizontalAlignment=AdaptiveHorizontalAlignment.Right,
                                         Weight=AdaptiveTextWeight.Bolder,
-                                        Text="05:00,23 Sep"//Hard coded
+                                        Text=datePlan.flightDetails.awayfromBase
 
                                     },
                                     new AdaptiveTextBlock()
@@ -443,7 +443,7 @@ namespace Airlines.XAirlines.Helpers
                     new AdaptiveSubmitAction()
                     {
                         Title="Currency Details",
-                        Data=new WeatherActionDetails(){City=datePlan.flightDetails.destination,ActionType=Constants.CurrencyCard}
+                        Data=new WeatherActionDetails(){sourceCurrencyCode=datePlan.flightDetails.sourceCurrencyCode, destinationCurrencyCode=datePlan.flightDetails.destinationCurrencyCode, City=datePlan.flightDetails.destination,ActionType=Constants.CurrencyCard}
                     }
                 }
             };
@@ -519,7 +519,7 @@ namespace Airlines.XAirlines.Helpers
 
 
         }
-        public static async Task<Attachment> GetWeatherCard(string cityName)
+        public static async Task<Attachment> GetWeatherCard(WeatherInfo wInfo)
         {
 
             DateTime dateTime;
@@ -537,7 +537,7 @@ namespace Airlines.XAirlines.Helpers
                                     {
                                       Size=AdaptiveTextSize.Medium,
                                       Weight=AdaptiveTextWeight.Bolder,
-                                      Text="Here is the weather report for "+cityName
+                                      Text="Here is the weather report for "+wInfo.name
                                     },
                             new AdaptiveColumnSet()
                             {
@@ -546,9 +546,13 @@ namespace Airlines.XAirlines.Helpers
 
                                     new AdaptiveColumn()
                                     {
-                                        
+
                                          Items=new List<AdaptiveElement>()
                                          {
+                                             //Date of arrival - get it from Test json
+                                             new AdaptiveTextBlock(){Text= "Date of Arrival",HorizontalAlignment=AdaptiveHorizontalAlignment.Left},
+                                             new AdaptiveTextBlock(){Text="Sun,24 Nov",Weight=AdaptiveTextWeight.Bolder}
+                                         },
 
                                              new AdaptiveTextBlock(){Text="Date of Arrival",HorizontalAlignment=AdaptiveHorizontalAlignment.Left},
                                              new AdaptiveTextBlock(){Text="Sun,24 Nov",Weight=AdaptiveTextWeight.Bolder}
@@ -615,6 +619,13 @@ namespace Airlines.XAirlines.Helpers
                                             }
                                         }
                                     },
+                                }
+                            },
+                            new AdaptiveColumnSet()
+                            {
+                                Separator=true,
+                                Columns=new List<AdaptiveColumn>()
+                                {
                                     new AdaptiveColumn()
                                     {
                                         Items=new List<AdaptiveElement>()
@@ -664,7 +675,7 @@ namespace Airlines.XAirlines.Helpers
                                                 HorizontalAlignment=AdaptiveHorizontalAlignment.Right,
                                                 Size=AdaptiveTextSize.Medium,
                                                 Weight=AdaptiveTextWeight.Bolder,
-                                                Text="32C"
+                                                Text=Math.Round(wInfo.main.temp_max-273).ToString()
                                             }
                                         }
                                     }
@@ -684,10 +695,18 @@ namespace Airlines.XAirlines.Helpers
 
 
         }
-        public static async Task<Attachment> GetCurrencyCard()
-        {
 
+        
+        public static async Task<Attachment> GetCurrencyCard(CurrencyInfo cInfo, string desCity, string desCurrencyCode)
+        {
             DateTime dateTime;
+            string desCode = cInfo.source + desCurrencyCode;
+            var desCurrency = Math.Round(cInfo.quotes.USDINR); //change is to dynamic
+            
+
+
+
+
             var Card = new AdaptiveCard(new AdaptiveSchemaVersion("1.0"))
             {
 
@@ -713,8 +732,7 @@ namespace Airlines.XAirlines.Helpers
                                                 Spacing=AdaptiveSpacing.Small,
                                                 Separator=true,
                                                 Weight=AdaptiveTextWeight.Bolder,
-                                                Text="Here are the currency details for Bangalore",
-
+                                                Text="Here are the currency details for " + desCity,
                                             }
                                         }
                                     }
@@ -737,13 +755,13 @@ namespace Airlines.XAirlines.Helpers
                                                     {
                                                         Size=AdaptiveTextSize.Medium,
                                                         Weight=AdaptiveTextWeight.Lighter,
-                                                        Text="1 AED"
+                                                        Text=cInfo.source
                                                     },
                                                     new AdaptiveTextBlock()
                                                     {
                                                         Size=AdaptiveTextSize.Medium,
                                                         Weight=AdaptiveTextWeight.Lighter,
-                                                        Text="1 INR"
+                                                        Text=desCurrencyCode
                                                     },
                                                 }
                                             }
@@ -758,14 +776,14 @@ namespace Airlines.XAirlines.Helpers
                                                 HorizontalAlignment=AdaptiveHorizontalAlignment.Right,
                                                 Size=AdaptiveTextSize.Medium,
                                                 Weight=AdaptiveTextWeight.Bolder,
-                                                Text="18.94 INR"
+                                                Text="1 " + cInfo.source
                                             },
                                             new AdaptiveTextBlock()
                                             {
                                                 HorizontalAlignment=AdaptiveHorizontalAlignment.Right,
                                                 Size=AdaptiveTextSize.Medium,
                                                 Weight=AdaptiveTextWeight.Bolder,
-                                                Text="0.053 AED"
+                                                Text=desCurrency + " " + desCurrencyCode
                                             }
                                         }
                                     }
