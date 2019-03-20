@@ -325,6 +325,12 @@
     <Content Include="Resources\flighticon.png" />
     <Content Include="Resources\Home.png" />
     <Content Include="Resources\homeicon.png" />
+    <Content Include="Resources\Rainwithcloud.png" />
+    <Content Include="Resources\Rainy.png" />
+    <Content Include="Resources\Sun-vector.png" />
+    <Content Include="Resources\Sun.png" />
+    <Content Include="Resources\Sunny and cloudy.png" />
+    <Content Include="Resources\Sunny-cloudy-weather.png" />
     <Content Include="Resources\Vacation.png" />
     <Content Include="Resources\vacationicon.png" />
     <Content Include="Scripts\bootstrap.js" />

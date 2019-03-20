@@ -8,7 +8,7 @@ namespace Airlines.XAirlines.Controllers
 {
     public class AirlinesController : Controller
     {
-        [Route("index")]
+        [Route("")]
         public ActionResult Index()
         {
             return View();

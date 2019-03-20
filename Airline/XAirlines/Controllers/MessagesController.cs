@@ -81,35 +81,105 @@ namespace Airlines.XAirlines.Controllers
                 ConnectorClient connector = new ConnectorClient(new Uri(message.ServiceUrl));
                 var channelData = message.GetChannelData<TeamsChannelData>();
 
-                // Ensure that we have an entry for this tenant in the database
-               
-                // Treat 1:1 add/remove events as if they were add/remove of a team member
-                if (channelData.EventType == null)
-                {
-                    if (message.MembersAdded != null)
-                        channelData.EventType = "teamMemberAdded";
-                    if (message.MembersRemoved != null)
-                        channelData.EventType = "teamMemberRemoved";
-                }
-
+                
                 switch (channelData.EventType)
                 {
                     case "teamMemberAdded":
-                        // Team member was added (user or bot)
-                        if (message.MembersAdded.Any(m => m.Id.Contains(message.Recipient.Id)))
+                    // Team member was added (user or bot)
+                    for (int i = 0; i < message.MembersAdded.Count; i++)
+
+                    {
+
+                        if (message.MembersAdded[i].Id == message.Recipient.Id)
+
                         {
-                            // Bot was added to a team: send welcome message
-                            message.Text = Constants.NextWeekRoster;
+
+                            // Bot is added. Let's send welcome message.
+
+                            message.Text = "hi";
+
                             await Conversation.SendAsync(message, () => new RootDialog());
 
-                           
+                            break;
+
                         }
+
                         else
+
                         {
-                            // Member was added to a team: update the team member count
-                          
+
+                            try
+
+                            {
+
+                                var userId = message.MembersAdded[i].Id;
+
+                                //var mychannelData = message.GetChannelData<TeamsChannelData>();
+
+                                var connectorClient = new ConnectorClient(new Uri(message.ServiceUrl));
+
+
+
+                                var parameters = new ConversationParameters
+
+                                {
+
+                                    Members = new ChannelAccount[] { new ChannelAccount(userId) },
+
+                                    ChannelData = new TeamsChannelData
+
+                                    {
+
+                                        Tenant = channelData.Tenant,
+
+                                        Notification = new NotificationInfo() { Alert = true }
+
+                                    }
+
+                                };
+
+
+
+                                var conversationResource = await connectorClient.Conversations.CreateConversationAsync(parameters);
+
+
+
+                                var replyMessage = Activity.CreateMessageActivity();
+
+                                replyMessage.ChannelData = new TeamsChannelData() { Notification = new NotificationInfo(true) };
+
+                                replyMessage.Conversation = new ConversationAccount(id: conversationResource.Id.ToString());
+
+                                var name = message.MembersAdded[i].Name;
+
+                                if (name != null)
+
+                                {
+
+                                    name = name.Split(' ').First();
+
+                                }
+                                var card = await CardHelper.GetWelcomeScreen(name);
+                                replyMessage.Attachments.Add(card);
+
+
+
+                                await connectorClient.Conversations.SendToConversationAsync((Activity)replyMessage);
+
+                            }
+
+                            catch (Exception ex)
+
+                            {
+
+                                ErrorLogService.LogError(ex);
+
+                            }
+
                         }
-                        break;
+
+                    }
+                    break;
                     case "teamMemberRemoved":
                         // Add team & channel details 
                         if (message.MembersRemoved.Any(m => m.Id.Contains(message.Recipient.Id)))

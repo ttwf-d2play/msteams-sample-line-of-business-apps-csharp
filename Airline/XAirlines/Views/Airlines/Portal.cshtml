@@ -1,4 +1,4 @@
-﻿@{ 
+﻿@{
     Layout = null;
 }
 <!DOCTYPE html>
@@ -44,21 +44,25 @@
 
             </div>
         </div>
-       
+
     </div>
     <script src="~/Scripts/jquery.js"></script>
-   
+
     <script src="~/Scripts/responsive-calendar.js"></script>
     <script type="text/javascript">
         $(document).ready(function () {
-        $(".responsive-calendar").responsiveCalendar({
-          time: '2019-04',
-          events: {
-            "2019-04-30": {"number": 5, "url": "http://w3widgets.com/responsive-slider"},
-            "2019-04-6": {"number": 1, "url": "http://w3widgets.com"},
-            "2019-04-3":{"number": 1},
-            "2019-04-2": {}}
-        });
-      });</script>
+            var dt = new Date();
+            var month = dt.getMonth();
+            var year = dt.getFullYear()
+            $(".responsive-calendar").responsiveCalendar({
+                time: '2019-03',
+                events: {
+                    "2019-04-30": { "number": 5, "url": "http://w3widgets.com/responsive-slider" },
+                    "2019-04-6": { "number": 1, "url": "http://w3widgets.com" },
+                    "2019-04-3": { "number": 1 },
+                    "2019-04-2": {}
+                }
+            });
+        });</script>
 </body>
 </html>

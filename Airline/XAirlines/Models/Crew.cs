@@ -35,6 +35,9 @@ namespace Airlines.XAirlines.Models
         public string day { get; set; }
         public DateTime date { get; set; }
         public bool vacationPlan { get; set; }
+        public string vacationDate { get; set; }
+        public string vacationReason { get; set; }
+        public bool isDayOff { get; set; }
         public bool halt { get; set; }
         public string lastUpdated { get; set; }
         public FlightDetails flightDetails { get; set; }

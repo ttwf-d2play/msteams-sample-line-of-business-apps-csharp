@@ -9,6 +9,7 @@ namespace Airlines.XAirlines.Common
     public class Constants
     {
         public const string NextWeekRoster = "my next week roster";
+        public const string UpdateCard = "update";
         public const string NextMonthRoster = "my next month roster";
         public const string ShowDetailedRoster = "show detailed roster";
         public const string WeatherCard = "get weather card";
