@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using AdaptiveCards;
+
 using Airlines.XAirlines.Models;
 using Microsoft.Bot.Connector;
 using Bogus;
@@ -13,6 +14,7 @@ using Airlines.XAirlines.Common;
 using System.IO;
 using Microsoft.Bot.Builder.Dialogs;
 using v = Airlines.XAirlines.Helpers;
+using static Airlines.XAirlines.Helpers.WeatherHelper;
 
 namespace Airlines.XAirlines.Helpers
 {
@@ -20,11 +22,9 @@ namespace Airlines.XAirlines.Helpers
     {
         public static async Task<Attachment> GetWeeklyRosterCard()
         {
-            //Common crewdata = new Common();
+           
             List<Plan> weekplan = Common.WeeksPlan();
-            //DateTime today = DateTime.Today;
-            //DateTime weekafter = today.AddDays(6);
-            //var weekplan = crew.plan.Where(c => c.date >= today && c.date <= weekafter);
+           
             var listCard = new ListCard();
             listCard.content = new Content();
             listCard.content.title = "Here is your next week's roster";
@@ -35,7 +35,7 @@ namespace Airlines.XAirlines.Helpers
                 item.id = i.flightDetails.flightStartDate;
                 item.type = "resultItem";
                 item.icon = i.vacationPlan==true?ApplicationSettings.BaseUrl + "/Resources/vacationicon.png": i.isDayOff==true?ApplicationSettings.BaseUrl + "/Resources/homeicon.png": ApplicationSettings.BaseUrl + "/Resources/flighticon.png";
-                item.title = i.vacationPlan==true?i.vacationDate:i.isDayOff==true?i.flightDetails.flightStartDate:i.flightDetails.flightStartDate + "-" + i.flightDetails.flightEndDate;
+                item.title = i.vacationPlan == true ? Convert.ToDateTime(i.vacationDate).ToString("ddd dd MMM") : i.isDayOff == true ? Convert.ToDateTime(i.flightDetails.flightStartDate).ToString("ddd dd MMM") : Convert.ToDateTime(i.flightDetails.flightStartDate).ToString("ddd dd MMM") + "-" + Convert.ToDateTime(i.flightDetails.flightEndDate).ToString("ddd dd MMM");
                 item.subtitle = i.vacationPlan==true?i.vacationReason:i.isDayOff==true?"Day Off":i.flightDetails.sourceCode + "-" + i.flightDetails.destinationCode;
                 item.tap = i.vacationPlan==true?null:i.isDayOff==true?null:new Tap()
                 {
@@ -236,7 +236,7 @@ namespace Airlines.XAirlines.Helpers
                                             {
                                                Size=AdaptiveTextSize.Medium,
                                                 Weight=AdaptiveTextWeight.Bolder,
-                                               Text=datePlan.flightDetails.flightStartDate
+                                               Text=Convert.ToDateTime(datePlan.flightDetails.flightStartDate).ToString("ddd dd MMM")
                                             },
                                             new AdaptiveTextBlock()
                                             {
@@ -259,7 +259,7 @@ namespace Airlines.XAirlines.Helpers
                                                Size=AdaptiveTextSize.Medium,
                                                HorizontalAlignment=AdaptiveHorizontalAlignment.Right,
                                                 Weight=AdaptiveTextWeight.Bolder,
-                                               Text=datePlan.flightDetails.flightEndDate
+                                               Text=Convert.ToDateTime(datePlan.flightDetails.flightEndDate).ToString("ddd dd MMM")
                                             },
                                             new AdaptiveTextBlock()
                                             {
@@ -428,17 +428,14 @@ namespace Airlines.XAirlines.Helpers
                                 }
                             }
                         },
-                        
                     }
-
-
                 },
                 Actions=new List<AdaptiveAction>()
                 {
                     new AdaptiveSubmitAction()
                     {
                         Title="Weather Report",
-                        Data=new WeatherActionDetails(){City=datePlan.flightDetails.destination,ActionType=Constants.WeatherCard}
+                        Data=new WeatherActionDetails(){Date=datePlan.flightDetails.flightEndDate,City=datePlan.flightDetails.destination,ActionType=Constants.WeatherCard}
                     },
                     new AdaptiveSubmitAction()
                     {
@@ -454,7 +451,6 @@ namespace Airlines.XAirlines.Helpers
                 Content = Card
             };
         }
-     
         public static async Task<Attachment> GetUpdateScreen()
         {
 
@@ -519,8 +515,9 @@ namespace Airlines.XAirlines.Helpers
 
 
         }
-        public static async Task<Attachment> GetWeatherCard(WeatherInfo wInfo)
+        public static async Task<Attachment> GetWeatherCard(WeatherInfo wInfo,string ArrivalDate)
         {
+           
 
             DateTime dateTime;
             var Card = new AdaptiveCard(new AdaptiveSchemaVersion("1.0"))
@@ -551,7 +548,7 @@ namespace Airlines.XAirlines.Helpers
                                          {
                                              //Date of arrival - get it from Test json
                                              new AdaptiveTextBlock(){Text= "Date of Arrival",HorizontalAlignment=AdaptiveHorizontalAlignment.Left},
-                                             new AdaptiveTextBlock(){Text="Sun,24 Nov",Weight=AdaptiveTextWeight.Bolder}
+                                             new AdaptiveTextBlock(){Text=ArrivalDate,Weight=AdaptiveTextWeight.Bolder}
                                          },
 
                                             
@@ -564,7 +561,7 @@ namespace Airlines.XAirlines.Helpers
                                             new AdaptiveImage()
                                             {
                                                 HorizontalAlignment=AdaptiveHorizontalAlignment.Right,
-                                                Url=new Uri(ApplicationSettings.BaseUrl+"/Resources/Sunny-cloudy-weather.png")
+                                                Url=wInfo.weather[0].description.Contains("rain")?new Uri(ApplicationSettings.BaseUrl+"/Resources/Rainwithcloud.png"):wInfo.main.temp_min-273>25?new Uri(ApplicationSettings.BaseUrl+"/Resources/Sun-vector.png"):new Uri(ApplicationSettings.BaseUrl+"/Resources/Sunny-cloudy-weather.png"),
                                             }
                                         }
                                     }
@@ -580,7 +577,7 @@ namespace Airlines.XAirlines.Helpers
                                         {
                                             new AdaptiveImage()
                                             {
-                                                Url=new Uri(ApplicationSettings.BaseUrl+"/Resources/Sunny and cloudy.png")
+                                                Url=wInfo.weather[0].description.Contains("rain")?new Uri(ApplicationSettings.BaseUrl+"/Resources/Rainy.png"):wInfo.main.temp_min-273>25?new Uri(ApplicationSettings.BaseUrl+"/Resources/Sun.png"):new Uri(ApplicationSettings.BaseUrl+"/Resources/Sunny and cloudy.png")
                                             }
                                         }
                                     },
@@ -590,7 +587,7 @@ namespace Airlines.XAirlines.Helpers
                                         {
                                             new AdaptiveTextBlock()
                                             {
-                                                Text="Mostly cloudy",
+                                                Text=wInfo.weather[0].description,
                                                
                                             }
                                         }
@@ -798,6 +795,282 @@ namespace Airlines.XAirlines.Helpers
         {
             var path = System.Web.Hosting.HostingEnvironment.MapPath(@"~/Cards/AdaptiveCard.json");
             return File.ReadAllText(path);
+        }
+        public static AdaptiveCard GetSomeCard()
+        {
+            var Card = new AdaptiveCard(new AdaptiveSchemaVersion("1.0"))
+            {
+
+                Body = new List<AdaptiveElement>()
+                     {
+                    new AdaptiveColumnSet()
+                    {
+                        Spacing=AdaptiveSpacing.Small,
+                        Columns=new List<AdaptiveColumn>()
+                        {
+                            new AdaptiveColumn()
+                            {
+                                Items=new List<AdaptiveElement>()
+                                {
+                                    new AdaptiveTextBlock()
+                                    {
+                                        HorizontalAlignment=AdaptiveHorizontalAlignment.Left,
+                                        Spacing=AdaptiveSpacing.Small,
+                                        Separator=true,
+                                        Weight=AdaptiveTextWeight.Bolder,
+                                        Color=AdaptiveTextColor.Attention,
+                                        Text="E3010",
+                                        MaxLines=1
+                                    }
+                                },
+
+                            },
+                            new AdaptiveColumn()
+                            {
+                                Items=new List<AdaptiveElement>()
+                                {
+                                    new AdaptiveTextBlock()
+                                    {
+                                        HorizontalAlignment=AdaptiveHorizontalAlignment.Right,
+
+                                        Separator=true,
+
+                                        Text="Updated 2 days ago",
+
+                                    }
+                                },
+
+                            },
+                        }
+                    },
+                    new AdaptiveColumnSet()
+                    {
+                        Separator=true,
+                        Columns=new List<AdaptiveColumn>()
+                        {
+                            new AdaptiveColumn()
+                            {
+                               Items=new List<AdaptiveElement>()
+                               {
+                                   new AdaptiveContainer()
+                                   {
+                                       Items=new List<AdaptiveElement>()
+                                       {
+                                            new AdaptiveTextBlock()
+                                            {
+                                               Size=AdaptiveTextSize.Medium,
+                                                Weight=AdaptiveTextWeight.Bolder,
+                                               Text="Tue, 23 Nov"
+                                            },
+                                            new AdaptiveTextBlock()
+                                            {
+                                               Size=AdaptiveTextSize.Small,
+                                               Weight=AdaptiveTextWeight.Bolder,
+                                               Text="Tue, 23 Nov"
+                                            },
+                                       }
+                                   }
+
+
+                               }
+                            },
+                            new AdaptiveColumn()
+                            {
+                                Items=new List<AdaptiveElement>()
+                                {
+                                          new AdaptiveTextBlock()
+                                            {
+                                               Size=AdaptiveTextSize.Medium,
+                                               HorizontalAlignment=AdaptiveHorizontalAlignment.Right,
+                                                Weight=AdaptiveTextWeight.Bolder,
+                                               Text="Tue, 23 Nov"
+                                            },
+                                            new AdaptiveTextBlock()
+                                            {
+                                                HorizontalAlignment=AdaptiveHorizontalAlignment.Right,
+                                               Size=AdaptiveTextSize.Small,
+                                               Weight=AdaptiveTextWeight.Bolder,
+                                               Text="Tue, 23 Nov"
+                                            },
+                                }
+                            }
+                        }
+                    },
+                    new AdaptiveColumnSet()
+                    {
+                      Separator=true,
+                      Columns=new List<AdaptiveColumn>()
+                      {
+                          new AdaptiveColumn()
+                          {
+                              Items=new List<AdaptiveElement>()
+                              {
+                                 new AdaptiveTextBlock()
+                                 {
+                                     HorizontalAlignment=AdaptiveHorizontalAlignment.Center,
+                                     Size=AdaptiveTextSize.Medium,
+                                     Weight=AdaptiveTextWeight.Bolder,
+                                     Text="3 hr 10 min"
+                                 }
+                              }
+                          }
+                      }
+                    },
+                    new AdaptiveColumnSet()
+                    {
+                        Columns=new List<AdaptiveColumn>()
+
+                        {
+                            new AdaptiveColumn()
+                            {
+                                Items=new List<AdaptiveElement>()
+                                {
+                                    new AdaptiveContainer()
+                                    {
+                                        Items=new List<AdaptiveElement>()
+                                        {
+                                            new AdaptiveTextBlock()
+                                            {
+                                                Size=AdaptiveTextSize.Small,
+                                                Weight=AdaptiveTextWeight.Lighter,
+                                                Text="7923-new delhi"
+
+                                            },
+                                            new AdaptiveTextBlock()
+                                            {
+                                                Size=AdaptiveTextSize.ExtraLarge,
+                                                Color=AdaptiveTextColor.Accent,
+                                                Text="DEL"
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            new AdaptiveColumn()
+                            {
+                                Items=new List<AdaptiveElement>()
+                                {
+                                    new AdaptiveTextBlock()
+                                    {
+                                        HorizontalAlignment=AdaptiveHorizontalAlignment.Right,
+                                        Size=AdaptiveTextSize.Small,
+                                        Weight=AdaptiveTextWeight.Lighter,
+                                        Text="7923-new delhi"
+
+                                    },
+                                    new AdaptiveTextBlock()
+                                    {
+                                        HorizontalAlignment=AdaptiveHorizontalAlignment.Right,
+                                        Size=AdaptiveTextSize.ExtraLarge,
+                                       Color=AdaptiveTextColor.Accent,
+                                        Text="DEL"
+
+                                    },
+                                    new AdaptiveTextBlock()
+                                    {
+                                        HorizontalAlignment=AdaptiveHorizontalAlignment.Right,
+                                        Size=AdaptiveTextSize.Medium,
+                                        Weight=AdaptiveTextWeight.Bolder,
+                                        Color=AdaptiveTextColor.Accent,
+                                        Text="2hr 15 min"
+                                        
+                                    },
+                                }
+                            }
+                        }
+
+                    },
+                    new AdaptiveColumnSet()
+                    {
+                        Columns=new List<AdaptiveColumn>()
+                        {
+                            new AdaptiveColumn()
+                            {
+                                Items=new List<AdaptiveElement>()
+                                {
+                                    new AdaptiveTextBlock()
+                                    {
+                                        Text="E-Gate Open"
+                                    },
+                                    new AdaptiveTextBlock()
+                                    {
+                                        Text="Block hrs"
+                                    },
+                                    new AdaptiveTextBlock()
+                                    {
+                                        Text="Away from base"
+                                    },
+                                    new AdaptiveTextBlock()
+                                    {
+                                        Text="AC type"
+                                    },
+                                    new AdaptiveTextBlock()
+                                    {
+                                        Text="Tail No"
+                                    },
+                                },
+
+                            },
+                            new AdaptiveColumn()
+                            {
+                                Items=new List<AdaptiveElement>()
+                                {
+                                    new AdaptiveTextBlock()
+                                    {
+                                        HorizontalAlignment=AdaptiveHorizontalAlignment.Right,
+                                        Weight=AdaptiveTextWeight.Bolder,
+                                        Text="21:00"
+
+                                    },
+                                    new AdaptiveTextBlock()
+                                    {
+                                        HorizontalAlignment=AdaptiveHorizontalAlignment.Right,
+                                        Weight=AdaptiveTextWeight.Bolder,
+                                        Text="21:00"
+
+                                    },
+                                    new AdaptiveTextBlock()
+                                    {
+                                        HorizontalAlignment=AdaptiveHorizontalAlignment.Right,
+                                        Weight=AdaptiveTextWeight.Bolder,
+                                        Text="21:00"
+
+                                    },
+                                    new AdaptiveTextBlock()
+                                    {
+                                        HorizontalAlignment=AdaptiveHorizontalAlignment.Right,
+                                        Weight=AdaptiveTextWeight.Bolder,
+                                        Text="B7777-300ER"
+
+                                    },
+                                    new AdaptiveTextBlock()
+                                    {
+                                        HorizontalAlignment=AdaptiveHorizontalAlignment.Right,
+                                        Weight=AdaptiveTextWeight.Bolder,
+                                        Text="A6EGA"
+                                    },
+                                }
+                            }
+                        },
+                    }
+                },
+                Actions = new List<AdaptiveAction>()
+                {
+                    new AdaptiveSubmitAction()
+                    {
+                        Title="Weather Report",
+                       // Data=new WeatherActionDetails(){Date=datePlan.flightDetails.flightEndDate,City=datePlan.flightDetails.destination,ActionType=Constants.WeatherCard}
+                    },
+                    new AdaptiveSubmitAction()
+                    {
+                        Title="Currency Details",
+                        //Data=new WeatherActionDetails(){sourceCurrencyCode=datePlan.flightDetails.sourceCurrencyCode, destinationCurrencyCode=datePlan.flightDetails.destinationCurrencyCode, City=datePlan.flightDetails.destination,ActionType=Constants.CurrencyCard}
+                    }
+                }
+            };
+
+            return Card;
+          
         }
     }
 }

@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
+using static Airlines.XAirlines.Helpers.WeatherHelper;
 
 namespace Airlines.XAirlines.Dialogs
 {
@@ -103,7 +104,7 @@ namespace Airlines.XAirlines.Dialogs
                 case Constants.WeatherCard:
                     //var desLocationInfo = JsonConvert.DeserializeObject<WeatherActionDetails>(activity.Value.ToString());
                     WeatherInfo weatherinfo = weather.GetWeatherInfo(desLocationInfo.City);
-                    card = await CardHelper.GetWeatherCard(weatherinfo);
+                    card = await CardHelper.GetWeatherCard(weatherinfo, desLocationInfo.Date);
                     break;
                 case Constants.CurrencyCard:
                     var desCurrency = JsonConvert.DeserializeObject<WeatherActionDetails>(activity.Value.ToString());
