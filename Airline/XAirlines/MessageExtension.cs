@@ -64,11 +64,11 @@ namespace Airlines.XAirlines
 
         private static ComposeExtensionAttachment GetAttachment(string title = null)
         {
-            var person = new Faker();
+            //var person = new Faker();
             var card = new ThumbnailCard
             {
-                Title = !string.IsNullOrWhiteSpace(title) ? title : person.Lorem.Sentence(),
-                Text = person.Lorem.Paragraph(),
+                //Title = !string.IsNullOrWhiteSpace(title) ? title : person.Lorem.Sentence(),
+                //Text = person.Lorem.Paragraph(),
                 Images = { new CardImage("http://lorempixel.com/640/480?rand=" + DateTime.Now.Ticks.ToString()) }
             };
 

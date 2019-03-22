@@ -55,8 +55,8 @@ namespace Airlines.XAirlines.Helpers
             attachment.ContentType = listCard.contentType;
             attachment.Content = listCard.content;
             return attachment;
-
         }
+
         public static async Task<Attachment> GetMonthlyRosterCard()
         {
 
@@ -684,8 +684,7 @@ namespace Airlines.XAirlines.Helpers
 
 
         }
-
-
+        
         public static async Task<Attachment> GetCurrencyCard(CurrencyInfo cInfo, string desCity, string desCurrencyCode)
         {
             DateTime dateTime;
