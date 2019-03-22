@@ -10,15 +10,10 @@ namespace Airlines.XAirlines.Helpers
 {
     public class Common
     {
-        private static int GenrateRandomNumber(int min, int max)
-        {
-            Random random = new Random();
-            return random.Next(min, max);
-        }
+
 
         public static Crew ReadJson()
         {
-            //int filenumber = GenrateRandomNumber(1, 10);
             int filenumber = 0;
             string location = ApplicationSettings.BaseUrl;
             string userName = (Environment.UserName).ToLower();
@@ -69,28 +64,3 @@ namespace Airlines.XAirlines.Helpers
 
 
 }
-        //public Crew GetWeeksData()
-        //{
-        //    Crew crew = ReadJson();
-
-        //    DateTime today = DateTime.Today;
-
-        //    DateTime weekafter = today.AddDays(6);
-
-        //    Crew weekplan = (Crew)crew.plan.Where(c => c.date >= today && c.date <= weekafter);
-
-        //    return weekplan;
-        //}
-
-        //public static Crew GetDataByDate(DateTime date)
-        //{
-        //    Crew crew = ReadJson();
-
-        //    DateTime today = DateTime.Today;
-
-        //    DateTime weekafter = today.AddDays(6);
-
-        //    Crew datePlan = (Crew)crew.plan.Where(c => c.date == date);
-
-        //    return datePlan;
-        
