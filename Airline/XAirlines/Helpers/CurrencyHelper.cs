@@ -62,7 +62,7 @@ namespace Airlines.XAirlines.Helpers
         public float USDBTN { get; set; }
         public float USDBWP { get; set; }
         public float USDBYN { get; set; }
-        public int USDBYR { get; set; }
+        public float USDBYR { get; set; }
         public float USDBZD { get; set; }
         public float USDCAD { get; set; }
         public float USDCDF { get; set; }
@@ -72,7 +72,7 @@ namespace Airlines.XAirlines.Helpers
         public float USDCNY { get; set; }
         public float USDCOP { get; set; }
         public float USDCRC { get; set; }
-        public int USDCUC { get; set; }
+        public float USDCUC { get; set; }
         public float USDCUP { get; set; }
         public float USDCVE { get; set; }
         public float USDCZK { get; set; }
@@ -186,7 +186,7 @@ namespace Airlines.XAirlines.Helpers
         public float USDTZS { get; set; }
         public float USDUAH { get; set; }
         public float USDUGX { get; set; }
-        public int USDUSD { get; set; }
+        public float USDUSD { get; set; }
         public float USDUYU { get; set; }
         public float USDUZS { get; set; }
         public float USDVEF { get; set; }
