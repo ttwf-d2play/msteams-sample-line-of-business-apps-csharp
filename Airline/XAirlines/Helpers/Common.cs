@@ -59,6 +59,19 @@ namespace Airlines.XAirlines.Helpers
             return weekplan;
 
         }
+
+        public List<DateTime> OneMonthsDates()
+        {
+            DateTime today = DateTime.Now;
+            List<DateTime> oneMonthDates = new List<DateTime>();
+            oneMonthDates.Add(today);
+            for (int i = 1; i < 30; i++)
+            {
+                oneMonthDates.Add(today.AddDays(i));
+            }
+            return oneMonthDates;
+        }
+
     }
 
 
