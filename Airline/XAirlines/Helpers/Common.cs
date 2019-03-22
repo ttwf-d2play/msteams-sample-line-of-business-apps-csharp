@@ -18,10 +18,29 @@ namespace Airlines.XAirlines.Helpers
 
         public static Crew ReadJson()
         {
-            int filenumber = GenrateRandomNumber(1, 10);
+            //int filenumber = GenrateRandomNumber(1, 10);
+            int filenumber = 0;
             string location = ApplicationSettings.BaseUrl;
+            string userName = (Environment.UserName).ToLower();
+            if(userName[0] == 'v')
+            {
+                if (userName[3] >= 'a' && userName[3] <= 'e') filenumber = 1;
+                if (userName[3] >= 'f' && userName[3] <= 'j') filenumber = 2;
+                if (userName[3] >= 'k' && userName[3] <= 'o') filenumber = 3;
+                if (userName[3] >= 'p' && userName[3] <= 't') filenumber = 4;
+                if (userName[3] >= 'u' && userName[3] <= 'z') filenumber = 5;
+            }
+            else
+            {
+                if (userName[0] >= 'a' && userName[0] <= 'e') filenumber = 1;
+                if (userName[0] >= 'f' && userName[0] <= 'j') filenumber = 2;
+                if (userName[0] >= 'k' && userName[0] <= 'o') filenumber = 3;
+                if (userName[0] >= 'p' && userName[0] <= 't') filenumber = 4;
+                if (userName[0] >= 'u' && userName[0] <= 'z') filenumber = 5;
+
+            }
             
-            string file = System.Web.Hosting.HostingEnvironment.MapPath(@"~\TestData\1.json");
+            string file = System.Web.Hosting.HostingEnvironment.MapPath(@"~\TestData\"+ filenumber +".json");
             string data = string.Empty;
             if (File.Exists(file))
             {
