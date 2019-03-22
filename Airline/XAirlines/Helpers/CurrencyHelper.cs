@@ -31,7 +31,8 @@ namespace Airlines.XAirlines.Helpers
         public string privacy { get; set; }
         public int timestamp { get; set; }
         public string source { get; set; }
-        public Quotes quotes { get; set; }
+        //public Quotes quotes { get; set; }
+        public Dictionary<string, double> quotes { get; set; }
     }
 
     public class Quotes
@@ -52,7 +53,7 @@ namespace Airlines.XAirlines.Helpers
         public float USDBGN { get; set; }
         public float USDBHD { get; set; }
         public float USDBIF { get; set; }
-        public int USDBMD { get; set; }
+        public float USDBMD { get; set; }
         public float USDBND { get; set; }
         public float USDBOB { get; set; }
         public float USDBRL { get; set; }

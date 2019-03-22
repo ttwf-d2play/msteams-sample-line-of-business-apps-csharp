@@ -55,8 +55,8 @@ namespace Airlines.XAirlines.Helpers
             attachment.ContentType = listCard.contentType;
             attachment.Content = listCard.content;
             return attachment;
-
         }
+
         public static async Task<Attachment> GetMonthlyRosterCard()
         {
 
@@ -687,24 +687,18 @@ namespace Airlines.XAirlines.Helpers
 
 
         }
-
         
         public static async Task<Attachment> GetCurrencyCard(CurrencyInfo cInfo, string desCity, string desCurrencyCode)
         {
             DateTime dateTime;
             string desCode = cInfo.source + desCurrencyCode;
-            var desCurrency = Math.Round(cInfo.quotes.USDINR); //change is to dynamic
-            
-
-
-
+            var desCurrency = Math.Round(cInfo.quotes[desCode], 2);
+            var desCurrencyTwo = Math.Round((desCurrency / 100), 2).ToString();
 
             var Card = new AdaptiveCard(new AdaptiveSchemaVersion("1.0"))
             {
-
                 Body = new List<AdaptiveElement>()
                 {
-
                     new AdaptiveContainer()
                     {
                         Items=new List<AdaptiveElement>()
@@ -747,13 +741,13 @@ namespace Airlines.XAirlines.Helpers
                                                     {
                                                         Size=AdaptiveTextSize.Medium,
                                                         Weight=AdaptiveTextWeight.Lighter,
-                                                        Text=cInfo.source
+                                                        Text="1 " + cInfo.source
                                                     },
                                                     new AdaptiveTextBlock()
                                                     {
                                                         Size=AdaptiveTextSize.Medium,
                                                         Weight=AdaptiveTextWeight.Lighter,
-                                                        Text=desCurrencyCode
+                                                        Text="1 " + desCurrencyCode
                                                     },
                                                 }
                                             }
@@ -768,14 +762,14 @@ namespace Airlines.XAirlines.Helpers
                                                 HorizontalAlignment=AdaptiveHorizontalAlignment.Right,
                                                 Size=AdaptiveTextSize.Medium,
                                                 Weight=AdaptiveTextWeight.Bolder,
-                                                Text="1 " + cInfo.source
+                                                Text=desCurrency + " " + desCurrencyCode
                                             },
                                             new AdaptiveTextBlock()
                                             {
                                                 HorizontalAlignment=AdaptiveHorizontalAlignment.Right,
                                                 Size=AdaptiveTextSize.Medium,
                                                 Weight=AdaptiveTextWeight.Bolder,
-                                                Text=desCurrency + " " + desCurrencyCode
+                                                Text=desCurrencyTwo + " " + cInfo.source
                                             }
                                         }
                                     }
@@ -791,8 +785,6 @@ namespace Airlines.XAirlines.Helpers
                 ContentType = AdaptiveCard.ContentType,
                 Content = Card
             };
-
-
         }
         public static String GetAdaptiveCardJson()
         {
