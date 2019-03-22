@@ -336,6 +336,7 @@
     <Compile Include="ViewModels\TabListViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\main.css" />
     <Content Include="Content\msteams-16.css" />
     <Content Include="Content\details.css" />
     <Content Include="Content\styles.css" />
@@ -362,6 +363,7 @@
     <Content Include="Resources\group.PNG" />
     <Content Include="Resources\Like.png" />
     <Content Include="Resources\Likes.PNG" />
+    <Content Include="Resources\line.png" />
     <Content Include="Resources\lines.PNG" />
     <Content Include="Resources\pencil.PNG" />
     <Content Include="Resources\Person.png" />
@@ -371,6 +373,7 @@
     <Content Include="Resources\Team.png" />
     <Content Include="Resources\temp.PNG" />
     <Content Include="Resources\template.PNG" />
+    <Content Include="Resources\vertical.png" />
     <Content Include="Resources\view.PNG" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
@@ -379,6 +382,7 @@
     <Content Include="Scripts\jquery.validate.min.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
+    <Content Include="Scripts\main.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -388,7 +392,9 @@
     <Content Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>
-    <Content Include="Views\Web.config" />
+    <Content Include="Views\Web.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Authentication\ConsentPage.cshtml" />
