@@ -37,6 +37,8 @@ namespace CrossVertical.Announcement.Helper
 
         public static string AppSecret { get; set; }
 
+        public static int NoOfParallelTasks { get; set; }
+        
         static ApplicationSettings()
         {
             ConnectionName = ConfigurationManager.AppSettings["ConnectionName"];
@@ -44,6 +46,8 @@ namespace CrossVertical.Announcement.Helper
 
             AppId = ConfigurationManager.AppSettings["MicrosoftAppId"];
             AppSecret = ConfigurationManager.AppSettings["MicrosoftAppPassword"];
+
+            NoOfParallelTasks = int.Parse(ConfigurationManager.AppSettings["NoOfParallelTasks"]);
         }
     }
 }

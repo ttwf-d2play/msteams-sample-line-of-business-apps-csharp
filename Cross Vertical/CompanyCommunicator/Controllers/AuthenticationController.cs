@@ -38,7 +38,7 @@ namespace CrossVertical.Announcement.Controllers
         [Route("adminconsent")]
         public async Task<ActionResult> ConsentPage(string tenant, string admin_consent, string state)
         {
-            
+
             if (string.IsNullOrEmpty(tenant))
             {
                 return HttpNotFound();
@@ -52,21 +52,26 @@ namespace CrossVertical.Announcement.Controllers
 
             var userDetails = await Cache.Users.GetItemAsync(adminUserDetails.UserEmailId);
 
-            await ProactiveMessageHelper.SendNotification(adminUserDetails.ServiceUrl, tenant, userDetails.BotConversationId, "Your app consent is successfully granted. Please go ahead and set groups & moderators." , null);
+            await ProactiveMessageHelper.SendPersonalNotification(adminUserDetails.ServiceUrl, tenant, userDetails, "Your app consent is successfully granted. Please go ahead and set groups & moderators.", null);
 
-            await ProactiveMessageHelper.SendNotification(adminUserDetails.ServiceUrl, tenant, userDetails.BotConversationId, null, CardHelper.GetGroupConfigurationCard().ToAttachment());
+            await ProactiveMessageHelper.SendPersonalNotification(adminUserDetails.ServiceUrl, tenant, userDetails, null, CardHelper.GetGroupConfigurationCard().ToAttachment());
 
             return View();
         }
 
         // GET: Authentication
         [Route("test")]
-        public async Task<ActionResult> Test()
+        public async Task<ActionResult> Test(string tasks)
         {
-            var token = await GraphHelper.GetAccessToken("0d9b645f-597b-41f0-a2a3-ef103fbd91bb", ApplicationSettings.AppId, ApplicationSettings.AppSecret);
-            GraphHelper helper = new GraphHelper(token);
-            var photo = await helper.GetUserProfilePhoto("0d9b645f-597b-41f0-a2a3-ef103fbd91bb", "mungo@blrdev.onmicrosoft.com");
-            return View();
+            ApplicationSettings.NoOfParallelTasks = int.Parse(tasks);
+            var campaignId = "48601a83-0324-4f85-a54e-de203a05d8fa";
+            var campaign = await Cache.Announcements.GetItemAsync(campaignId);
+            await AnnouncementSender.SendAnnouncement(campaign);
+            return null;
+            //var token = await GraphHelper.GetAccessToken("0d9b645f-597b-41f0-a2a3-ef103fbd91bb", ApplicationSettings.AppId, ApplicationSettings.AppSecret);
+            //GraphHelper helper = new GraphHelper(token);
+            //var photo = await helper.GetUserProfilePhoto("0d9b645f-597b-41f0-a2a3-ef103fbd91bb", "mungo@blrdev.onmicrosoft.com");
+            //return View();
         }
     }
 }

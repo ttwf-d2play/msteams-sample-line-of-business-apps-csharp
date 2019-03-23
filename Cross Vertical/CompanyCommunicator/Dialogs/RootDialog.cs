@@ -28,6 +28,7 @@ using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Connector;
 using Microsoft.Bot.Connector.Teams;
 using Microsoft.Bot.Connector.Teams.Models;
+using Microsoft.Practices.EnterpriseLibrary.TransientFaultHandling;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -62,6 +63,12 @@ namespace CrossVertical.Announcement.Dialogs
         {
             var activity = await result as Activity;
 
+            // Send typing indicator...
+            var typingMsg = context.MakeMessage();
+            typingMsg.Type = ActivityTypes.Typing;
+            typingMsg.Text = null;
+            await context.PostAsync(typingMsg);
+
             string message = string.Empty;
             if (activity.Text != null)
                 message = Microsoft.Bot.Connector.Teams.ActivityExtensions.GetTextWithoutMentions(activity).ToLowerInvariant();
@@ -69,10 +76,6 @@ namespace CrossVertical.Announcement.Dialogs
             string profileKey = GetKey(activity, Constants.ProfileKey);
             User userDetails = null;
             var channelData = context.Activity.GetChannelData<TeamsChannelData>();
-            var emailId = await GetUserEmailId(activity);
-
-            Tenant tenantData = await Common.CheckAndAddTenantDetails(channelData.Tenant.Id);
-            Role role = Common.GetUserRole(emailId, tenantData);
 
             if (context.ConversationData.ContainsKey(profileKey))
             {
@@ -81,8 +84,14 @@ namespace CrossVertical.Announcement.Dialogs
             else
             {
                 userDetails = await CheckAndAddUserDetails(activity, channelData);
+                if (userDetails == null)
+                    return;
                 context.ConversationData.SetValue(profileKey, userDetails);
             }
+
+
+            Tenant tenantData = await Common.CheckAndAddTenantDetails(channelData.Tenant.Id);
+            Role role = Common.GetUserRole(userDetails.Id, tenantData);
 
             if (!tenantData.IsAdminConsented)
             {
@@ -136,6 +145,17 @@ namespace CrossVertical.Announcement.Dialogs
                     {
                         reply.Attachments.Add(CardHelper.GetWelcomeScreen(channelData.Team != null, role));
                     }
+
+                    var exponentialBackoffRetryStrategy = new ExponentialBackoff(3, TimeSpan.FromSeconds(2),
+                     TimeSpan.FromSeconds(20), TimeSpan.FromSeconds(1));
+
+                    // Define the Retry Policy
+                    var retryPolicy = new RetryPolicy(new BotSdkTransientExceptionDetectionStrategy(), exponentialBackoffRetryStrategy);
+
+                    //await retryPolicy.ExecuteAsync(() =>
+                    //                    context.PostAsync(reply)
+                    //                    ).ConfigureAwait(false);
+
                     await context.PostAsync(reply);
                 }
             }
@@ -247,10 +267,17 @@ namespace CrossVertical.Announcement.Dialogs
                     break;
                 case Constants.SendAnnouncement:
                 case Constants.ScheduleAnnouncement:
-                    new Task(async () =>
+                    try
                     {
-                        await SendOrScheduleAnnouncement(type, context, activity, channelData);
-                    }).Start();
+                        new Task(async () =>
+                                    {
+                                        await SendOrScheduleAnnouncement(type, context, activity, channelData);
+                                    }).Start();
+                    }
+                    catch (Exception ex)
+                    {
+                        ErrorLogService.LogError(ex);
+                    }
                     break;
                 case Constants.Acknowledge:
                     await SaveAcknowledgement(context, activity, channelData);
@@ -275,7 +302,7 @@ namespace CrossVertical.Announcement.Dialogs
         private async Task ShowRecentAnnouncements(IDialogContext context, Activity activity, TeamsChannelData channelData)
         {
             var tid = channelData.Tenant.Id;
-            var emailId = await GetUserEmailId(activity);
+            var emailId = await GetCurrentUserEmailId(activity);
 
             // Fetch my announcements
             var myTenantAnnouncements = await Common.GetMyAnnouncements(emailId, tid);
@@ -359,8 +386,8 @@ namespace CrossVertical.Announcement.Dialogs
                 }
                 var reply = activity.CreateReply();
                 var card = campaign.GetPreviewCard().ToAttachment();
-                var userEmailId = await GetUserEmailId(activity);
-                var group = campaign.Recipients.Groups.FirstOrDefault(g => g.Users.Any(u => u.Id.ToLower()== userEmailId.ToLower()));
+                var userEmailId = await GetCurrentUserEmailId(activity);
+                var group = campaign.Recipients.Groups.FirstOrDefault(g => g.Users.Any(u => u.Id.ToLower() == userEmailId.ToLower()));
                 if (group != null)
                 {
                     var campaignCard = CardHelper.GetCardWithAcknowledgementDetails(card, campaign.Id, userEmailId, group.GroupId);
@@ -580,8 +607,6 @@ namespace CrossVertical.Announcement.Dialogs
         private static async Task SendAnnouncement(IDialogContext context, Activity activity, TeamsChannelData channelData, Campaign campaign)
         {
             await AnnouncementSender.SendAnnouncement(campaign);
-            campaign.Status = Status.Sent;
-            await Cache.Announcements.AddOrUpdateItemAsync(campaign.Id, campaign);
         }
 
         private async Task CreateOrEditAnnouncement(IDialogContext context, Activity activity, TeamsChannelData channelData)
@@ -688,7 +713,7 @@ namespace CrossVertical.Announcement.Dialogs
             AdminUserDetails adminDetails = new AdminUserDetails
             {
                 ServiceUrl = activity.ServiceUrl,
-                UserEmailId = await GetUserEmailId(activity)
+                UserEmailId = await GetCurrentUserEmailId(activity)
             };
             var loginUrl = GetAdminConsentUrl(channelData.Tenant.Id, ApplicationSettings.AppId, adminDetails);
             configurationCard.Buttons = new List<CardAction>();
@@ -728,7 +753,7 @@ namespace CrossVertical.Announcement.Dialogs
                 Body = data.Body,
                 ImageUrl = data.Image,
                 Sensitivity = (MessageSensitivity)Enum.Parse(typeof(MessageSensitivity), data.MessageType),
-                OwnerId = await GetUserEmailId(activity)
+                OwnerId = await GetCurrentUserEmailId(activity)
             };
 
             announcement.Id = string.IsNullOrEmpty(data.Id) ? Guid.NewGuid().ToString() : data.Id; // Assing the Existing Announcement Id
@@ -860,6 +885,8 @@ namespace CrossVertical.Announcement.Dialogs
         internal async static Task<User> CheckAndAddUserDetails(Activity activity, TeamsChannelData channelData)
         {
             var currentUser = await GetCurrentUser(activity);
+            if (currentUser == null)
+                return null;
             // User not present in cache
             var userDetails = await Cache.Users.GetItemAsync(currentUser.UserPrincipalName.ToLower());
             if (userDetails == null && currentUser != null)
@@ -967,24 +994,34 @@ namespace CrossVertical.Announcement.Dialogs
             return activity.From.Id + key;
         }
 
-        public static async Task<string> GetUserEmailId(Activity activity)
+        public static async Task<string> GetCurrentUserEmailId(Activity activity)
         {
             // Fetch the members in the current conversation
-            ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
-            try
-            {
-                var members = await connector.Conversations.GetConversationMembersAsync(activity.Conversation.Id);
-                if (members.Count == 0)
-                    return null;
-                return members.Where(m => m.Id == activity.From.Id).First().AsTeamsChannelAccount().UserPrincipalName.ToLower();
-            }
-            catch (Exception)
-            {
-                // This is the case for compose extension.
-                var channelData = activity.GetChannelData<TeamsChannelData>();
-                var tid = channelData.Tenant.Id;
-                return await GetEmailIdFromGraphAPI(activity, tid);
-            }
+            using (ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl)))
+                try
+                {
+                    var exponentialBackoffRetryStrategy = new ExponentialBackoff(3, TimeSpan.FromSeconds(2),
+                           TimeSpan.FromSeconds(20), TimeSpan.FromSeconds(1));
+
+                    // Define the Retry Policy
+                    var retryPolicy = new RetryPolicy(new BotSdkTransientExceptionDetectionStrategy(), exponentialBackoffRetryStrategy);
+
+                    var members = await retryPolicy.ExecuteAsync(() =>
+                                                connector.Conversations.GetConversationMembersAsync(activity.Conversation.Id)
+                                                ).ConfigureAwait(false);
+
+                    // var members = await connector.Conversations.GetConversationMembersAsync(activity.Conversation.Id);
+                    if (members.Count == 0)
+                        return null;
+                    return members.FirstOrDefault(m => m.Id == activity.From.Id)?.AsTeamsChannelAccount()?.UserPrincipalName?.ToLower();
+                }
+                catch (Exception)
+                {
+                    // This is the case for compose extension.
+                    var channelData = activity.GetChannelData<TeamsChannelData>();
+                    var tid = channelData.Tenant.Id;
+                    return await GetEmailIdFromGraphAPI(activity, tid);
+                }
         }
 
         private static async Task<string> GetEmailIdFromGraphAPI(Activity activity, string tid)
@@ -1003,11 +1040,25 @@ namespace CrossVertical.Announcement.Dialogs
         public static async Task<TeamsChannelAccount> GetCurrentUser(Activity activity)
         {
             // Fetch the members in the current conversation
-            ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
-            var members = await connector.Conversations.GetConversationMembersAsync(activity.Conversation.Id);
-            if (members.Count == 0)
-                return null;
-            return members.Where(m => m.Id == activity.From.Id).First().AsTeamsChannelAccount();
+            using (ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl)))
+
+            {
+                var exponentialBackoffRetryStrategy = new ExponentialBackoff(3, TimeSpan.FromSeconds(2),
+                          TimeSpan.FromSeconds(20), TimeSpan.FromSeconds(1));
+
+                // Define the Retry Policy
+                var retryPolicy = new RetryPolicy(new BotSdkTransientExceptionDetectionStrategy(), exponentialBackoffRetryStrategy);
+
+                var members = await retryPolicy.ExecuteAsync(() =>
+                                             connector.Conversations.GetConversationMembersAsync(activity.Conversation.Id)
+                                            ).ConfigureAwait(false);
+
+
+                // var members = await connector.Conversations.GetConversationMembersAsync(activity.Conversation.Id);
+                if (members.Count == 0)
+                    return null;
+                return members.FirstOrDefault(m => m.Id == activity.From.Id)?.AsTeamsChannelAccount();
+            }
         }
 
         #endregion

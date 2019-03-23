@@ -24,6 +24,7 @@ using CrossVertical.Announcement.Models;
 using CrossVertical.Announcement.Repository;
 using Microsoft.Bot.Connector;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -83,6 +84,18 @@ namespace CrossVertical.Announcement.Helpers
             }
 
             return tenantData;
+        }
+
+        public static Task ForEachAsync<T>(IEnumerable<T> source, int dop, Func<T, Task> body)
+        {
+            return Task.WhenAll(
+                from partition in Partitioner.Create(source).GetPartitions(dop)
+                select Task.Run(async delegate
+                {
+                    using (partition)
+                        while (partition.MoveNext())
+                            await body(partition.Current);
+                }));
         }
     }
 }
