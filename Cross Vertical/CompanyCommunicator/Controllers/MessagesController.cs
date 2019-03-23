@@ -244,6 +244,7 @@ namespace CrossVertical.Announcement.Controllers
                 case "channelCreated":
                     await AddNewChannelDetails(channelData, tenant);
                     break;
+
                 case "channelRenamed":
                     await RenameChannel(channelData, tenant);
                     break;
@@ -339,28 +340,37 @@ namespace CrossVertical.Announcement.Controllers
 
         private static async Task RenameChannel(TeamsChannelData channelData, Tenant tenant)
         {
+            var channelId = channelData.Channel.Id;
             var team = await GetTeam(channelData, tenant);
             if (team != null)
             {
-                var channel = team.Channels.FirstOrDefault(c => c.Id == channelData.Channel.Id);
+                var channel = team.Channels.FirstOrDefault(c => c.Id == channelId);
                 if (channel != null)
                 {
                     channel.Name = channelData.Channel.Name;
-                    await Cache.Teams.AddOrUpdateItemAsync(team.Id, team);
                 }
+                else
+                {
+                    // We must have missed the addition event
+                    team.Channels.Add(new Channel() { Id = channelId, Name = channelData.Channel.Name });
+                }
+                await Cache.Teams.AddOrUpdateItemAsync(team.Id, team);
             }
         }
 
         private static async Task AddNewChannelDetails(TeamsChannelData channelData, Tenant tenant)
         {
+            var channelId = channelData.Channel.Id;
             var team = await GetTeam(channelData, tenant);
             if (team != null)
             {
-                team.Channels.Add(new Channel() { Id = channelData.Channel.Id, Name = channelData.Channel.Name });
+                if (!team.Channels.Any(c => c.Id == channelId))
+                {
+                    team.Channels.Add(new Channel() { Id = channelId, Name = channelData.Channel.Name });
+                }
                 await Cache.Teams.AddOrUpdateItemAsync(team.Id, team);
             }
-
-        }
+       }
 
         private static async Task<Team> GetTeam(TeamsChannelData channelData, Tenant tenant)
         {
@@ -368,6 +378,10 @@ namespace CrossVertical.Announcement.Controllers
             if (tenant.Teams.Contains(channelData.Team.Id))
             {
                 return await Cache.Teams.GetItemAsync(channelData.Team.Id);
+            }
+            else
+            {
+                // TODO: Backfill the team information
             }
             return null;
         }
@@ -391,7 +405,6 @@ namespace CrossVertical.Announcement.Controllers
             }
             tenant.Teams.Remove(channelData.Team.Id);
             await Cache.Tenants.AddOrUpdateItemAsync(tenant.Id, tenant);
-
         }
 
         private static async Task AddTeamDetails(Activity message, TeamsChannelData channelData, Tenant tenant)
@@ -400,7 +413,7 @@ namespace CrossVertical.Announcement.Controllers
             {
                 ConnectorClient connector = new ConnectorClient(new Uri(message.ServiceUrl));
                 var members = await connector.Conversations.GetConversationMembersAsync(channelData.Team.Id);
-                int count = members.Count;
+
                 Team team = null;
                 if (tenant.Teams.Contains(channelData.Team.Id))
                 {
@@ -422,7 +435,10 @@ namespace CrossVertical.Announcement.Controllers
                 ConversationList channels = connector.GetTeamsConnectorClient().Teams.FetchChannelList(message.GetChannelData<TeamsChannelData>().Team.Id);
                 foreach (var channel in channels.Conversations)
                 {
-                    team.Channels.Add(new Channel() { Id = channel.Id, Name = channel.Name ?? "General" });
+                    if (!team.Channels.Any(c => c.Id == channel.Id))
+                    {
+                        team.Channels.Add(new Channel() { Id = channel.Id, Name = channel.Name ?? "General" });
+                    }
                 }
                 await Cache.Teams.AddOrUpdateItemAsync(team.Id, team);
 
@@ -431,7 +447,6 @@ namespace CrossVertical.Announcement.Controllers
                 await Cache.Tenants.AddOrUpdateItemAsync(tenant.Id, tenant);
 
                 await SendWelcomeMessageToAllMembers(tenant, message, channelData, members.AsTeamsChannelAccounts());
-
             }
         }
 
