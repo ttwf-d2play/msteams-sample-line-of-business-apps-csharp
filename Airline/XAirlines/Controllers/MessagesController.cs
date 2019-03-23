@@ -78,58 +78,24 @@ namespace Airlines.XAirlines.Controllers
             ConnectorClient connector = new ConnectorClient(new Uri(message.ServiceUrl));
             var channelData = message.GetChannelData<TeamsChannelData>();
 
+            // Treat 1:1 add/remove events as if they were add/remove of a team member
+            if (channelData.EventType == null)
+            {
+                if (message.MembersAdded != null)
+                    channelData.EventType = "teamMemberAdded";
+                if (message.MembersRemoved != null)
+                    channelData.EventType = "teamMemberRemoved";
+            }
+
             switch (channelData.EventType)
             {
                 case "teamMemberAdded":
                     // Team member was added (user or bot)
-                    for (int i = 0; i < message.MembersAdded.Count; i++)
+                    if (message.MembersAdded.Any(m => m.Id.Contains(message.Recipient.Id)))
                     {
-                       if (message.MembersAdded[i].Id == message.Recipient.Id)
-                        {
-                            // Bot is added. Let's send welcome message.
-                            message.Text = "hi";
-                            await Conversation.SendAsync(message, () => new RootDialog());
-                            break;
-
-                        }
-                        else
-                        {
-                            try
-                            {
-                                var userId = message.MembersAdded[i].Id;
-                                var connectorClient = new ConnectorClient(new Uri(message.ServiceUrl));
-                                var parameters = new ConversationParameters
-                                {
-                                    Members = new ChannelAccount[] { new ChannelAccount(userId) },
-                                    ChannelData = new TeamsChannelData
-                                    {
-                                        Tenant = channelData.Tenant,
-                                        Notification = new NotificationInfo() { Alert = true }
-                                    }
-                                };
-
-                                var conversationResource = await connectorClient.Conversations.CreateConversationAsync(parameters);
-                                var replyMessage = Activity.CreateMessageActivity();
-                                replyMessage.ChannelData = new TeamsChannelData() { Notification = new NotificationInfo(true) };
-                                replyMessage.Conversation = new ConversationAccount(id: conversationResource.Id.ToString());
-
-                                var name = message.MembersAdded[i].Name;
-
-                                if (name != null)
-                                {
-                                    name = name.Split(' ').First();
-                                }
-                                var card = CardHelper.GetWelcomeScreen(name);
-                                replyMessage.Attachments.Add(card);
-
-                                await connectorClient.Conversations.SendToConversationAsync((Activity)replyMessage);
-
-                            }
-                            catch (Exception ex)
-                            {
-                                ErrorLogService.LogError(ex);
-                            }
-                        }
+                        // Bot was added to a team: send welcome message
+                        message.Text = "hi";
+                        await Conversation.SendAsync(message, () => new RootDialog());
                     }
                     break;
                 case "teamMemberRemoved":
@@ -137,12 +103,10 @@ namespace Airlines.XAirlines.Controllers
                     if (message.MembersRemoved.Any(m => m.Id.Contains(message.Recipient.Id)))
                     {
                         // Bot was removed from a team: remove entry for the team in the database
-
                     }
                     else
                     {
                         // Member was removed from a team: update the team member  count
-
                     }
                     break;
                 // Update the team and channel info in the database when the team is rename or when channel are added/removed/renamed

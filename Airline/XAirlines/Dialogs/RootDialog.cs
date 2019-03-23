@@ -62,7 +62,7 @@ namespace Airlines.XAirlines.Dialogs
                         card = CardHelper.GetUpdateScreen();
                         break;
                     default:
-                        card = CardHelper.GetWelcomeScreen(userDetails.UserPrincipalName);
+                        card = CardHelper.GetWelcomeScreen(userDetails.GivenName ?? userDetails.Name);
                         break;
                 }
 
