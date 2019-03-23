@@ -27,8 +27,8 @@
     {
       "entityId": "com.contoso.Airlines.portal",
       "name": "Portal",
-      "contentUrl": "https://3c695b97.ngrok.io/portal",
-      "websiteUrl": "https://3c695b97.ngrok.io/portal",
+      "contentUrl": "https://airlinecabincrew.azurewebsites.net/portal?userEmailId={upn}",
+      "websiteUrl": "https://airlinecabincrew.azurewebsites.net/portal",
       "scopes": [
         "personal"
       ]
@@ -36,7 +36,7 @@
   ],
   "bots": [
     {
-      "botId": "1eb1961a-d813-4513-9752-15f811b9fade",
+      "botId": "d7efafde-bb2e-495c-b8af-554724d59261",
       "needsChannelSelector": false,
       "isNotificationOnly": false,
       "scopes": [
@@ -72,5 +72,5 @@
     "identity",
     "messageTeamMembers"
   ],
-  "validDomains": [ "*.botframework.com" ]
+  "validDomains": [ "airlinecabincrew.azurewebsites.net", "*.botframework.com" ]
 }

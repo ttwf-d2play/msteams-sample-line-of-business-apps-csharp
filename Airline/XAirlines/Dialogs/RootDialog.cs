@@ -4,12 +4,11 @@ using Airlines.XAirlines.Models;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Connector;
 using Microsoft.Bot.Connector.Teams;
+using Microsoft.Bot.Connector.Teams.Models;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 using static Airlines.XAirlines.Helpers.WeatherHelper;
 
 namespace Airlines.XAirlines.Dialogs
@@ -17,7 +16,6 @@ namespace Airlines.XAirlines.Dialogs
     [Serializable]
     public class RootDialog : IDialog<object>
     {
-
         /// <summary>
         /// Called when the dialog is started.
         /// </summary>
@@ -32,44 +30,49 @@ namespace Airlines.XAirlines.Dialogs
         private async Task MessageReceivedAsync(IDialogContext context, IAwaitable<object> result)
         {
             var activity = await result as Activity;
-            var reply = context.MakeMessage();
-            Attachment card = null;
+
+            var typingReply = activity.CreateReply();
+            typingReply.Text = null;
+            typingReply.Type = ActivityTypes.Typing;
+            await context.PostAsync(typingReply);
+
             string message = string.Empty;
-            var userName = await GetUserEmailId(activity);
+            var userDetails = await GetCurrentUserDetails(activity);
+            if (userDetails == null)
+            {
+                await context.PostAsync("Failed to read user profile. Please try again.");
+            }
+
             if (!string.IsNullOrEmpty(activity.Text))
             {
                 message = Microsoft.Bot.Connector.Teams.ActivityExtensions.GetTextWithoutMentions(activity).ToLowerInvariant();
-
-
-
+                Attachment card = null;
                 switch (message.Trim())
                 {
                     case Constants.NextMonthRoster:
-                        card = await CardHelper.GetMonthlyRosterCard();
+                        card = CardHelper.GetMonthlyRosterCard();
                         break;
                     case Constants.NextWeekRoster:
-                        card = await CardHelper.GetWeeklyRosterCard();
+                        card = await CardHelper.GetWeeklyRosterCard(userDetails.UserPrincipalName);
                         break;
-                    case Constants.ShowDetailedRoster:
-                        card = await CardHelper.GetDetailedRoster(activity);
-                        break;
+                    //case Constants.ShowDetailedRoster:
+                    //    card = CardHelper.GetDetailedRoster(userDetails.GivenName ?? userDetails.Name);
+                    //    break;
                     case Constants.UpdateCard:
-                        card = await CardHelper.GetUpdateScreen();
+                        card = CardHelper.GetUpdateScreen();
                         break;
-
                     default:
-                        
-                        card = await CardHelper.GetWelcomeScreen(userName);
+                        card = CardHelper.GetWelcomeScreen(userDetails.UserPrincipalName);
                         break;
                 }
+
+                var reply = context.MakeMessage();
                 reply.Attachments.Add(card);
                 await context.PostAsync(reply);
-
 
             }
             else if (activity.Value != null)
             {
-
                 await HandleActions(context, activity);
                 return;
             }
@@ -77,57 +80,70 @@ namespace Airlines.XAirlines.Dialogs
 
         private async Task HandleActions(IDialogContext context, Activity activity)
         {
-            WeatherHelper weather = new WeatherHelper();
-            var reply = context.MakeMessage();
-            var details = JsonConvert.DeserializeObject<ActionDetails>(activity.Value.ToString());
+            var actionDetails = JsonConvert.DeserializeObject<ActionDetails>(activity.Value.ToString());
+            var userDetails = await GetCurrentUserDetails(activity);
+            var type = actionDetails.ActionType;
 
-            CurrencyHelper currency = new CurrencyHelper();
-         
-                var desLocationInfo = JsonConvert.DeserializeObject<WeatherActionDetails>(activity.Value.ToString());
-                //WeatherInfo weatherinfo = weather.GetWeatherInfo(desLocationInfo.City);
-          
-            
-
-            var type = details.ActionType;
             Attachment card = null;
+
             switch (type)
             {
                 case Constants.ShowDetailedRoster:
-                    card=await CardHelper.GetDetailedRoster(activity);
+                    card = await GetDetailedRoasterCard(activity, userDetails);
                     break;
                 case Constants.NextWeekRoster:
-                    card = await CardHelper.GetWeeklyRosterCard();
+                    card = await CardHelper.GetWeeklyRosterCard(userDetails.UserPrincipalName);
                     break;
                 case Constants.NextMonthRoster:
-                    card = await CardHelper.GetMonthlyRosterCard();
+                    card = CardHelper.GetMonthlyRosterCard();
                     break;
                 case Constants.WeatherCard:
-                    //var desLocationInfo = JsonConvert.DeserializeObject<WeatherActionDetails>(activity.Value.ToString());
-                    WeatherInfo weatherinfo = weather.GetWeatherInfo(desLocationInfo.City);
-                    card = await CardHelper.GetWeatherCard(weatherinfo, desLocationInfo.Date);
+                    card = await GetWeatherCard(activity);
                     break;
                 case Constants.CurrencyCard:
-                    var desCurrency = JsonConvert.DeserializeObject<WeatherActionDetails>(activity.Value.ToString());
-                    CurrencyInfo currencyinfo = currency.GetCurrencyInfo();
-                    card = await CardHelper.GetCurrencyCard(currencyinfo, desLocationInfo.City, desLocationInfo.destinationCurrencyCode);
+                    card = await GetCurrencyCard(activity);
                     break;
-
             }
+
+            var reply = context.MakeMessage();
             reply.Attachments.Add(card);
             await context.PostAsync(reply);
             return;
         }
-        private async Task<string> GetUserEmailId(Activity activity)
 
+        private static async Task<Attachment> GetDetailedRoasterCard(Activity activity, TeamsChannelAccount userDetails)
         {
+            var details = JsonConvert.DeserializeObject<AirlineActionDetails>(activity.Value.ToString());
+            Crew crew = await Helpers.CabinCrewPlansHelper.ReadJson(userDetails.UserPrincipalName);
+            var datePlan = crew.plan.Where(c => c.flightDetails.flightStartDate == details.Id).FirstOrDefault();
+            return CardHelper.GetDetailedRoster(datePlan);
 
+        }
+
+        private static async Task<Attachment> GetCurrencyCard(Activity activity)
+        {
+            CurrencyHelper currency = new CurrencyHelper();
+            var desCurrency = JsonConvert.DeserializeObject<CurrencyActionDetails>(activity.Value.ToString());
+            CurrencyInfo currencyinfo = currency.GetCurrencyInfo();
+            return await CardHelper.GetCurrencyCard(currencyinfo, desCurrency.City, desCurrency.DestinationCurrencyCode);
+        }
+
+        private static async Task<Attachment> GetWeatherCard(Activity activity)
+        {
+            WeatherHelper weather = new WeatherHelper();
+            var desLocationInfo = JsonConvert.DeserializeObject<WeatherActionDetails>(activity.Value.ToString());
+            WeatherInfo weatherinfo = weather.GetWeatherInfo(desLocationInfo.City);
+            return await CardHelper.GetWeatherCard(weatherinfo, desLocationInfo.Date);
+
+        }
+
+        private async Task<TeamsChannelAccount> GetCurrentUserDetails(Activity activity)
+        {
             // Fetch the members in the current conversation
-
             ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
-
             var members = await connector.Conversations.GetConversationMembersAsync(activity.Conversation.Id);
 
-            return members.Where(m => m.Id == activity.From.Id).First().AsTeamsChannelAccount().GivenName;
+            return members.FirstOrDefault(m => m.Id == activity.From.Id)?.AsTeamsChannelAccount();
 
         }
 

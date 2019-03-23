@@ -1,94 +1,164 @@
-﻿@*@model Airlines.XAirlines.Models.Portal
-<!DOCTYPE html>
-<html>
-<head>
-    <title></title>
-    <meta charset="utf-8" />
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/b"></script>
-    <link rel="stylesheet" href="~/Content/details.css" />
-</head>
-<body>
-    <div id="container">
+﻿@model Airlines.XAirlines.ViewModels.PortalViewModel
 
-        <main>
-            <div style="overflow:scroll">
-                <div class="split-left">
-                    <span class="text"></span>
-                    @Html.Raw(Model.html)
-                </div>
-
-            </div>
-        </main>
-    </div>
-</body>
-</html>*@
 @{
     Layout = null;
 }
 <!DOCTYPE html>
-<html lang="en">
+<html>
+
 <head>
     <meta charset="utf-8">
-    <title></title>
-    <meta name="distributor" content="Global" />
-    <meta itemprop="contentRating" content="General" />
-    <meta name="robots" content="All" />
-    <meta name="revisit-after" content="7 days" />
-    <meta name="description" content="The source of truly unique and awesome jquery plugins." />
-    <meta name="keywords" content="slider, carousel, responsive, swipe, one to one movement, touch devices, jquery, plugin, bootstrap compatible, html5, css3" />
-    <meta name="author" content="w3widgets.com">
+    <title>Calendar</title>
+    <link rel="icon" type="image/gif/png" href="cal.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href='http://fonts.googleapis.com/css?family=Economica' rel='stylesheet' type='text/css'>
-    <!-- Bootstrap -->
-    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
-    <!-- Respomsive slider -->
-    <link href="~/Content/responsive-calendar.css" rel="stylesheet">
-    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css">
+    <link rel="stylesheet" href="~/Content/portal.css">
 </head>
+
 <body>
-    <div class="container">
-        <!-- Responsive calendar - START -->
-        <div class="responsive-calendar">
-            <div class="controls">
-                <h4><span data-head-year></span> <span data-head-month></span></h4>
+    <div class="container no-pad">
 
-                <a class="pull-left" data-go="prev"><div class="btn btn-primary">Prev</div></a>
-                <a class="pull-right" data-go="next"><div class="btn btn-primary">Next</div></a>
-            </div><hr />
-            <div class="day-headers">
-                <div class="day header">Mon</div>
-                <div class="day header">Tue</div>
-                <div class="day header">Wed</div>
-                <div class="day header">Thu</div>
-                <div class="day header">Fri</div>
-                <div class="day header">Sat</div>
-                <div class="day header">Sun</div>
+        @foreach (var monthlySchedule in Model.Monthly)
+        {
+            <div class="month">
+                <span class="month-size">@(monthlySchedule.MonthName)</span>
             </div>
-            <div class="days" data-group="days">
+            <table class="responsive-calendar">
+                <thead >
+                    <tr >
+                        <th >Sun</th>
+                        <th >Mon</th>
+                        <th >Tue</th>
+                        <th >Wed</th>
+                        <th >Thu</th>
+                        <th >Fri</th>
+                        <th >Sat</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var weeklySchedule in monthlySchedule.Weekly)
+                    {
+                        <tr >
+                            @if (weeklySchedule.DayOfWeek != 1)
+                            {
+                                for (int i = 0; i < weeklySchedule.DayOfWeek; i++)
+                                {
+                                    <td>&nbsp;</td>
+                                }
+                            }
+                            @foreach (var dailyDuty in weeklySchedule.Daily)
+                            {
+                                <td class="date">@dailyDuty.Date.Day</td>
+                            }
 
-            </div>
-        </div>
+                            @for (int i = (weeklySchedule.DayOfWeek + weeklySchedule.Daily.Count); i <= 7; i++)
+                            {
+                                <td><div>&nbsp;</div></td>
+                            }
+                        </tr>
+
+                        <tr class="desktop">
+                            @if (weeklySchedule.DayOfWeek != 1)
+                            {
+                                for (int i = 0; i < weeklySchedule.DayOfWeek; i++)
+                                {
+                                    <td><div>&nbsp;</div></td>
+                                }
+                            }
+                            @foreach (var dailyDuty in weeklySchedule.Daily)
+                            {
+                                if (dailyDuty.Details != null)
+                                {
+                                    <td onclick="submit();">
+                                        <div class="@(dailyDuty.Details.Colour)">@dailyDuty.Details.DisplayText</div>
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td><div>&nbsp;</div></td>
+                                }
+
+                            }
+
+                            @for (int i = (weeklySchedule.DayOfWeek + weeklySchedule.Daily.Count); i <= 7; i++)
+                            {
+                                <td><div>&nbsp;</div></td>
+                            }
+                        </tr>
+
+                        <tr class="@(monthlySchedule.Weekly.IndexOf(weeklySchedule) == monthlySchedule.Weekly.Count-1? "": "size-pad" )">
+                            @if (weeklySchedule.DayOfWeek != 1)
+                            {
+                                for (int i = 0; i < weeklySchedule.DayOfWeek; i++)
+                                {
+                                    <td><div>&nbsp;</div></td>
+                                }
+                            }
+                            @foreach (var dailyDuty in weeklySchedule.Daily)
+                            {
+                                if (dailyDuty.Details != null && !string.IsNullOrEmpty(dailyDuty.Details.Event2))
+                                {
+                                    <td>
+                                        <div class="@(dailyDuty.Details.Colour) day-event">
+                                            @dailyDuty.Details.Event2
+                                        </div>
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td><div>&nbsp;</div></td>
+                                }
+
+                            }
+
+                           
+                                @for (int i = (weeklySchedule.DayOfWeek + weeklySchedule.Daily.Count); i <= 7; i++)
+                                {
+                                    <td><div></div></td>
+                                }
+                            
+                        </tr>
+                    }
+
+                </tbody>
+            </table>
+        }
+
 
     </div>
-    <script src="~/Scripts/jquery.js"></script>
 
-    <script src="~/Scripts/responsive-calendar.js"></script>
-    <script type="text/javascript">
-        $(document).ready(function () {
-            var dt = new Date();
-            var month = dt.getMonth();
-            var year = dt.getFullYear()
-            $(".responsive-calendar").responsiveCalendar({
-                time: '2019-03',
-                events: {
-                    "2019-04-30": { "number": 5, "url": "http://w3widgets.com/responsive-slider" },
-                    "2019-04-6": { "number": 1, "url": "http://w3widgets.com" },
-                    "2019-04-3": { "number": 1 },
-                    "2019-04-2": {}
-                }
-            });
-        });</script>
+    <script src="@(" https://unpkg.com/@microsoft/teams-js@1.3.4/dist/MicrosoftTeams.min.js")"></script>
+
+
+    <script>
+        microsoftTeams.initialize();
+
+        function submit() {
+            let taskInfo = {
+                title: null,
+                height: null,
+                width: null,
+                url: null,
+                card: null,
+                fallbackUrl: null,
+                completionBotId: null,
+            };
+            // Set task moduel basic details.
+            taskInfo.title = "Show Duty";
+            taskInfo.height = "medium";
+            taskInfo.width = "medium";
+            taskInfo.height = "600";
+            taskInfo.width = "500";
+
+            taskInfo.url = '@(Airlines.XAirlines.Helpers.ApplicationSettings.BaseUrl)'  + '/duty?code=' + "planCode";
+
+            microsoftTeams.tasks.startTask(taskInfo);
+        }
+    </script>
 </body>
+
 </html>

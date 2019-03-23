@@ -296,7 +296,7 @@
     </Compile>
     <Compile Include="Helpers\ApplicationSettings.cs" />
     <Compile Include="Helpers\CardHelper.cs" />
-    <Compile Include="Helpers\Common.cs" />
+    <Compile Include="Helpers\CabinCrewPlansHelper.cs" />
     <Compile Include="Helpers\CurrencyHelper.cs" />
     <Compile Include="Helpers\WeatherHelper.cs" />
     <Compile Include="MessageExtension.cs" />
@@ -305,10 +305,12 @@
     <Compile Include="Models\ListCard.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repository\DocumentDBRepository.cs" />
+    <Compile Include="ViewModels\PortalViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\portal.css" />
     <Content Include="Content\msteams-16.css" />
     <Content Include="Content\responsive-calendar.css" />
     <Content Include="favicon.ico" />
@@ -362,6 +364,7 @@
     <Content Include="Views\Web.config" />
     <Content Include="TestData\1.json" />
     <Content Include="Scripts\responsive-calendar.coffee" />
+    <Content Include="Views\Airlines\AdaptiveCardRenderer.cshtml" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

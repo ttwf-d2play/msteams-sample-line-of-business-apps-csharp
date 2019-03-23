@@ -20,11 +20,11 @@ namespace Airlines.XAirlines.Helpers
 {
     public class CardHelper
     {
-        public static async Task<Attachment> GetWeeklyRosterCard()
+        public static async Task<Attachment> GetWeeklyRosterCard(string userName)
         {
-           
-            List<Plan> weekplan = Common.WeeksPlan();
-           
+
+            List<Plan> weekplan = await CabinCrewPlansHelper.WeeksPlan(userName);
+
             var listCard = new ListCard();
             listCard.content = new Content();
             listCard.content.title = "Here is your next week's roster";
@@ -34,15 +34,18 @@ namespace Airlines.XAirlines.Helpers
                 var item = new Item();
                 item.id = i.flightDetails.flightStartDate;
                 item.type = "resultItem";
-                item.icon = i.vacationPlan==true?ApplicationSettings.BaseUrl + "/Resources/vacationicon.png": i.isDayOff==true?ApplicationSettings.BaseUrl + "/Resources/homeicon.png": ApplicationSettings.BaseUrl + "/Resources/flighticon.png";
+                item.icon = i.vacationPlan == true ? ApplicationSettings.BaseUrl + "/Resources/vacationicon.png" : i.isDayOff == true ? ApplicationSettings.BaseUrl + "/Resources/homeicon.png" : ApplicationSettings.BaseUrl + "/Resources/flighticon.png";
                 item.title = i.vacationPlan == true ? Convert.ToDateTime(i.vacationDate).ToString("ddd dd MMM") : i.isDayOff == true ? Convert.ToDateTime(i.flightDetails.flightStartDate).ToString("ddd dd MMM") : Convert.ToDateTime(i.flightDetails.flightStartDate).ToString("ddd dd MMM") + "-" + Convert.ToDateTime(i.flightDetails.flightEndDate).ToString("ddd dd MMM");
-                item.subtitle = i.vacationPlan==true?i.vacationReason:i.isDayOff==true?"Day Off":i.flightDetails.sourceCode + "-" + i.flightDetails.destinationCode;
-                item.tap = i.vacationPlan==true?null:i.isDayOff==true?null:new Tap()
+                item.subtitle = i.vacationPlan == true ? i.vacationReason : i.isDayOff == true ? "Day Off" : i.flightDetails.sourceCode + "-" + i.flightDetails.destinationCode;
+                item.tap = i.vacationPlan == true ? null : i.isDayOff == true ? null : new Tap()
                 {
                     type = ActionTypes.MessageBack,
                     title = "Id",
                     value = JsonConvert.SerializeObject(new AirlineActionDetails()
-                    { Id = item.id, ActionType = Constants.ShowDetailedRoster })
+                    {
+                        Id = item.id,
+                        ActionType = Constants.ShowDetailedRoster
+                    })
                 };
                 list.Add(item);
 
@@ -57,16 +60,12 @@ namespace Airlines.XAirlines.Helpers
             return attachment;
         }
 
-        public static async Task<Attachment> GetMonthlyRosterCard()
+        public static Attachment GetMonthlyRosterCard()
         {
-
-
             var Card = new AdaptiveCard(new AdaptiveSchemaVersion("1.0"))
             {
-
                 Body = new List<AdaptiveElement>()
                      {
-
                     new AdaptiveContainer()
                     {
                         Items=new List<AdaptiveElement>()
@@ -82,24 +81,19 @@ namespace Airlines.XAirlines.Helpers
             };
             Card.Actions.Add(new AdaptiveOpenUrlAction()
             {
-                Title="View Crew Portal",
+                Title = "View Crew Portal",
                 Url = new System.Uri(Constants.PortalTabDeeplink)
             });
-
-           
 
             return new Attachment()
             {
                 ContentType = AdaptiveCard.ContentType,
                 Content = Card
             };
-
-
         }
-        public static async Task<Attachment> GetWelcomeScreen(string userName)
+
+        public static Attachment GetWelcomeScreen(string userName)
         {
-
-
             var Card = new AdaptiveCard(new AdaptiveSchemaVersion("1.0"))
             {
 
@@ -119,7 +113,7 @@ namespace Airlines.XAirlines.Helpers
                             {
                                 Columns=new List<AdaptiveColumn>()
                                 {
-                                   
+
                                     new AdaptiveColumn()
                                     {
                                          Width=AdaptiveColumnWidth.Auto,
@@ -138,7 +132,7 @@ namespace Airlines.XAirlines.Helpers
                             {
                                 Columns=new List<AdaptiveColumn>()
                                 {
-                                    
+
 
                                     new AdaptiveColumn()
                                     {
@@ -168,12 +162,8 @@ namespace Airlines.XAirlines.Helpers
 
 
         }
-        public static async Task<Attachment> GetDetailedRoster(Activity activity)
+        public static Attachment GetDetailedRoster(Plan datePlan)
         {
-            var details = JsonConvert.DeserializeObject<AirlineActionDetails>(activity.Value.ToString());
-            //Common crewdata = new Common();
-            Crew crew = Common.ReadJson();
-            var datePlan = crew.plan.Where(c => c.flightDetails.flightStartDate == details.Id).FirstOrDefault();
             var Card = new AdaptiveCard(new AdaptiveSchemaVersion("1.0"))
             {
 
@@ -295,7 +285,7 @@ namespace Airlines.XAirlines.Helpers
                     new AdaptiveColumnSet()
                     {
                         Columns=new List<AdaptiveColumn>()
-                        
+
                         {
                             new AdaptiveColumn()
                             {
@@ -332,7 +322,7 @@ namespace Airlines.XAirlines.Helpers
                                         Size=AdaptiveTextSize.Small,
                                         Weight=AdaptiveTextWeight.Lighter,
                                         Text=datePlan.flightDetails.destinationFlightCode+"-"+datePlan.flightDetails.destination
-                                    
+
                                     },
                                     new AdaptiveTextBlock()
                                     {
@@ -354,7 +344,7 @@ namespace Airlines.XAirlines.Helpers
                                 }
                             }
                         }
-                        
+
                     },
                     new AdaptiveColumnSet()
                     {
@@ -385,7 +375,7 @@ namespace Airlines.XAirlines.Helpers
                                         Text="Tail No"
                                     },
                                 },
-                                
+
                             },
                             new AdaptiveColumn()
                             {
@@ -396,7 +386,7 @@ namespace Airlines.XAirlines.Helpers
                                         HorizontalAlignment=AdaptiveHorizontalAlignment.Right,
                                         Weight=AdaptiveTextWeight.Bolder,
                                         Text=datePlan.flightDetails.gateOpensAt
-                                    
+
                                     },
                                     new AdaptiveTextBlock()
                                     {
@@ -430,17 +420,25 @@ namespace Airlines.XAirlines.Helpers
                         },
                     }
                 },
-                Actions=new List<AdaptiveAction>()
+                Actions = new List<AdaptiveAction>()
                 {
                     new AdaptiveSubmitAction()
                     {
                         Title="Weather Report",
-                        Data=new WeatherActionDetails(){Date=datePlan.flightDetails.flightEndDate,City=datePlan.flightDetails.destination,ActionType=Constants.WeatherCard}
+                        Data=new WeatherActionDetails(){
+                            Date =datePlan.flightDetails.flightEndDate,
+                            City =datePlan.flightDetails.destination,
+                            ActionType =Constants.WeatherCard
+                        }
                     },
                     new AdaptiveSubmitAction()
                     {
                         Title="Currency Details",
-                        Data=new WeatherActionDetails(){sourceCurrencyCode=datePlan.flightDetails.sourceCurrencyCode, destinationCurrencyCode=datePlan.flightDetails.destinationCurrencyCode, City=datePlan.flightDetails.destination,ActionType=Constants.CurrencyCard}
+                        Data=new CurrencyActionDetails(){
+                            SourceCurrencyCode =datePlan.flightDetails.sourceCurrencyCode,
+                            DestinationCurrencyCode =datePlan.flightDetails.destinationCurrencyCode,
+                            City =datePlan.flightDetails.destination,
+                            ActionType =Constants.CurrencyCard}
                     }
                 }
             };
@@ -451,10 +449,9 @@ namespace Airlines.XAirlines.Helpers
                 Content = Card
             };
         }
-        public static async Task<Attachment> GetUpdateScreen()
+        public static Attachment GetUpdateScreen()
         {
 
-            DateTime dateTime;
             var Card = new AdaptiveCard(new AdaptiveSchemaVersion("1.0"))
             {
 
@@ -475,16 +472,16 @@ namespace Airlines.XAirlines.Helpers
                             {
                                 Columns=new List<AdaptiveColumn>()
                                 {
-                                    
+
                                     new AdaptiveColumn()
                                     {
                                          Width=AdaptiveColumnWidth.Auto,
                                          Items=new List<AdaptiveElement>()
                                          {
-                                             
+
                                              new AdaptiveTextBlock(){Text="New roster for the month of "+DateTime.Now.ToString("MMMM")+" has been released.Please acknowledge to view your new roster",Wrap=true}
                                          },
-                                          
+
                                     },
                                     new AdaptiveColumn()
                                     {
@@ -496,7 +493,7 @@ namespace Airlines.XAirlines.Helpers
                                     },
                                 }
                             }
-                            
+
                         }
                     }
                 }
@@ -505,7 +502,7 @@ namespace Airlines.XAirlines.Helpers
             Card.Actions.Add(new AdaptiveSubmitAction()
             {
                 Title = "Acknowledge and view portal",
-                Data=new ActionDetails() { ActionType=Constants.NextWeekRoster}
+                Data = new ActionDetails() { ActionType = Constants.NextWeekRoster }
             });
             return new Attachment()
             {
@@ -515,9 +512,9 @@ namespace Airlines.XAirlines.Helpers
 
 
         }
-        public static async Task<Attachment> GetWeatherCard(WeatherInfo wInfo,string ArrivalDate)
+        public static async Task<Attachment> GetWeatherCard(WeatherInfo wInfo, string ArrivalDate)
         {
-           
+
 
             DateTime dateTime;
             var Card = new AdaptiveCard(new AdaptiveSchemaVersion("1.0"))
@@ -551,7 +548,7 @@ namespace Airlines.XAirlines.Helpers
                                              new AdaptiveTextBlock(){Text=ArrivalDate,Weight=AdaptiveTextWeight.Bolder}
                                          },
 
-                                            
+
 
                                     },
                                     new AdaptiveColumn()
@@ -588,7 +585,7 @@ namespace Airlines.XAirlines.Helpers
                                             new AdaptiveTextBlock()
                                             {
                                                 Text=wInfo.weather[0].description,
-                                               
+
                                             }
                                         }
                                     }
@@ -631,7 +628,7 @@ namespace Airlines.XAirlines.Helpers
                                     },
                                 }
                             },
-                            
+
                             new AdaptiveColumnSet()
                             {
                                 Separator=true,
@@ -684,7 +681,7 @@ namespace Airlines.XAirlines.Helpers
 
 
         }
-        
+
         public static async Task<Attachment> GetCurrencyCard(CurrencyInfo cInfo, string desCity, string desCurrencyCode)
         {
             DateTime dateTime;
@@ -965,7 +962,7 @@ namespace Airlines.XAirlines.Helpers
                                         Weight=AdaptiveTextWeight.Bolder,
                                         Color=AdaptiveTextColor.Accent,
                                         Text="2hr 15 min"
-                                        
+
                                     },
                                 }
                             }
@@ -1062,7 +1059,7 @@ namespace Airlines.XAirlines.Helpers
             };
 
             return Card;
-          
+
         }
     }
 }

@@ -18,13 +18,23 @@ namespace Airlines.XAirlines.Models
     {
         public string Text { get; set; }
     }
-    public class WeatherActionDetails:ActionDetails
+
+    public class CityActionDetails : ActionDetails
     {
         public string City { get; set; }
-        public string Date { get; set; }
-        public string sourceCurrencyCode { get; set; }
-        public string destinationCurrencyCode { get; set; }
     }
+
+    public class WeatherActionDetails : CityActionDetails
+    {
+        public string Date { get; set; }
+    }
+
+    public class CurrencyActionDetails : CityActionDetails
+    {
+        public string SourceCurrencyCode { get; set; }
+        public string DestinationCurrencyCode { get; set; }
+    }
+
     public class Portal
     {
         public HtmlTag html { get; set; }
