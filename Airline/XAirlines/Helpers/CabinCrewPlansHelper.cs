@@ -49,42 +49,44 @@ namespace Airlines.XAirlines.Helpers
 
         }
 
-        public static async void UpdateMockData()
+        public static void UpdateMockData()
         {
-            if (DateTime.Now.Day == 1)
+            if (DateTime.Now.Day == 1) //check first login of that day
             {
-
-            }
-
-            string file = @"C:\Users\v-abjodh\Desktop\Teams\AirlinesJson\1.json";
-            string data = string.Empty;
-            Crew crewObject;
-            if (File.Exists(file))
-            {
-                using (StreamReader reader = new StreamReader(file))
+                for (int i = 1; i <= 5; i++)
                 {
-                    data = reader.ReadToEnd();
-                    crewObject = (new JavaScriptSerializer().Deserialize<Crew>(data));
+                    string file = @"C:\Users\v-abjodh\Desktop\Teams\AirlinesJson\" + i + ".json";
+                    string data = string.Empty;
+                    Crew crewObject;
+                    if (File.Exists(file))
+                    {
+                        using (StreamReader reader = new StreamReader(file))
+                        {
+                            data = reader.ReadToEnd();
+                            crewObject = (new JavaScriptSerializer().Deserialize<Crew>(data));
+                        }
+
+                        for (int i = 0; i < crewObject.plan.Count; i++)
+                        {
+                            crewObject.plan[i].date = crewObject.plan[i].date.AddMonths(1);
+                            //CultureInfo provider = CultureInfo.InvariantCulture;
+                            //string lastDate = crewObject.plan[i].lastUpdated;
+
+                            //DateTime lastUpdatedDate = DateTime.ParseExact(lastDate, "yyyy/mm/dd", provider);
+                            //crewObject.plan[i].lastUpdated = lastUpdatedDate.AddMonths(1).ToString();
+
+                            //DateTime startDate = Convert.ToDateTime(crewObject.plan[i].flightDetails.flightStartDate);
+                            //crewObject.plan[i].flightDetails.flightStartDate = startDate.AddMonths(1).ToString();
+
+                            //DateTime endDate = Convert.ToDateTime(crewObject.plan[i].flightDetails.flightEndDate);
+                            //crewObject.plan[i].flightDetails.flightStartDate = endDate.AddMonths(1).ToString();
+
+                        }
+                        string json = JsonConvert.SerializeObject(crewObject);
+                        File.WriteAllText(file, json);
+                    }
                 }
-
-                for (int i = 0; i < crewObject.plan.Count; i++)
-                {
-                    crewObject.plan[i].date = crewObject.plan[i].date.AddMonths(1);
-                    //CultureInfo provider = CultureInfo.InvariantCulture;
-                    //string lastDate = crewObject.plan[i].lastUpdated;
-
-                    //DateTime lastUpdatedDate = DateTime.ParseExact(lastDate, "yyyy/mm/dd", provider);
-                    //crewObject.plan[i].lastUpdated = lastUpdatedDate.AddMonths(1).ToString();
-
-                    //DateTime startDate = Convert.ToDateTime(crewObject.plan[i].flightDetails.flightStartDate);
-                    //crewObject.plan[i].flightDetails.flightStartDate = startDate.AddMonths(1).ToString();
-
-                    //DateTime endDate = Convert.ToDateTime(crewObject.plan[i].flightDetails.flightEndDate);
-                    //crewObject.plan[i].flightDetails.flightStartDate = endDate.AddMonths(1).ToString();
-
-                }
-                string json = JsonConvert.SerializeObject(crewObject);
-                File.WriteAllText(file, json);
+                
             }
         }
 
