@@ -11,9 +11,6 @@ namespace Airlines.XAirlines.Helpers
     {
         public CurrencyInfo GetCurrencyInfo()
         {
-
-            string apiKey = "29d0ff0f89f41d3bdd19f6c25ea4b1c4";
-
             string url = string.Format("http://www.apilayer.net/api/live?access_key=29d0ff0f89f41d3bdd19f6c25ea4b1c4");
 
             using (WebClient client = new WebClient())

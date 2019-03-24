@@ -1,4 +1,5 @@
 ﻿using Airlines.XAirlines.Models;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -21,7 +22,7 @@ namespace Airlines.XAirlines.Helpers
 
 
             int fileNumber = (value % 5) + 1;
-            fileNumber = 1; // No flight detail availabe
+            //fileNumber = 1; // No flight detail availabe
 
             string file = System.Web.Hosting.HostingEnvironment.MapPath(@"~\TestData\"+ fileNumber + ".json");
             string data = string.Empty;
@@ -46,6 +47,45 @@ namespace Airlines.XAirlines.Helpers
             List<Plan> weekplan = crew.plan.Where(c => c.date >= today && c.date <= weekafter).ToList();
             return weekplan;
 
+        }
+
+        public static async void UpdateMockData()
+        {
+            if (DateTime.Now.Day == 1)
+            {
+
+            }
+
+            string file = @"C:\Users\v-abjodh\Desktop\Teams\AirlinesJson\1.json";
+            string data = string.Empty;
+            Crew crewObject;
+            if (File.Exists(file))
+            {
+                using (StreamReader reader = new StreamReader(file))
+                {
+                    data = reader.ReadToEnd();
+                    crewObject = (new JavaScriptSerializer().Deserialize<Crew>(data));
+                }
+
+                for (int i = 0; i < crewObject.plan.Count; i++)
+                {
+                    crewObject.plan[i].date = crewObject.plan[i].date.AddMonths(1);
+                    //CultureInfo provider = CultureInfo.InvariantCulture;
+                    //string lastDate = crewObject.plan[i].lastUpdated;
+
+                    //DateTime lastUpdatedDate = DateTime.ParseExact(lastDate, "yyyy/mm/dd", provider);
+                    //crewObject.plan[i].lastUpdated = lastUpdatedDate.AddMonths(1).ToString();
+
+                    //DateTime startDate = Convert.ToDateTime(crewObject.plan[i].flightDetails.flightStartDate);
+                    //crewObject.plan[i].flightDetails.flightStartDate = startDate.AddMonths(1).ToString();
+
+                    //DateTime endDate = Convert.ToDateTime(crewObject.plan[i].flightDetails.flightEndDate);
+                    //crewObject.plan[i].flightDetails.flightStartDate = endDate.AddMonths(1).ToString();
+
+                }
+                string json = JsonConvert.SerializeObject(crewObject);
+                File.WriteAllText(file, json);
+            }
         }
 
         public List<DateTime> OneMonthsDates()

@@ -14,12 +14,9 @@ namespace Airlines.XAirlines.Helpers
         {
             string appId = "619590f1e4a82a6ed18ee9b109bb9c14";
             string url = string.Format("http://api.openweathermap.org/data/2.5/weather?q={0}&APPID=619590f1e4a82a6ed18ee9b109bb9c14", des);
-            //string url = string.Format("http://www.apilayer.net/api/live?access_key=29d0ff0f89f41d3bdd19f6c25ea4b1c4");
-
+            
             using (WebClient client = new WebClient())
             {
-
-
                 string json = client.DownloadString(url);
 
                 WeatherInfo weatherinfo = (new JavaScriptSerializer().Deserialize<WeatherInfo>(json));
