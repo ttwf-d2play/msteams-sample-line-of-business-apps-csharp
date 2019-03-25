@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Web;
@@ -12,11 +13,27 @@ namespace Airlines.XAirlines.Helpers
         public CurrencyInfo GetCurrencyInfo()
         {
             string url = string.Format("http://www.apilayer.net/api/live?access_key=29d0ff0f89f41d3bdd19f6c25ea4b1c4");
+            string backupDataLocation = System.Web.Hosting.HostingEnvironment.MapPath(@"~\TestData\CurrencybackupData\");
 
             using (WebClient client = new WebClient())
             {
+                FileStream fs;
+                CurrencyInfo curr;
                 string json = client.DownloadString(url);
-                CurrencyInfo curr = (new JavaScriptSerializer().Deserialize<CurrencyInfo>(json));
+                string successFlag = json.Substring(11, 4);
+
+               string backupfilelocation = backupDataLocation + "backup.json";
+               File.WriteAllText(backupfilelocation, json);
+
+                if (successFlag != "true")
+                {
+                    using (StreamReader reader = new StreamReader(backupDataLocation + "backup.json"))
+                    {
+                        json = reader.ReadToEnd();
+                    }
+                }
+
+                curr = (new JavaScriptSerializer().Deserialize<CurrencyInfo>(json));
                 return curr;
             }
         }
