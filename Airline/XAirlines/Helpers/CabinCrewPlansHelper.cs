@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -51,7 +52,7 @@ namespace Airlines.XAirlines.Helpers
             return weekplan;
         }
 
-        public static void UpdateMockData(int filename)
+        public static async Task UpdateMockData(int filename)
         {
             string file = @"C:\Users\v-abjodh\Desktop\Teams\AirlinesJson\" + filename + ".json";
             string data = string.Empty;
@@ -67,17 +68,9 @@ namespace Airlines.XAirlines.Helpers
                 for (int j = 0; j <= crewObject.plan.Count-1; j++)
                 {
                     crewObject.plan[j].date = DateTime.Now.Date.AddDays(j);
-                    //CultureInfo provider = CultureInfo.InvariantCulture;
-                    //string lastDate = crewObject.plan[j].lastUpdated;
-
-                    //DateTime lastUpdatedDate = DateTime.ParseExact(lastDate, "yyyy/mm/dd", provider);
-                    //crewObject.plan[j].lastUpdated = lastUpdatedDate.AddMonths(1).ToString();
-
-                    //DateTime startDate = Convert.ToDateTime(crewObject.plan[i].flightDetails.flightStartDate);
-                    //crewObject.plan[j].flightDetails.flightStartDate = startDate.AddMonths(1).ToString();
-
-                    //DateTime endDate = Convert.ToDateTime(crewObject.plan[i].flightDetails.flightEndDate);
-                    //crewObject.plan[j].flightDetails.flightStartDate = endDate.AddMonths(1).ToString();
+                    crewObject.plan[j].lastUpdated = DateTime.Now.Date.AddDays(-2);
+                    crewObject.plan[j].flightDetails.flightStartDate = DateTime.Now.Date.AddDays(j);
+                    crewObject.plan[j].flightDetails.flightEndDate = DateTime.Now.Date.AddDays(j);
                 }
                 string json = JsonConvert.SerializeObject(crewObject);
                 File.WriteAllText(file, json);

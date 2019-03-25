@@ -32,7 +32,7 @@ namespace Airlines.XAirlines.Helpers
             foreach (var i in weekplan)
             {
                 var item = new Item();
-                item.id = i.flightDetails.flightStartDate;
+                item.id = i.flightDetails.flightStartDate.Date.ToString();
                 item.type = "resultItem";
                 item.icon = i.vacationPlan == true ? ApplicationSettings.BaseUrl + "/Resources/vacationicon.png" : i.isDayOff == true ? ApplicationSettings.BaseUrl + "/Resources/homeicon.png" : ApplicationSettings.BaseUrl + "/Resources/flighticon.png";
                 item.title = i.vacationPlan == true ? Convert.ToDateTime(i.vacationDate).ToString("ddd dd MMM") : i.isDayOff == true ? Convert.ToDateTime(i.flightDetails.flightStartDate).ToString("ddd dd MMM") : Convert.ToDateTime(i.flightDetails.flightStartDate).ToString("ddd dd MMM") + "-" + Convert.ToDateTime(i.flightDetails.flightEndDate).ToString("ddd dd MMM");
@@ -426,7 +426,7 @@ namespace Airlines.XAirlines.Helpers
                     {
                         Title="Weather Report",
                         Data=new WeatherActionDetails(){
-                            Date =datePlan.flightDetails.flightEndDate,
+                            Date =datePlan.flightDetails.flightEndDate.Date.ToString(),
                             City =datePlan.flightDetails.destination,
                             ActionType =Constants.WeatherCard
                         }
