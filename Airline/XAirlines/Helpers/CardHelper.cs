@@ -426,7 +426,7 @@ namespace Airlines.XAirlines.Helpers
                     {
                         Title="Weather Report",
                         Data=new WeatherActionDetails(){
-                            Date =datePlan.flightDetails.flightEndDate.Date.ToString(),
+                            Date =datePlan.flightDetails.flightEndDate.Date,
                             City =datePlan.flightDetails.destination,
                             ActionType =Constants.WeatherCard
                         }
@@ -512,7 +512,7 @@ namespace Airlines.XAirlines.Helpers
 
 
         }
-        public static async Task<Attachment> GetWeatherCard(WeatherInfo wInfo, string ArrivalDate)
+        public static async Task<Attachment> GetWeatherCard(WeatherInfo wInfo, DateTime ArrivalDate)
         {
 
 
@@ -545,7 +545,7 @@ namespace Airlines.XAirlines.Helpers
                                          {
                                              //Date of arrival - get it from Test json
                                              new AdaptiveTextBlock(){Text= "Date of Arrival",HorizontalAlignment=AdaptiveHorizontalAlignment.Left},
-                                             new AdaptiveTextBlock(){Text=ArrivalDate,Weight=AdaptiveTextWeight.Bolder}
+                                             new AdaptiveTextBlock(){Text=ArrivalDate.ToString(),Weight=AdaptiveTextWeight.Bolder}
                                          },
 
 

@@ -24,10 +24,10 @@ namespace Airlines.XAirlines.Helpers
             int fileNumber = (value % 5) + 1;
             
             string file = System.Web.Hosting.HostingEnvironment.MapPath(@"~\TestData\" + fileNumber + ".json");
-            DateTime filelastmodified = File.GetLastWriteTime(file);
+            DateTime filelastmodified = File.GetLastWriteTime(file).Date;
             DateTime currentDate = DateTime.Now.Date;
 
-            if (filelastmodified != currentDate) UpdateMockData(fileNumber);
+            if (filelastmodified.Date != currentDate.Date) UpdateMockData(file);
             
             string data = string.Empty;
             if (File.Exists(file))
@@ -52,14 +52,13 @@ namespace Airlines.XAirlines.Helpers
             return weekplan;
         }
 
-        public static async Task UpdateMockData(int filename)
+        public static async Task UpdateMockData(string filename)
         {
-            string file = @"C:\Users\v-abjodh\Desktop\Teams\AirlinesJson\" + filename + ".json";
             string data = string.Empty;
             Crew crewObject;
-            if (File.Exists(file))
+            if (File.Exists(filename))
             {
-                using (StreamReader reader = new StreamReader(file))
+                using (StreamReader reader = new StreamReader(filename))
                 {
                     data = reader.ReadToEnd();
                     crewObject = (new JavaScriptSerializer().Deserialize<Crew>(data));
@@ -72,8 +71,17 @@ namespace Airlines.XAirlines.Helpers
                     crewObject.plan[j].flightDetails.flightStartDate = DateTime.Now.Date.AddDays(j);
                     crewObject.plan[j].flightDetails.flightEndDate = DateTime.Now.Date.AddDays(j);
                 }
+                int planCount = crewObject.plan.Count;
+                Plan p1 = crewObject.plan[0];
+                //crewObject.plan[planCount + 1] = p1;
+                for (int i = 0; i < crewObject.plan.Count-1; i++)
+                {
+                    crewObject.plan[i] = crewObject.plan[i + 1];
+                }
+                crewObject.plan[planCount-1] = p1;
                 string json = JsonConvert.SerializeObject(crewObject);
-                File.WriteAllText(file, json);
+                
+                File.WriteAllText(filename, json);
             }
         }
 

@@ -26,7 +26,7 @@ namespace Airlines.XAirlines.Models
 
     public class WeatherActionDetails : CityActionDetails
     {
-        public string Date { get; set; }
+        public DateTime Date { get; set; }
     }
 
     public class CurrencyActionDetails : CityActionDetails
