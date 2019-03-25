@@ -48,7 +48,15 @@ namespace Airlines.XAirlines.Helpers
             return weekplan;
 
         }
+        public static async Task<List<Plan>> MonthsPlan(string userEmailId)
+        {
+            Crew crew = await CabinCrewPlansHelper.ReadJson(userEmailId);
+            DateTime today = DateTime.Today;
+            DateTime monthafter = today.AddDays(30);
+            List<Plan> weekplan = crew.plan.Where(c => c.date >= today && c.date <= monthafter).ToList();
+            return weekplan;
 
+        }
         public static void UpdateMockData()
         {
             if (DateTime.Now.Day == 1) //check first login of that day
@@ -66,9 +74,9 @@ namespace Airlines.XAirlines.Helpers
                             crewObject = (new JavaScriptSerializer().Deserialize<Crew>(data));
                         }
 
-                        for (int i = 0; i < crewObject.plan.Count; i++)
-                        {
-                            crewObject.plan[i].date = crewObject.plan[i].date.AddMonths(1);
+                        //for (int i = 0; i < crewObject.plan.Count; i++)
+                        //{
+                           // crewObject.plan[i].date = crewObject.plan[i].date.AddMonths(1);
                             //CultureInfo provider = CultureInfo.InvariantCulture;
                             //string lastDate = crewObject.plan[i].lastUpdated;
 
@@ -81,7 +89,7 @@ namespace Airlines.XAirlines.Helpers
                             //DateTime endDate = Convert.ToDateTime(crewObject.plan[i].flightDetails.flightEndDate);
                             //crewObject.plan[i].flightDetails.flightStartDate = endDate.AddMonths(1).ToString();
 
-                        }
+                       // }
                         string json = JsonConvert.SerializeObject(crewObject);
                         File.WriteAllText(file, json);
                     }
@@ -90,7 +98,7 @@ namespace Airlines.XAirlines.Helpers
             }
         }
 
-        public List<DateTime> OneMonthsDates()
+        public static  List<DateTime> OneMonthsDates()
         {
             DateTime today = DateTime.Now;
             List<DateTime> oneMonthDates = new List<DateTime>();

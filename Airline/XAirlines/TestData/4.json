@@ -1065,7 +1065,7 @@
       "vacationPlan": false,
       "vacationDate": null,
       "vacationReason": null,
-      "isDayOff": false,
+      "isDayOff": true,
       "halt": false,
       "lastUpdated": "2/27/19",
       "flightDetails": {
