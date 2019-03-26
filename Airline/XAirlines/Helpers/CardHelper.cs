@@ -515,7 +515,7 @@ namespace Airlines.XAirlines.Helpers
         }
         public static async Task<Attachment> GetWeatherCard(WeatherInfo wInfo, DateTime ArrivalDate)
         {
-            AdaptiveCard Card = GetTabWeatherCard(wInfo, ArrivalDate);
+            AdaptiveCard Card = GetTabWeatherCard(wInfo, ArrivalDate.ToString());
             return new Attachment()
             {
                 ContentType = AdaptiveCard.ContentType,
@@ -864,7 +864,7 @@ namespace Airlines.XAirlines.Helpers
                                             {
                                                Size=AdaptiveTextSize.Medium,
                                                 Weight=AdaptiveTextWeight.Bolder,
-                                               Text=weekplan[0].flightDetails.flightStartDate
+                                               Text=weekplan[0].flightDetails.flightStartDate.ToString()
                                             },
                                             new AdaptiveTextBlock()
                                             {
@@ -887,7 +887,7 @@ namespace Airlines.XAirlines.Helpers
                                                Size=AdaptiveTextSize.Medium,
                                                HorizontalAlignment=AdaptiveHorizontalAlignment.Right,
                                                 Weight=AdaptiveTextWeight.Bolder,
-                                               Text=weekplan[0].flightDetails.flightEndDate
+                                               Text=weekplan[0].flightDetails.flightEndDate.ToString()
                                             },
                                             new AdaptiveTextBlock()
                                             {
@@ -1063,7 +1063,7 @@ namespace Airlines.XAirlines.Helpers
                     new AdaptiveShowCardAction()
                     {
                         Title="Weather Report",
-                        Card=GetTabWeatherCard(weatherinfo,weekplan[0].flightDetails.flightEndDate)
+                        Card=GetTabWeatherCard(weatherinfo,weekplan[0].flightDetails.flightEndDate.ToString())
                        // Data=new WeatherActionDetails(){Date=datePlan.flightDetails.flightEndDate,City=datePlan.flightDetails.destination,ActionType=Constants.WeatherCard}
                     },
                     new AdaptiveShowCardAction()

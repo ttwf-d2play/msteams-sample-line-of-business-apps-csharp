@@ -58,7 +58,7 @@ namespace Airlines.XAirlines.Helpers
             DateTime monthafter = today.AddDays(30);
             List<Plan> weekplan = crew.plan.Where(c => c.date >= today && c.date <= monthafter).ToList();
             return weekplan;
-
+        }
         public static async Task UpdateMockData(string filename)
         {
             string data = string.Empty;
@@ -74,6 +74,7 @@ namespace Airlines.XAirlines.Helpers
                 for (int j = 0; j <= crewObject.plan.Count-1; j++)
                 {
                     crewObject.plan[j].date = DateTime.Now.Date.AddDays(j);
+                    crewObject.plan[j].vacationDate = DateTime.Now.Date.AddDays(j);
                     crewObject.plan[j].lastUpdated = DateTime.Now.Date.AddDays(-2);
                     crewObject.plan[j].flightDetails.flightStartDate = DateTime.Now.Date.AddDays(j);
                     crewObject.plan[j].flightDetails.flightEndDate = DateTime.Now.Date.AddDays(j);

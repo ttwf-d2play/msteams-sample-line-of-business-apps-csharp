@@ -10,6 +10,17 @@ namespace Airlines.XAirlines.Helpers
 {
     public class CurrencyHelper
     {
+        //public CurrencyInfo GetCurrencyInfo()
+        //{
+        //    string url = string.Format("http://www.apilayer.net/api/live?access_key=29d0ff0f89f41d3bdd19f6c25ea4b1c4");
+
+        //    using (WebClient client = new WebClient())
+        //    {
+        //        string json = client.DownloadString(url);
+        //        CurrencyInfo curr = (new JavaScriptSerializer().Deserialize<CurrencyInfo>(json));
+        //        return curr;
+        //    }
+        //}
         public CurrencyInfo GetCurrencyInfo()
         {
             string url = string.Format("http://www.apilayer.net/api/live?access_key=29d0ff0f89f41d3bdd19f6c25ea4b1c4");
@@ -22,8 +33,8 @@ namespace Airlines.XAirlines.Helpers
                 string json = client.DownloadString(url);
                 string successFlag = json.Substring(11, 4);
 
-               string backupfilelocation = backupDataLocation + "backup.json";
-               File.WriteAllText(backupfilelocation, json);
+                string backupfilelocation = backupDataLocation + "backup.json";
+               // File.WriteAllText(backupfilelocation, json);
 
                 if (successFlag != "true")
                 {

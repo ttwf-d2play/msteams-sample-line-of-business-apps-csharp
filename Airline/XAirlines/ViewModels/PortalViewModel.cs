@@ -38,7 +38,7 @@ namespace Airlines.XAirlines.ViewModels
                 }
 
                 var duty = duties.FirstOrDefault(d => d.Date.Date == currentDate.Date);
-                weeklySchedule.Daily.Add(new Duty() { Date = currentDate, Details = duty?.Details });
+                weeklySchedule.Daily.Add(new Duty() { Date = currentDate,vacationPlan=duty.vacationPlan,isDayOff=duty.isDayOff, Details = duty?.Details });
 
                 daysCount++;
 
@@ -54,9 +54,8 @@ namespace Airlines.XAirlines.ViewModels
         public List<MonthSchedule> Monthly { get; set; } = new List<MonthSchedule>();
 
         public string UserEmailId { get; set; }
-        public string vacationPlan { get; set; }
+        
     }
-
     public class MonthSchedule
     {
         public int Month { get; set; }
@@ -80,6 +79,9 @@ namespace Airlines.XAirlines.ViewModels
     {
         public DateTime Date { get; set; }
         public Details Details { get; set; }
+        public bool vacationPlan { get; set; }
+        public bool isDayOff { get; set; }
+
     }
 
     public class Details

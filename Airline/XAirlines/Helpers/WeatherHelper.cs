@@ -11,6 +11,19 @@ namespace Airlines.XAirlines.Helpers
 {
     public class WeatherHelper
     {
+        //public WeatherInfo GetWeatherInfo(string des)
+        //{
+        //    string appId = "619590f1e4a82a6ed18ee9b109bb9c14";
+        //    string url = string.Format("http://api.openweathermap.org/data/2.5/weather?q={0}&APPID=619590f1e4a82a6ed18ee9b109bb9c14", des);
+
+        //    using (WebClient client = new WebClient())
+        //    {
+        //        string json = client.DownloadString(url);
+
+        //        WeatherInfo weatherinfo = (new JavaScriptSerializer().Deserialize<WeatherInfo>(json));
+        //        return weatherinfo;
+        //    }
+        //}
         public WeatherInfo GetWeatherInfo(string des)
         {
             string url = string.Format("http://api.openweathermap.org/data/2.5/weather?q={0}&APPID=619590f1e4a82a6ed18ee9b109bb9c14", des);
@@ -23,7 +36,7 @@ namespace Airlines.XAirlines.Helpers
                 string json = client.DownloadString(url);
                 string jsonSuccessCode = json.Substring(json.Length - 4, 3);
 
-                File.WriteAllText(backupDataLocation + des + ".json", json);
+                //File.WriteAllText(backupDataLocation + des + ".json", json);
 
                 if (jsonSuccessCode != "200")
                 {
