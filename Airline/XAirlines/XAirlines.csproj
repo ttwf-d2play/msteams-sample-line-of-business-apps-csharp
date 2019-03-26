@@ -365,8 +365,15 @@
     <Content Include="TestData\1.json" />
     <Content Include="Scripts\responsive-calendar.coffee" />
     <Content Include="Views\Airlines\AdaptiveCardRenderer.cshtml" />
+    <Content Include="TestData\2.json" />
+    <Content Include="TestData\3.json" />
+    <Content Include="TestData\4.json" />
+    <Content Include="TestData\5.json" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="TestData\CurrencyBackupMockData\" />
+    <Folder Include="TestData\WeatherBackupMockData\" />
+  </ItemGroup>
   <ItemGroup>
     <Content Include="Manifest\manifest.json" />
     <Content Include="ApplicationInsights.config">

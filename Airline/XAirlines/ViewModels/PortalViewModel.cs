@@ -54,6 +54,7 @@ namespace Airlines.XAirlines.ViewModels
         public List<MonthSchedule> Monthly { get; set; } = new List<MonthSchedule>();
 
         public string UserEmailId { get; set; }
+        public string vacationPlan { get; set; }
     }
 
     public class MonthSchedule
@@ -79,6 +80,7 @@ namespace Airlines.XAirlines.ViewModels
     {
         public DateTime Date { get; set; }
         public Details Details { get; set; }
+        public bool vacationPlan { get; set; }
     }
 
     public class Details
