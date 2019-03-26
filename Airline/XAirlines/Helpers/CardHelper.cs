@@ -541,7 +541,7 @@ namespace Airlines.XAirlines.Helpers
                                     {
                                       Size=AdaptiveTextSize.Medium,
                                       Weight=AdaptiveTextWeight.Bolder,
-                                      Text="Here is the weather report for "+wInfo.name
+                                      Text="Here is the weather report for "+wInfo.name.ToUpper()
                                     },
 
                             new AdaptiveColumnSet()

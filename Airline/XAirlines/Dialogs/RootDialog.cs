@@ -55,9 +55,6 @@ namespace Airlines.XAirlines.Dialogs
                     case Constants.NextWeekRoster:
                         card = await CardHelper.GetWeeklyRosterCard(userDetails.UserPrincipalName);
                         break;
-                    //case Constants.ShowDetailedRoster:
-                    //    card = CardHelper.GetDetailedRoster(userDetails.GivenName ?? userDetails.Name);
-                    //    break;
                     case Constants.UpdateCard:
                         card = CardHelper.GetUpdateScreen();
                         break;
