@@ -37,22 +37,24 @@ namespace Airlines.XAirlines.Controllers
             var colour = new[] { "pink", "org", "blue" };
             foreach (var item in cabinCrewData)
             {
-              duties.Add(item.vacationPlan==true?new Duty() {Date=item.vacationDate,Details=new Details() {DisplayText="AL",Colour=colour[1] } }:item.isDayOff==true?new ViewModels.Duty() { Date=item.date,Details=new Details() {DisplayText="OFF",Colour=colour[0]} } :new Duty(){Date = item.flightDetails.flightStartDate,vacationPlan=item.vacationPlan, Details = new Details() { DisplayText = item.flightDetails.sourceCode, Colour = colour[2]} });
+              duties.Add(item.vacationPlan==true?new Duty() {Date=item.vacationDate,isDayOff=item.isDayOff,vacationPlan=item.vacationPlan,Details=new Details() {DisplayText="AL",Colour=colour[1] } }:item.isDayOff==true?new ViewModels.Duty() { Date=item.date, isDayOff = item.isDayOff,vacationPlan = item.vacationPlan,Details=new Details() {DisplayText="OFF",Colour=colour[0]} } :new Duty(){Date = Convert.ToDateTime(item.flightDetails.flightStartDate), isDayOff = item.isDayOff,vacationPlan = item.vacationPlan, Details = new Details() { DisplayText = item.flightDetails.sourceCode, Colour = colour[2]} });
             }
 
-           // List<Duty> duties = new List<Duty>();
+            // List<Duty> duties = new List<Duty>();
             //var destinations = new[] { "AL", "OFF", "DEL", "BLR", "OFF", "DEL", "HYD", "OFF", "DEL", "BOM", "DEL", "BLR", "OFF", "DEL", "HYD", };
             //var colour = new[] { "pink", "org", "blue" };
 
             //for (int i = 0; i < 15; i++)
             //{
-               // duties.Add(new Duty() { Date = DateTime.Today.AddDays(i * 2), Details = new Details() { DisplayText = destinations[i], Colour = colour[i % 3] } });
+            // duties.Add(new Duty() { Date = DateTime.Today.AddDays(i * 2), Details = new Details() { DisplayText = destinations[i], Colour = colour[i % 3] } });
             //}
 
             //duties[5].Details.Event2 = "BLR";
 
-            PortalViewModel viewModel = new PortalViewModel(DateTime.Today, 30, 2, duties);
-            viewModel.UserEmailId = userEmailId;
+           
+                PortalViewModel viewModel = new PortalViewModel(DateTime.Today, 30, 2, duties);
+            
+           viewModel.UserEmailId = userEmailId;
             
             return View(viewModel);
         }
@@ -60,9 +62,19 @@ namespace Airlines.XAirlines.Controllers
         [Route("duty")]
         public async Task<ActionResult> Duty(string code,string userEmailId)
         {
+            //Portal portal = new Portal();
+            //AdaptiveCardRenderer renderer = new AdaptiveCardRenderer();
+
+            //WeatherHelper weather = new WeatherHelper();
+            //WeatherInfo weatherinfo = weather.GetWeatherInfo("Moscow");
+            //var card = await CardHelper.GetWeatherCard(weatherinfo, DateTime.Now.Date); // change this date
+            //RenderedAdaptiveCard renderedCard = renderer.RenderCard(card.Content as AdaptiveCard);
+            //HtmlTag cardhtml = renderedCard.Html;
+            //portal.html = cardhtml;
+            //return View("AdaptiveCardRenderer", portal);
             Portal portal = new Portal();
             AdaptiveCardRenderer renderer = new AdaptiveCardRenderer();
-            var card =await CardHelper.GetMyDetailedCard(code,userEmailId);
+            var card = await CardHelper.GetMyDetailedCard(code, userEmailId);
             RenderedAdaptiveCard renderedCard = renderer.RenderCard(card.Content as AdaptiveCard);
             HtmlTag cardhtml = renderedCard.Html;
             portal.html = cardhtml;

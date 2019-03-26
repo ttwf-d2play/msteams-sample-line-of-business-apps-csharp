@@ -9,11 +9,17 @@
         <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/b"></script>
         <link rel="stylesheet" href="~/Content/details.css" />
-        <script>
+        <script type="text/javascript">
             $(document).ready(function () {
-                $(".ac-adaptivecard ac-showCard").click(function () {
-                    alert("clicked");
-                })
+               
+                $(".ac-action-showCard").click(function () {
+                   
+                    var ele = $(this).attr('data-ac-showcardid')
+                    var myele = document.getElementById(ele)
+                    
+                    myele.style.display="block"
+                   
+                });
             });
         </script>
     </head>

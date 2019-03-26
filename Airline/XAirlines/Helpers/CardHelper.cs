@@ -862,7 +862,7 @@ namespace Airlines.XAirlines.Helpers
                                             {
                                                Size=AdaptiveTextSize.Medium,
                                                 Weight=AdaptiveTextWeight.Bolder,
-                                               Text=weekplan[0].flightDetails.flightStartDate.ToString()
+                                               Text=weekplan[0].flightDetails.flightStartDate.ToString("ddd dd MMM")
                                             },
                                             new AdaptiveTextBlock()
                                             {
@@ -885,7 +885,7 @@ namespace Airlines.XAirlines.Helpers
                                                Size=AdaptiveTextSize.Medium,
                                                HorizontalAlignment=AdaptiveHorizontalAlignment.Right,
                                                 Weight=AdaptiveTextWeight.Bolder,
-                                               Text=weekplan[0].flightDetails.flightEndDate.ToString()
+                                               Text=weekplan[0].flightDetails.flightEndDate.ToString("ddd dd MMM")
                                             },
                                             new AdaptiveTextBlock()
                                             {
@@ -1067,7 +1067,7 @@ namespace Airlines.XAirlines.Helpers
                     new AdaptiveShowCardAction()
                     {
                         Title="Currency Details",
-                        Card=GetTabCurrencyCard(currencyinfo,weekplan[0].flightDetails.destinationCode,weekplan[0].flightDetails.destinationCurrencyCode)
+                        Card=GetTabCurrencyCard(currencyinfo,weekplan[0].flightDetails.destination,weekplan[0].flightDetails.destinationCurrencyCode)
                         //Data=new WeatherActionDetails(){sourceCurrencyCode=datePlan.flightDetails.sourceCurrencyCode, destinationCurrencyCode=datePlan.flightDetails.destinationCurrencyCode, City=datePlan.flightDetails.destination,ActionType=Constants.CurrencyCard}
                     }
                 }

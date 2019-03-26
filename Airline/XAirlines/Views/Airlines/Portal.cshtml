@@ -42,51 +42,68 @@
                 <tbody>
                     @foreach (var weeklySchedule in monthlySchedule.Weekly)
                     {
-                        <tr>
+                    <tr>
 
-                            @for (int i = 0; i < weeklySchedule.DayOfWeek; i++)
+                        @for (int i = 0; i < weeklySchedule.DayOfWeek; i++)
+                        {
+                            <td>&nbsp;</td>
+                        }
+
+                        @foreach (var dailyDuty in weeklySchedule.Daily)
+                        {
+                            if (dailyDuty.vacationPlan == true||dailyDuty.isDayOff == true)
                             {
-                                <td>&nbsp;</td>
+                                <td class="date" >@dailyDuty.Date.Day</td>
                             }
-
-                            @foreach (var dailyDuty in weeklySchedule.Daily)
+                            else
                             {
                                 <td class="date" onclick="submit('@dailyDuty.Date','@Model.UserEmailId');">@dailyDuty.Date.Day</td>
                             }
+                        }
 
-                            @for (int i = (weeklySchedule.DayOfWeek + weeklySchedule.Daily.Count); i <= 7; i++)
+                        @for (int i = (weeklySchedule.DayOfWeek + weeklySchedule.Daily.Count); i <= 7; i++)
+                        {
+                            <td><div>&nbsp;</div></td>
+                        }
+                    </tr>
+
+                    <tr class="desktop">
+
+                        @for (int i = 0; i < weeklySchedule.DayOfWeek; i++)
+                        {
+                            <td><div>&nbsp;</div></td>
+                        }
+
+                        @foreach (var dailyDuty in weeklySchedule.Daily)
+                        {
+                            if (dailyDuty.Details != null)
                             {
-                                <td><div>&nbsp;</div></td>
-                            }
-                        </tr>
-
-                        <tr class="desktop">
-
-                            @for (int i = 0; i < weeklySchedule.DayOfWeek; i++)
-                            {
-                                <td><div>&nbsp;</div></td>
-                            }
-
-                            @foreach (var dailyDuty in weeklySchedule.Daily)
-                            {
-                                if (dailyDuty.Details != null)
+                                if (dailyDuty.vacationPlan == true||dailyDuty.isDayOff==true)
                                 {
-                                    <td onclick="submit('@dailyDuty.Date', '@Model.UserEmailId');">
+                                    <td >
                                         <div class="@(dailyDuty.Details.Colour)">@dailyDuty.Details.DisplayText</div>
                                     </td>
                                 }
                                 else
                                 {
-                                    <td><div>&nbsp;</div></td>
+                                    <td onclick="submit('@dailyDuty.Date', '@Model.UserEmailId');">
+                                        <div class="@(dailyDuty.Details.Colour)">@dailyDuty.Details.DisplayText</div>
+                                    </td>
                                 }
 
                             }
-
-                            @for (int i = (weeklySchedule.DayOfWeek + weeklySchedule.Daily.Count); i <= 7; i++)
+                            else
                             {
                                 <td><div>&nbsp;</div></td>
                             }
-                        </tr>
+
+                        }
+
+                        @for (int i = (weeklySchedule.DayOfWeek + weeklySchedule.Daily.Count); i <= 7; i++)
+                        {
+                            <td><div>&nbsp;</div></td>
+                        }
+                    </tr>
 
                         <tr class="@(monthlySchedule.Weekly.IndexOf(weeklySchedule) == monthlySchedule.Weekly.Count-1? "": "size-pad" )">
 
@@ -133,7 +150,6 @@
 
     <script>
         microsoftTeams.initialize();
-
         function submit(code,EmailId) {
             let taskInfo = {
                 title: null,
@@ -148,11 +164,9 @@
             taskInfo.title = "Show Duty";
             taskInfo.height = "medium";
             taskInfo.width = "medium";
-            taskInfo.height = "600";
+            taskInfo.height = "900";
             taskInfo.width = "500";
-
             taskInfo.url = '@(Airlines.XAirlines.Helpers.ApplicationSettings.BaseUrl)' + '/duty?code=' + code + '&userEmailId=' + EmailId;
-
             microsoftTeams.tasks.startTask(taskInfo);
         }
     </script>
