@@ -27,7 +27,7 @@ namespace Airlines.XAirlines.Helpers
             DateTime filelastmodified = File.GetLastWriteTime(file).Date;
             DateTime currentDate = DateTime.Now.Date;
 
-            if (filelastmodified.Date != currentDate.Date) await UpdateMockData(file);
+            if (filelastmodified.Date != currentDate.Date) UpdateMockData(file);
             
             string data = string.Empty;
             if (File.Exists(file))
@@ -60,7 +60,7 @@ namespace Airlines.XAirlines.Helpers
             return weekplan;
         }
 
-        public static async Task UpdateMockData(string filename)
+        public static void UpdateMockData(string filename)
         {
             string data = string.Empty;
             Crew crewObject;
@@ -72,7 +72,6 @@ namespace Airlines.XAirlines.Helpers
                     crewObject = (new JavaScriptSerializer().Deserialize<Crew>(data));
                 }
 
-                //send the top object to the bottom
                 int planCount = crewObject.plan.Count;
                 Plan p1 = crewObject.plan[0];
 
@@ -111,7 +110,4 @@ namespace Airlines.XAirlines.Helpers
         }
 
     }
-
-
-
 }

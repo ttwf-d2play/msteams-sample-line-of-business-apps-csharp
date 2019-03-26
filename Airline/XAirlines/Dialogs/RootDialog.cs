@@ -121,18 +121,16 @@ namespace Airlines.XAirlines.Dialogs
         }
 
         private static async Task<Attachment> GetCurrencyCard(Activity activity)
-        {
-            CurrencyHelper currency = new CurrencyHelper();
+        {            
             var desCurrency = JsonConvert.DeserializeObject<CurrencyActionDetails>(activity.Value.ToString());
-            CurrencyInfo currencyinfo = currency.GetCurrencyInfo();
+            CurrencyInfo currencyinfo = CurrencyHelper.GetCurrencyInfo();
             return await CardHelper.GetCurrencyCard(currencyinfo, desCurrency.City, desCurrency.DestinationCurrencyCode);
         }
 
         private static async Task<Attachment> GetWeatherCard(Activity activity)
         {
-            WeatherHelper weather = new WeatherHelper();
             var desLocationInfo = JsonConvert.DeserializeObject<WeatherActionDetails>(activity.Value.ToString());
-            WeatherInfo weatherinfo = weather.GetWeatherInfo(desLocationInfo.City);
+            WeatherInfo weatherinfo = WeatherHelper.GetWeatherInfo(desLocationInfo.City);
             return await CardHelper.GetWeatherCard(weatherinfo, desLocationInfo.Date);
 
         }

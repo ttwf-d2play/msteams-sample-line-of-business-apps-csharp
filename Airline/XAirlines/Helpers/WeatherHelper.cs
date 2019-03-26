@@ -11,34 +11,37 @@ namespace Airlines.XAirlines.Helpers
 {
     public class WeatherHelper
     {
-        public WeatherInfo GetWeatherInfo(string des)
+        public static WeatherInfo GetWeatherInfo(string des)
         {
             string url = string.Format("http://api.openweathermap.org/data/2.5/weather?q={0}&APPID=619590f1e4a82a6ed18ee9b109bb9c14", des);
             string backupDataLocation = System.Web.Hosting.HostingEnvironment.MapPath(@"~\TestData\WeatherBackupMockData\");
-
 
             using (WebClient client = new WebClient())
             {
                 WeatherInfo weatherinfo;
                 string json = client.DownloadString(url);
-                string jsonSuccessCode = json.Substring(json.Length - 4, 3);
-
-                File.WriteAllText(backupDataLocation + des + ".json", json);
-
-                if (jsonSuccessCode != "200")
-                {
-                    if (!File.Exists(backupDataLocation + des + ".json"))
-                        
-                    using (StreamReader reader = new StreamReader(backupDataLocation + des + ".json"))
-                    {
-                        json = reader.ReadToEnd();
-                    }
-                }
 
                 weatherinfo = (new JavaScriptSerializer().Deserialize<WeatherInfo>(json));
+
+                if (weatherinfo.cod != 200)
+                {
+                    if (File.Exists(backupDataLocation + des + ".json"))
+                    {
+                        using (StreamReader reader = new StreamReader(backupDataLocation + des + ".json"))
+                        {
+                            json = reader.ReadToEnd();
+                            weatherinfo = (new JavaScriptSerializer().Deserialize<WeatherInfo>(json));
+                        }
+                    }
+                    else return null;
+                }
+
+                File.WriteAllText(backupDataLocation + des + ".json", json);
                 return weatherinfo;
             }
         }
+    }
+
 
         public class WeatherInfo
         {
@@ -98,12 +101,4 @@ namespace Airlines.XAirlines.Helpers
             public string description { get; set; }
             public string icon { get; set; }
         }
-
-    }
-
-
-
-
-
-
 }

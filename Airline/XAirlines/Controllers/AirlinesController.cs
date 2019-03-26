@@ -75,8 +75,8 @@ namespace Airlines.XAirlines.Controllers
             Portal portal = new Portal();
             AdaptiveCardRenderer renderer = new AdaptiveCardRenderer();
 
-            WeatherHelper weather = new WeatherHelper();
-            WeatherInfo weatherinfo = weather.GetWeatherInfo(city);
+            
+            WeatherInfo weatherinfo = WeatherHelper.GetWeatherInfo(city);
             var card = await CardHelper.GetWeatherCard(weatherinfo, DateTime.Now.Date); // change this date
             RenderedAdaptiveCard renderedCard = renderer.RenderCard(card.Content as AdaptiveCard);
             HtmlTag cardhtml = renderedCard.Html;
