@@ -36,7 +36,7 @@ namespace Airlines.XAirlines.Helpers
                 string json = client.DownloadString(url);
                 string jsonSuccessCode = json.Substring(json.Length - 4, 3);
 
-                //File.WriteAllText(backupDataLocation + des + ".json", json);
+                File.WriteAllText(backupDataLocation + des + ".json", json);
 
                 if (jsonSuccessCode != "200")
                 {

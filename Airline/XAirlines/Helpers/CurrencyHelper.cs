@@ -34,7 +34,7 @@ namespace Airlines.XAirlines.Helpers
                 string successFlag = json.Substring(11, 4);
 
                 string backupfilelocation = backupDataLocation + "backup.json";
-               // File.WriteAllText(backupfilelocation, json);
+                File.WriteAllText(backupfilelocation, json);
 
                 if (successFlag != "true")
                 {

@@ -11,10 +11,15 @@
         <link rel="stylesheet" href="~/Content/details.css" />
         <script type="text/javascript">
             $(document).ready(function () {
-                alert("Ready");
-
-                $(".ac-showCard").click($("#ac-56e57092").style.display = block
-                );
+               
+                $(".ac-action-showCard").click(function () {
+                   
+                    var ele = $(this).attr('data-ac-showcardid')
+                    var myele = document.getElementById(ele)
+                    
+                    myele.style.display="block"
+                   
+                });
             });
         </script>
     </head>

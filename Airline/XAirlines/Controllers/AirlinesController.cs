@@ -62,9 +62,19 @@ namespace Airlines.XAirlines.Controllers
         [Route("duty")]
         public async Task<ActionResult> Duty(string code,string userEmailId)
         {
+            //Portal portal = new Portal();
+            //AdaptiveCardRenderer renderer = new AdaptiveCardRenderer();
+
+            //WeatherHelper weather = new WeatherHelper();
+            //WeatherInfo weatherinfo = weather.GetWeatherInfo("Moscow");
+            //var card = await CardHelper.GetWeatherCard(weatherinfo, DateTime.Now.Date); // change this date
+            //RenderedAdaptiveCard renderedCard = renderer.RenderCard(card.Content as AdaptiveCard);
+            //HtmlTag cardhtml = renderedCard.Html;
+            //portal.html = cardhtml;
+            //return View("AdaptiveCardRenderer", portal);
             Portal portal = new Portal();
             AdaptiveCardRenderer renderer = new AdaptiveCardRenderer();
-            var card =await CardHelper.GetMyDetailedCard(code,userEmailId);
+            var card = await CardHelper.GetMyDetailedCard(code, userEmailId);
             RenderedAdaptiveCard renderedCard = renderer.RenderCard(card.Content as AdaptiveCard);
             HtmlTag cardhtml = renderedCard.Html;
             portal.html = cardhtml;
