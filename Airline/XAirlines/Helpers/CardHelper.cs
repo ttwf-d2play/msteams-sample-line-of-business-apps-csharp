@@ -543,6 +543,7 @@ namespace Airlines.XAirlines.Helpers
                                       Weight=AdaptiveTextWeight.Bolder,
                                       Text="Here is the weather report for "+wInfo.name
                                     },
+
                             new AdaptiveColumnSet()
                             {
                                 Columns=new List<AdaptiveColumn>()
