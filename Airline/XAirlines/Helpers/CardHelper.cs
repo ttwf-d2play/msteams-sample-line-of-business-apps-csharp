@@ -33,7 +33,7 @@ namespace Airlines.XAirlines.Helpers
             foreach (var i in weekplan)
             {
                 var item = new Item();
-                item.id = i.flightDetails.flightStartDate;
+                item.id = i.flightDetails.flightStartDate.Date.ToString();
                 item.type = "resultItem";
                 item.icon = i.vacationPlan == true ? ApplicationSettings.BaseUrl + "/Resources/vacationicon.png" : i.isDayOff == true ? ApplicationSettings.BaseUrl + "/Resources/homeicon.png" : ApplicationSettings.BaseUrl + "/Resources/flighticon.png";
                 item.title = i.vacationPlan == true ? Convert.ToDateTime(i.vacationDate).ToString("ddd dd MMM") : i.isDayOff == true ? Convert.ToDateTime(i.flightDetails.flightStartDate).ToString("ddd dd MMM") : Convert.ToDateTime(i.flightDetails.flightStartDate).ToString("ddd dd MMM") + "-" + Convert.ToDateTime(i.flightDetails.flightEndDate).ToString("ddd dd MMM");
@@ -427,7 +427,7 @@ namespace Airlines.XAirlines.Helpers
                     {
                         Title="Weather Report",
                         Data=new WeatherActionDetails(){
-                            Date =datePlan.flightDetails.flightEndDate,
+                            Date =datePlan.flightDetails.flightEndDate.Date,
                             City =datePlan.flightDetails.destination,
                             ActionType =Constants.WeatherCard
                         }
@@ -513,7 +513,7 @@ namespace Airlines.XAirlines.Helpers
 
 
         }
-        public static async Task<Attachment> GetWeatherCard(WeatherInfo wInfo, string ArrivalDate)
+        public static async Task<Attachment> GetWeatherCard(WeatherInfo wInfo, DateTime ArrivalDate)
         {
             AdaptiveCard Card = GetTabWeatherCard(wInfo, ArrivalDate);
             return new Attachment()
@@ -556,7 +556,7 @@ namespace Airlines.XAirlines.Helpers
                                          {
                                              //Date of arrival - get it from Test json
                                              new AdaptiveTextBlock(){Text= "Date of Arrival",HorizontalAlignment=AdaptiveHorizontalAlignment.Left},
-                                             new AdaptiveTextBlock(){Text=ArrivalDate,Weight=AdaptiveTextWeight.Bolder}
+                                             new AdaptiveTextBlock(){Text=ArrivalDate.ToString(),Weight=AdaptiveTextWeight.Bolder}
                                          },
 
 

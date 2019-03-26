@@ -115,7 +115,7 @@ namespace Airlines.XAirlines.Dialogs
         {
             var details = JsonConvert.DeserializeObject<AirlineActionDetails>(activity.Value.ToString());
             Crew crew = await Helpers.CabinCrewPlansHelper.ReadJson(userDetails.UserPrincipalName);
-            var datePlan = crew.plan.Where(c => c.flightDetails.flightStartDate == details.Id).FirstOrDefault();
+            var datePlan = crew.plan.Where(c => c.flightDetails.flightStartDate.ToString() == details.Id).FirstOrDefault();
             return CardHelper.GetDetailedRoster(datePlan);
 
         }
