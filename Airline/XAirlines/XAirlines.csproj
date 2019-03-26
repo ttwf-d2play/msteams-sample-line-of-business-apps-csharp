@@ -370,7 +370,10 @@
     <Content Include="TestData\4.json" />
     <Content Include="TestData\5.json" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="TestData\CurrencyBackupMockData\" />
+    <Folder Include="TestData\WeatherBackupMockData\" />
+  </ItemGroup>
   <ItemGroup>
     <Content Include="Manifest\manifest.json" />
     <Content Include="ApplicationInsights.config">

@@ -515,7 +515,7 @@ namespace Airlines.XAirlines.Helpers
         }
         public static async Task<Attachment> GetWeatherCard(WeatherInfo wInfo, DateTime ArrivalDate)
         {
-            AdaptiveCard Card = GetTabWeatherCard(wInfo, ArrivalDate.ToString());
+            AdaptiveCard Card = GetTabWeatherCard(wInfo, ArrivalDate.Date);
             return new Attachment()
             {
                 ContentType = AdaptiveCard.ContentType,
@@ -525,7 +525,7 @@ namespace Airlines.XAirlines.Helpers
 
         }
 
-        private static AdaptiveCard GetTabWeatherCard(WeatherInfo wInfo, string ArrivalDate)
+        private static AdaptiveCard GetTabWeatherCard(WeatherInfo wInfo, DateTime ArrivalDate)
         {
             DateTime dateTime;
             var Card = new AdaptiveCard(new AdaptiveSchemaVersion("1.0"))
@@ -556,7 +556,7 @@ namespace Airlines.XAirlines.Helpers
                                          {
                                              //Date of arrival - get it from Test json
                                              new AdaptiveTextBlock(){Text= "Date of Arrival",HorizontalAlignment=AdaptiveHorizontalAlignment.Left},
-                                             new AdaptiveTextBlock(){Text=ArrivalDate.ToString(),Weight=AdaptiveTextWeight.Bolder}
+                                             new AdaptiveTextBlock(){Text=ArrivalDate.ToShortDateString(),Weight=AdaptiveTextWeight.Bolder}
                                          },
 
 
@@ -1063,7 +1063,7 @@ namespace Airlines.XAirlines.Helpers
                     new AdaptiveShowCardAction()
                     {
                         Title="Weather Report",
-                        Card=GetTabWeatherCard(weatherinfo,weekplan[0].flightDetails.flightEndDate.ToString())
+                        Card=GetTabWeatherCard(weatherinfo,weekplan[0].flightDetails.flightEndDate.Date)
                        // Data=new WeatherActionDetails(){Date=datePlan.flightDetails.flightEndDate,City=datePlan.flightDetails.destination,ActionType=Constants.WeatherCard}
                     },
                     new AdaptiveShowCardAction()
