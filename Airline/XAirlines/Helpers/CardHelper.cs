@@ -515,10 +515,10 @@ namespace Airlines.XAirlines.Helpers
         }
         public static async Task<Attachment> GetWeatherCard(WeatherInfo wInfo, DateTime ArrivalDate)
         {
-            var Card = new AdaptiveCard(new AdaptiveSchemaVersion("1.0"))
-            {
+                var Card = new AdaptiveCard(new AdaptiveSchemaVersion("1.0"))
+                {
 
-                Body = new List<AdaptiveElement>()
+                    Body = new List<AdaptiveElement>()
                 {
 
                     new AdaptiveContainer()
@@ -529,7 +529,7 @@ namespace Airlines.XAirlines.Helpers
                                     {
                                       Size=AdaptiveTextSize.Medium,
                                       Weight=AdaptiveTextWeight.Bolder,
-                                      Text="Here is the weather report for "+wInfo.name.ToUpper()
+                                      Text=string.IsNullOrEmpty(wInfo.name)?"Sorry we are not able to fetch the weather right now":"Here is the weather report for "+wInfo.name.ToUpper()
                                     },
 
                             new AdaptiveColumnSet()
@@ -539,16 +539,12 @@ namespace Airlines.XAirlines.Helpers
 
                                     new AdaptiveColumn()
                                     {
-
-                                         Items=new List<AdaptiveElement>()
+                                     Items=new List<AdaptiveElement>()
                                          {
                                              //Date of arrival - get it from Test json
                                              new AdaptiveTextBlock(){Text= "Date of Arrival",HorizontalAlignment=AdaptiveHorizontalAlignment.Left},
                                              new AdaptiveTextBlock(){Text=ArrivalDate.ToString("ddd,dd MMM"),Weight=AdaptiveTextWeight.Bolder}
                                          },
-
-
-
                                     },
                                     new AdaptiveColumn()
                                     {
@@ -671,16 +667,17 @@ namespace Airlines.XAirlines.Helpers
                     }
                 }
 
-            };
+                };
+            
             return new Attachment()
             {
                 ContentType = AdaptiveCard.ContentType,
                 Content = Card
             };
+        
 
 
         }
-
         private static AdaptiveCard GetTabWeatherCard(WeatherInfo wInfo, DateTime ArrivalDate)
         {            
             var Card = new AdaptiveCard(new AdaptiveSchemaVersion("1.0"))
@@ -925,10 +922,8 @@ namespace Airlines.XAirlines.Helpers
         public static async Task<Attachment> GetMyDetailedCard(string code,string userEmailId)
         {
             Crew crew = await CabinCrewPlansHelper.ReadJson(userEmailId);
-             
             var weekplan = crew.plan.Where(c => c.date ==Convert.ToDateTime(code)).ToList();
-            WeatherInfo weatherinfo = WeatherHelper.GetWeatherInfo(weekplan[0].flightDetails.destinationCode);
-                        
+            WeatherInfo weatherinfo = WeatherHelper.GetWeatherInfo(weekplan[0].flightDetails.destination);
             CurrencyInfo currencyinfo = CurrencyHelper.GetCurrencyInfo();
             var Card = new AdaptiveCard(new AdaptiveSchemaVersion("1.0"))
             {

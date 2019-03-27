@@ -128,7 +128,9 @@ namespace Airlines.XAirlines.Dialogs
         {
             var desLocationInfo = JsonConvert.DeserializeObject<WeatherActionDetails>(activity.Value.ToString());
             WeatherInfo weatherinfo = WeatherHelper.GetWeatherInfo(desLocationInfo.City);
+            
             return await CardHelper.GetWeatherCard(weatherinfo, desLocationInfo.Date);
+          
 
         }
 

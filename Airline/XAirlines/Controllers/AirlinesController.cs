@@ -56,18 +56,5 @@ namespace Airlines.XAirlines.Controllers
             portal.html = cardhtml;
             return View("AdaptiveCardRenderer", portal);
         }
-
-        [Route("Weather")]
-        public async Task<ActionResult> Weather(string city)
-        {
-            Portal portal = new Portal();
-            AdaptiveCardRenderer renderer = new AdaptiveCardRenderer();            
-            WeatherInfo weatherinfo = WeatherHelper.GetWeatherInfo(city);
-            var card = await CardHelper.GetWeatherCard(weatherinfo, DateTime.Now.Date); // change this date
-            RenderedAdaptiveCard renderedCard = renderer.RenderCard(card.Content as AdaptiveCard);
-            HtmlTag cardhtml = renderedCard.Html;
-            portal.html = cardhtml;
-            return View("AdaptiveCardRenderer", portal);
-        }
     }
 }

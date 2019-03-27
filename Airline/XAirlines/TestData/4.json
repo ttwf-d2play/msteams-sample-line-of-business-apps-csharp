@@ -19,46 +19,12 @@
       "month": "March",
       "weekNumber": 1,
       "day": "Wednesday",
-      "date": "2019-03-26T00:00:00+05:30",
-      "vacationPlan": false,
-      "vacationDate": "2019-03-26T00:00:00+05:30",
-      "isDayOff": true,
-      "halt": false,
-      "lastUpdated": "2019-03-24T00:00:00+05:30",
-      "flightDetails": {
-        "code": "E0370",
-        "flightStartDate": "2019-03-26T00:00:00+05:30",
-        "source": "Minneapolis",
-        "sourceCode": "MSP",
-        "sourceFlightCode": "7923",
-        "sourceCurrencyCode": "USD",
-        "flightDepartueTime": "08:00",
-        "destination": "Manchester",
-        "destinationCode": "MAN",
-        "destinationFlightCode": "7504",
-        "destinationCurrencyCode": "GBP",
-        "flightEndDate": "2019-03-26T00:00:00+05:30",
-        "flightArrivalTime": "21:45",
-        "layOVer": "2h:45m",
-        "travelDuraion": "13h:45m",
-        "gateNumber": "BOM-Gate15",
-        "blockhours": "12h:36m",
-        "awayfromBase": "05:00",
-        "gateOpensAt": "06:30",
-        "acType": "B777 - 300 ER",
-        "tailNo": "A6EGA"
-      }
-    },
-    {
-      "month": "March",
-      "weekNumber": 1,
-      "day": "Wednesday",
       "date": "2019-03-27T00:00:00+05:30",
       "vacationPlan": false,
       "vacationDate": "2019-03-27T00:00:00+05:30",
       "isDayOff": false,
       "halt": false,
-      "lastUpdated": "2019-03-24T00:00:00+05:30",
+      "lastUpdated": "2019-03-25T00:00:00+05:30",
       "flightDetails": {
         "code": "E0371",
         "flightStartDate": "2019-03-27T00:00:00+05:30",
@@ -92,7 +58,7 @@
       "vacationDate": "2019-03-28T00:00:00+05:30",
       "isDayOff": false,
       "halt": false,
-      "lastUpdated": "2019-03-24T00:00:00+05:30",
+      "lastUpdated": "2019-03-25T00:00:00+05:30",
       "flightDetails": {
         "code": "E1126",
         "flightStartDate": "2019-03-28T00:00:00+05:30",
@@ -126,7 +92,7 @@
       "vacationDate": "2019-03-29T00:00:00+05:30",
       "isDayOff": false,
       "halt": false,
-      "lastUpdated": "2019-03-24T00:00:00+05:30",
+      "lastUpdated": "2019-03-25T00:00:00+05:30",
       "flightDetails": {
         "code": "E0370",
         "flightStartDate": "2019-03-29T00:00:00+05:30",
@@ -161,7 +127,7 @@
       "vacationReason": "Sick",
       "isDayOff": false,
       "halt": false,
-      "lastUpdated": "2019-03-24T00:00:00+05:30",
+      "lastUpdated": "2019-03-25T00:00:00+05:30",
       "flightDetails": {
         "code": "E0370",
         "flightStartDate": "2019-03-30T00:00:00+05:30",
@@ -195,7 +161,7 @@
       "vacationDate": "2019-03-31T00:00:00+05:30",
       "isDayOff": false,
       "halt": false,
-      "lastUpdated": "2019-03-24T00:00:00+05:30",
+      "lastUpdated": "2019-03-25T00:00:00+05:30",
       "flightDetails": {
         "code": "E0370",
         "flightStartDate": "2019-03-31T00:00:00+05:30",
@@ -229,7 +195,7 @@
       "vacationDate": "2019-04-01T00:00:00+05:30",
       "isDayOff": false,
       "halt": false,
-      "lastUpdated": "2019-03-24T00:00:00+05:30",
+      "lastUpdated": "2019-03-25T00:00:00+05:30",
       "flightDetails": {
         "code": "E0370",
         "flightStartDate": "2019-04-01T00:00:00+05:30",
@@ -263,7 +229,7 @@
       "vacationDate": "2019-04-02T00:00:00+05:30",
       "isDayOff": false,
       "halt": false,
-      "lastUpdated": "2019-03-24T00:00:00+05:30",
+      "lastUpdated": "2019-03-25T00:00:00+05:30",
       "flightDetails": {
         "code": "E0370",
         "flightStartDate": "2019-04-02T00:00:00+05:30",
@@ -297,7 +263,7 @@
       "vacationDate": "2019-04-03T00:00:00+05:30",
       "isDayOff": true,
       "halt": false,
-      "lastUpdated": "2019-03-24T00:00:00+05:30",
+      "lastUpdated": "2019-03-25T00:00:00+05:30",
       "flightDetails": {
         "code": "E0370",
         "flightStartDate": "2019-04-03T00:00:00+05:30",
@@ -331,7 +297,7 @@
       "vacationDate": "2019-04-04T00:00:00+05:30",
       "isDayOff": false,
       "halt": false,
-      "lastUpdated": "2019-03-24T00:00:00+05:30",
+      "lastUpdated": "2019-03-25T00:00:00+05:30",
       "flightDetails": {
         "code": "E0370",
         "flightStartDate": "2019-04-04T00:00:00+05:30",
@@ -365,7 +331,7 @@
       "vacationDate": "2019-04-05T00:00:00+05:30",
       "isDayOff": false,
       "halt": false,
-      "lastUpdated": "2019-03-24T00:00:00+05:30",
+      "lastUpdated": "2019-03-25T00:00:00+05:30",
       "flightDetails": {
         "code": "E0370",
         "flightStartDate": "2019-04-05T00:00:00+05:30",
@@ -399,7 +365,7 @@
       "vacationDate": "2019-04-06T00:00:00+05:30",
       "isDayOff": true,
       "halt": false,
-      "lastUpdated": "2019-03-24T00:00:00+05:30",
+      "lastUpdated": "2019-03-25T00:00:00+05:30",
       "flightDetails": {
         "code": "E0370",
         "flightStartDate": "2019-04-06T00:00:00+05:30",
@@ -433,7 +399,7 @@
       "vacationDate": "2019-04-07T00:00:00+05:30",
       "isDayOff": false,
       "halt": false,
-      "lastUpdated": "2019-03-24T00:00:00+05:30",
+      "lastUpdated": "2019-03-25T00:00:00+05:30",
       "flightDetails": {
         "code": "E0370",
         "flightStartDate": "2019-04-07T00:00:00+05:30",
@@ -467,7 +433,7 @@
       "vacationDate": "2019-04-08T00:00:00+05:30",
       "isDayOff": false,
       "halt": false,
-      "lastUpdated": "2019-03-24T00:00:00+05:30",
+      "lastUpdated": "2019-03-25T00:00:00+05:30",
       "flightDetails": {
         "code": "E0370",
         "flightStartDate": "2019-04-08T00:00:00+05:30",
@@ -502,7 +468,7 @@
       "vacationReason": "Day Off",
       "isDayOff": false,
       "halt": false,
-      "lastUpdated": "2019-03-24T00:00:00+05:30",
+      "lastUpdated": "2019-03-25T00:00:00+05:30",
       "flightDetails": {
         "code": "E0370",
         "flightStartDate": "2019-04-09T00:00:00+05:30",
@@ -536,7 +502,7 @@
       "vacationDate": "2019-04-10T00:00:00+05:30",
       "isDayOff": false,
       "halt": false,
-      "lastUpdated": "2019-03-24T00:00:00+05:30",
+      "lastUpdated": "2019-03-25T00:00:00+05:30",
       "flightDetails": {
         "code": "E0370",
         "flightStartDate": "2019-04-10T00:00:00+05:30",
@@ -570,7 +536,7 @@
       "vacationDate": "2019-04-11T00:00:00+05:30",
       "isDayOff": false,
       "halt": false,
-      "lastUpdated": "2019-03-24T00:00:00+05:30",
+      "lastUpdated": "2019-03-25T00:00:00+05:30",
       "flightDetails": {
         "code": "E0370",
         "flightStartDate": "2019-04-11T00:00:00+05:30",
@@ -605,7 +571,7 @@
       "vacationReason": "Annual Leave",
       "isDayOff": false,
       "halt": false,
-      "lastUpdated": "2019-03-24T00:00:00+05:30",
+      "lastUpdated": "2019-03-25T00:00:00+05:30",
       "flightDetails": {
         "code": "E0370",
         "flightStartDate": "2019-04-12T00:00:00+05:30",
@@ -639,7 +605,7 @@
       "vacationDate": "2019-04-13T00:00:00+05:30",
       "isDayOff": false,
       "halt": false,
-      "lastUpdated": "2019-03-24T00:00:00+05:30",
+      "lastUpdated": "2019-03-25T00:00:00+05:30",
       "flightDetails": {
         "code": "E0370",
         "flightStartDate": "2019-04-13T00:00:00+05:30",
@@ -673,7 +639,7 @@
       "vacationDate": "2019-04-14T00:00:00+05:30",
       "isDayOff": true,
       "halt": false,
-      "lastUpdated": "2019-03-24T00:00:00+05:30",
+      "lastUpdated": "2019-03-25T00:00:00+05:30",
       "flightDetails": {
         "code": "E0370",
         "flightStartDate": "2019-04-14T00:00:00+05:30",
@@ -707,7 +673,7 @@
       "vacationDate": "2019-04-15T00:00:00+05:30",
       "isDayOff": false,
       "halt": false,
-      "lastUpdated": "2019-03-24T00:00:00+05:30",
+      "lastUpdated": "2019-03-25T00:00:00+05:30",
       "flightDetails": {
         "code": "E0370",
         "flightStartDate": "2019-04-15T00:00:00+05:30",
@@ -742,7 +708,7 @@
       "vacationReason": "Sick",
       "isDayOff": false,
       "halt": false,
-      "lastUpdated": "2019-03-24T00:00:00+05:30",
+      "lastUpdated": "2019-03-25T00:00:00+05:30",
       "flightDetails": {
         "code": "E0370",
         "flightStartDate": "2019-04-16T00:00:00+05:30",
@@ -776,7 +742,7 @@
       "vacationDate": "2019-04-17T00:00:00+05:30",
       "isDayOff": false,
       "halt": false,
-      "lastUpdated": "2019-03-24T00:00:00+05:30",
+      "lastUpdated": "2019-03-25T00:00:00+05:30",
       "flightDetails": {
         "code": "E0370",
         "flightStartDate": "2019-04-17T00:00:00+05:30",
@@ -810,7 +776,7 @@
       "vacationDate": "2019-04-18T00:00:00+05:30",
       "isDayOff": false,
       "halt": false,
-      "lastUpdated": "2019-03-24T00:00:00+05:30",
+      "lastUpdated": "2019-03-25T00:00:00+05:30",
       "flightDetails": {
         "code": "E0370",
         "flightStartDate": "2019-04-18T00:00:00+05:30",
@@ -845,7 +811,7 @@
       "vacationReason": "Sick Leave",
       "isDayOff": false,
       "halt": false,
-      "lastUpdated": "2019-03-24T00:00:00+05:30",
+      "lastUpdated": "2019-03-25T00:00:00+05:30",
       "flightDetails": {
         "code": "E0102",
         "flightStartDate": "2019-04-19T00:00:00+05:30",
@@ -879,7 +845,7 @@
       "vacationDate": "2019-04-20T00:00:00+05:30",
       "isDayOff": false,
       "halt": false,
-      "lastUpdated": "2019-03-24T00:00:00+05:30",
+      "lastUpdated": "2019-03-25T00:00:00+05:30",
       "flightDetails": {
         "code": "E0370",
         "flightStartDate": "2019-04-20T00:00:00+05:30",
@@ -913,7 +879,7 @@
       "vacationDate": "2019-04-21T00:00:00+05:30",
       "isDayOff": false,
       "halt": false,
-      "lastUpdated": "2019-03-24T00:00:00+05:30",
+      "lastUpdated": "2019-03-25T00:00:00+05:30",
       "flightDetails": {
         "code": "E0370",
         "flightStartDate": "2019-04-21T00:00:00+05:30",
@@ -947,7 +913,7 @@
       "vacationDate": "2019-04-22T00:00:00+05:30",
       "isDayOff": false,
       "halt": false,
-      "lastUpdated": "2019-03-24T00:00:00+05:30",
+      "lastUpdated": "2019-03-25T00:00:00+05:30",
       "flightDetails": {
         "code": "E0370",
         "flightStartDate": "2019-04-22T00:00:00+05:30",
@@ -981,7 +947,7 @@
       "vacationDate": "2019-04-23T00:00:00+05:30",
       "isDayOff": false,
       "halt": false,
-      "lastUpdated": "2019-03-24T00:00:00+05:30",
+      "lastUpdated": "2019-03-25T00:00:00+05:30",
       "flightDetails": {
         "code": "E0370",
         "flightStartDate": "2019-04-23T00:00:00+05:30",
@@ -1015,7 +981,7 @@
       "vacationDate": "2019-04-24T00:00:00+05:30",
       "isDayOff": false,
       "halt": false,
-      "lastUpdated": "2019-03-24T00:00:00+05:30",
+      "lastUpdated": "2019-03-25T00:00:00+05:30",
       "flightDetails": {
         "code": "E0370",
         "flightStartDate": "2019-04-24T00:00:00+05:30",
@@ -1049,7 +1015,7 @@
       "vacationDate": "2019-04-25T00:00:00+05:30",
       "isDayOff": false,
       "halt": false,
-      "lastUpdated": "2019-03-24T00:00:00+05:30",
+      "lastUpdated": "2019-03-25T00:00:00+05:30",
       "flightDetails": {
         "code": "E0370",
         "flightStartDate": "2019-04-25T00:00:00+05:30",
@@ -1083,7 +1049,7 @@
       "vacationDate": "2019-04-26T00:00:00+05:30",
       "isDayOff": false,
       "halt": false,
-      "lastUpdated": "2019-03-24T00:00:00+05:30",
+      "lastUpdated": "2019-03-25T00:00:00+05:30",
       "flightDetails": {
         "code": "E0370",
         "flightStartDate": "2019-04-26T00:00:00+05:30",
@@ -1117,7 +1083,7 @@
       "vacationDate": "2019-04-27T00:00:00+05:30",
       "isDayOff": false,
       "halt": false,
-      "lastUpdated": "2019-03-24T00:00:00+05:30",
+      "lastUpdated": "2019-03-25T00:00:00+05:30",
       "flightDetails": {
         "code": "E0370",
         "flightStartDate": "2019-04-27T00:00:00+05:30",
@@ -1151,7 +1117,7 @@
       "vacationDate": "2019-04-28T00:00:00+05:30",
       "isDayOff": false,
       "halt": false,
-      "lastUpdated": "2019-03-24T00:00:00+05:30",
+      "lastUpdated": "2019-03-25T00:00:00+05:30",
       "flightDetails": {
         "flightStartDate": "2019-04-28T00:00:00+05:30",
         "source": "Philadelphia",
@@ -1182,7 +1148,7 @@
       "vacationDate": "2019-04-29T00:00:00+05:30",
       "isDayOff": false,
       "halt": false,
-      "lastUpdated": "2019-03-24T00:00:00+05:30",
+      "lastUpdated": "2019-03-25T00:00:00+05:30",
       "flightDetails": {
         "code": "E0370",
         "flightStartDate": "2019-04-29T00:00:00+05:30",
@@ -1217,7 +1183,7 @@
       "vacationReason": "Annual Leave",
       "isDayOff": false,
       "halt": false,
-      "lastUpdated": "2019-03-24T00:00:00+05:30",
+      "lastUpdated": "2019-03-25T00:00:00+05:30",
       "flightDetails": {
         "code": "E0370",
         "flightStartDate": "2019-04-30T00:00:00+05:30",
@@ -1251,7 +1217,7 @@
       "vacationDate": "2019-05-01T00:00:00+05:30",
       "isDayOff": false,
       "halt": false,
-      "lastUpdated": "2019-03-24T00:00:00+05:30",
+      "lastUpdated": "2019-03-25T00:00:00+05:30",
       "flightDetails": {
         "code": "E0370",
         "flightStartDate": "2019-05-01T00:00:00+05:30",
@@ -1265,6 +1231,40 @@
         "destinationFlightCode": "7504",
         "destinationCurrencyCode": "EUR",
         "flightEndDate": "2019-05-01T00:00:00+05:30",
+        "flightArrivalTime": "21:45",
+        "layOVer": "2h:45m",
+        "travelDuraion": "13h:45m",
+        "gateNumber": "BOM-Gate15",
+        "blockhours": "12h:36m",
+        "awayfromBase": "05:00",
+        "gateOpensAt": "06:30",
+        "acType": "B777 - 300 ER",
+        "tailNo": "A6EGA"
+      }
+    },
+    {
+      "month": "March",
+      "weekNumber": 1,
+      "day": "Wednesday",
+      "date": "2019-05-02T00:00:00+05:30",
+      "vacationPlan": false,
+      "vacationDate": "2019-05-02T00:00:00+05:30",
+      "isDayOff": true,
+      "halt": false,
+      "lastUpdated": "2019-03-25T00:00:00+05:30",
+      "flightDetails": {
+        "code": "E0370",
+        "flightStartDate": "2019-05-02T00:00:00+05:30",
+        "source": "Minneapolis",
+        "sourceCode": "MSP",
+        "sourceFlightCode": "7923",
+        "sourceCurrencyCode": "USD",
+        "flightDepartueTime": "08:00",
+        "destination": "Manchester",
+        "destinationCode": "MAN",
+        "destinationFlightCode": "7504",
+        "destinationCurrencyCode": "GBP",
+        "flightEndDate": "2019-05-02T00:00:00+05:30",
         "flightArrivalTime": "21:45",
         "layOVer": "2h:45m",
         "travelDuraion": "13h:45m",
