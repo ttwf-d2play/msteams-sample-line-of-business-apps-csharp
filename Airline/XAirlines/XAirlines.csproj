@@ -317,7 +317,6 @@
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
     <Content Include="Manifest\color.png" />
-    <Content Include="Cards\AdaptiveCard.json" />
     <None Include="Properties\PublishProfiles\airlinecabincrew - FTP.pubxml" />
     <None Include="Properties\PublishProfiles\airlinecabincrew - Web Deploy.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />

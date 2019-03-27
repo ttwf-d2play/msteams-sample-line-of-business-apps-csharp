@@ -18,12 +18,26 @@ namespace Airlines.XAirlines.Helpers
 
             using (WebClient client = new WebClient())
             {
-                WeatherInfo weatherinfo;
-                string json = client.DownloadString(url);
-
-                weatherinfo = (new JavaScriptSerializer().Deserialize<WeatherInfo>(json));
-
-                if (weatherinfo.cod != 200)
+                WeatherInfo weatherinfo = null;
+                string json = null;
+                try
+                {
+                    json = client.DownloadString(url);
+                    weatherinfo = (new JavaScriptSerializer().Deserialize<WeatherInfo>(json));
+                    if (weatherinfo.cod != 200)
+                    {
+                        if (File.Exists(backupDataLocation + des + ".json"))
+                        {
+                            using (StreamReader reader = new StreamReader(backupDataLocation + des + ".json"))
+                            {
+                                json = reader.ReadToEnd();
+                                weatherinfo = (new JavaScriptSerializer().Deserialize<WeatherInfo>(json));
+                            }
+                        }
+                        else return null;
+                    }
+                }
+                catch (Exception)
                 {
                     if (File.Exists(backupDataLocation + des + ".json"))
                     {
@@ -33,8 +47,11 @@ namespace Airlines.XAirlines.Helpers
                             weatherinfo = (new JavaScriptSerializer().Deserialize<WeatherInfo>(json));
                         }
                     }
-                    else return null;
                 }
+
+                
+
+
 
                 File.WriteAllText(backupDataLocation + des + ".json", json);
                 return weatherinfo;
