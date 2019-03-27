@@ -21,16 +21,30 @@ namespace Airlines.XAirlines.Helpers
             {
                 FileStream fs;
                 CurrencyInfo curr;
-                string json = client.DownloadString(url);
+                string json = null;
 
-                curr = (new JavaScriptSerializer().Deserialize<CurrencyInfo>(json));
-
-                if(curr.success != true)
+                try
                 {
+                    json = client.DownloadString(url);
+
+                    curr = (new JavaScriptSerializer().Deserialize<CurrencyInfo>(json));
+
+                    if (curr.success != true)
+                    {
+                        using (StreamReader reader = new StreamReader(backupDataLocation))
+                        {
+                            json = reader.ReadToEnd();
+                            curr = (new JavaScriptSerializer().Deserialize<CurrencyInfo>(json));
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+
                     using (StreamReader reader = new StreamReader(backupDataLocation))
                     {
                         json = reader.ReadToEnd();
-                        curr = (new JavaScriptSerializer().Deserialize<CurrencyInfo>(json));                        
+                        curr = (new JavaScriptSerializer().Deserialize<CurrencyInfo>(json));
                     }
                 }
                 

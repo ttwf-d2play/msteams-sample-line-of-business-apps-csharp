@@ -526,7 +526,7 @@ namespace Airlines.XAirlines.Helpers
         }
 
         private static AdaptiveCard GetTabWeatherCard(WeatherInfo wInfo, DateTime ArrivalDate)
-        {            
+        {
             var Card = new AdaptiveCard(new AdaptiveSchemaVersion("1.0"))
             {
 
@@ -537,11 +537,12 @@ namespace Airlines.XAirlines.Helpers
                     {
                         Items=new List<AdaptiveElement>()
                         {
+                            
                              new AdaptiveTextBlock()
                                     {
                                       Size=AdaptiveTextSize.Medium,
                                       Weight=AdaptiveTextWeight.Bolder,
-                                      Text="Here is the weather report for "+wInfo.name.ToUpper()
+                                      Text="Here is the weather report for "+wInfo?.name.ToUpper()
                                     },
 
                             new AdaptiveColumnSet()
@@ -569,7 +570,7 @@ namespace Airlines.XAirlines.Helpers
                                             new AdaptiveImage()
                                             {
                                                 HorizontalAlignment=AdaptiveHorizontalAlignment.Right,
-                                                Url=wInfo.weather[0].description.Contains("rain")?new Uri(ApplicationSettings.BaseUrl+"/Resources/Rainwithcloud.png"):wInfo.main.temp_min-273>25?new Uri(ApplicationSettings.BaseUrl+"/Resources/Sun-vector.png"):new Uri(ApplicationSettings.BaseUrl+"/Resources/Sunny-cloudy-weather.png"),
+                                                Url=wInfo.weather.FirstOrDefault().description.Contains("rain")?new Uri(ApplicationSettings.BaseUrl+"/Resources/Rainwithcloud.png"):wInfo?.main.temp_min-273>25?new Uri(ApplicationSettings.BaseUrl+"/Resources/Sun-vector.png"):new Uri(ApplicationSettings.BaseUrl+"/Resources/Sunny-cloudy-weather.png"),
                                             }
                                         }
                                     }
@@ -797,7 +798,7 @@ namespace Airlines.XAirlines.Helpers
             Crew crew = await CabinCrewPlansHelper.ReadJson(userEmailId);
              
             var weekplan = crew.plan.Where(c => c.date ==Convert.ToDateTime(code)).ToList();
-            WeatherInfo weatherinfo = WeatherHelper.GetWeatherInfo(weekplan[0].flightDetails.destinationCode);
+            WeatherInfo weatherinfo = WeatherHelper.GetWeatherInfo((weekplan.FirstOrDefault()).flightDetails.destination);
                         
             CurrencyInfo currencyinfo = CurrencyHelper.GetCurrencyInfo();
             var Card = new AdaptiveCard(new AdaptiveSchemaVersion("1.0"))
