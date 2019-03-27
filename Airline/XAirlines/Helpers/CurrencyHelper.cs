@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
-using System.Web;
 using System.Web.Script.Serialization;
-using System.Threading.Tasks;
 
 
 namespace Airlines.XAirlines.Helpers
@@ -15,41 +12,43 @@ namespace Airlines.XAirlines.Helpers
         public static CurrencyInfo GetCurrencyInfo()
         {
             string url = string.Format("http://www.apilayer.net/api/live?access_key=29d0ff0f89f41d3bdd19f6c25ea4b1c4");
-            string backupDataLocation = System.Web.Hosting.HostingEnvironment.MapPath(@"~\TestData\CurrencyBackupMockData\Currencybackup.json");
-            
+            string backupDataLocation = System.Web.Hosting.HostingEnvironment.MapPath(@"~\TestData\CurrencyBackupMockData\");
+
+            if (!Directory.Exists(backupDataLocation))
+                Directory.CreateDirectory(backupDataLocation);
+
+            string fileName = Path.Combine(backupDataLocation, "Currencybackup.json");
+
+            CurrencyInfo curr = null;
+
             using (WebClient client = new WebClient())
             {
-                FileStream fs;
-                CurrencyInfo curr;
                 string json = null;
-
                 try
                 {
                     json = client.DownloadString(url);
 
                     curr = (new JavaScriptSerializer().Deserialize<CurrencyInfo>(json));
-
                     if (curr.success != true)
                     {
-                        using (StreamReader reader = new StreamReader(backupDataLocation))
+                        if (File.Exists(fileName))
                         {
-                            json = reader.ReadToEnd();
+                            json = File.ReadAllText(fileName);
                             curr = (new JavaScriptSerializer().Deserialize<CurrencyInfo>(json));
                         }
                     }
+                    else
+                        File.WriteAllText(fileName, json);
                 }
                 catch (Exception)
                 {
-
-                    using (StreamReader reader = new StreamReader(backupDataLocation))
+                    if (File.Exists(fileName))
                     {
-                        json = reader.ReadToEnd();
+                        json = File.ReadAllText(fileName);
                         curr = (new JavaScriptSerializer().Deserialize<CurrencyInfo>(json));
                     }
                 }
-                
-                File.WriteAllText(backupDataLocation, json);
-                return curr;               
+                return curr;
             }
         }
     }
@@ -60,7 +59,7 @@ namespace Airlines.XAirlines.Helpers
         public string privacy { get; set; }
         public int timestamp { get; set; }
         public string source { get; set; }
-       
+
         public Dictionary<string, double> quotes { get; set; }
     }
 }

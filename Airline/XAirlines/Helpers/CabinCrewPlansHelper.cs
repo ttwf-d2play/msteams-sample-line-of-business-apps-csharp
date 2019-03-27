@@ -2,7 +2,6 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -28,7 +27,7 @@ namespace Airlines.XAirlines.Helpers
             DateTime currentDate = DateTime.Now.Date;
 
             if (filelastmodified.Date != currentDate.Date) UpdateMockData(file);
-            
+
             string data = string.Empty;
             if (File.Exists(file))
             {
@@ -66,11 +65,8 @@ namespace Airlines.XAirlines.Helpers
             Crew crewObject;
             if (File.Exists(filename))
             {
-                using (StreamReader reader = new StreamReader(filename))
-                {
-                    data = reader.ReadToEnd();
-                    crewObject = (new JavaScriptSerializer().Deserialize<Crew>(data));
-                }
+                File.ReadAllText(filename);
+                crewObject = (new JavaScriptSerializer().Deserialize<Crew>(data));
 
                 int planCount = crewObject.plan.Count;
                 Plan p1 = crewObject.plan[0];
@@ -82,7 +78,7 @@ namespace Airlines.XAirlines.Helpers
                 crewObject.plan[planCount - 1] = p1;
 
                 //update dates of plans starting today
-                for (int j = 0; j <= crewObject.plan.Count-1; j++)
+                for (int j = 0; j <= crewObject.plan.Count - 1; j++)
                 {
                     crewObject.plan[j].date = DateTime.Now.Date.AddDays(j);
                     crewObject.plan[j].vacationDate = DateTime.Now.Date.AddDays(j);
@@ -90,14 +86,14 @@ namespace Airlines.XAirlines.Helpers
                     crewObject.plan[j].flightDetails.flightStartDate = DateTime.Now.Date.AddDays(j);
                     crewObject.plan[j].flightDetails.flightEndDate = DateTime.Now.Date.AddDays(j);
                 }
-                
+
                 string json = JsonConvert.SerializeObject(crewObject); //create json object
-                
+
                 File.WriteAllText(filename, json);
             }
-        }       
+        }
 
-        public static  List<DateTime> OneMonthsDates()
+        public static List<DateTime> OneMonthsDates()
         {
             DateTime today = DateTime.Now;
             List<DateTime> oneMonthDates = new List<DateTime>();

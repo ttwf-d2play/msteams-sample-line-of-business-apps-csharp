@@ -51,6 +51,10 @@ namespace Airlines.XAirlines.Controllers
             Portal portal = new Portal();
             AdaptiveCardRenderer renderer = new AdaptiveCardRenderer();
             var card = await CardHelper.GetMyDetailedCard(code, userEmailId);
+            if (card == null)
+            {
+                return HttpNotFound();
+            }
             RenderedAdaptiveCard renderedCard = renderer.RenderCard(card.Content as AdaptiveCard);
             HtmlTag cardhtml = renderedCard.Html;
             portal.html = cardhtml;

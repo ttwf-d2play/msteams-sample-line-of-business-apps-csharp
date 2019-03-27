@@ -111,16 +111,16 @@ namespace Airlines.XAirlines.Dialogs
         private static async Task<Attachment> GetDetailedRoasterCard(Activity activity, TeamsChannelAccount userDetails)
         {
             var details = JsonConvert.DeserializeObject<AirlineActionDetails>(activity.Value.ToString());
-            Crew crew = await Helpers.CabinCrewPlansHelper.ReadJson(userDetails.UserPrincipalName);
-            var datePlan = crew.plan.Where(c => c.flightDetails.flightStartDate.ToString() == details.Id).FirstOrDefault();
+            Crew crew = await CabinCrewPlansHelper.ReadJson(userDetails.UserPrincipalName);
+            var datePlan = crew.plan.FirstOrDefault(c => c.flightDetails.flightStartDate.Date.ToString() == details.Id);
             return CardHelper.GetDetailedRoster(datePlan);
-
         }
 
         private static async Task<Attachment> GetCurrencyCard(Activity activity)
-        {            
+        {
             var desCurrency = JsonConvert.DeserializeObject<CurrencyActionDetails>(activity.Value.ToString());
             CurrencyInfo currencyinfo = CurrencyHelper.GetCurrencyInfo();
+
             return await CardHelper.GetCurrencyCard(currencyinfo, desCurrency.City, desCurrency.DestinationCurrencyCode);
         }
 
