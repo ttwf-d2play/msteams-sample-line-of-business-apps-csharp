@@ -13,21 +13,16 @@ namespace Airlines.XAirlines.Helpers
         {
             string url = string.Format("http://www.apilayer.net/api/live?access_key=29d0ff0f89f41d3bdd19f6c25ea4b1c4");
             string backupDataLocation = System.Web.Hosting.HostingEnvironment.MapPath(@"~\TestData\CurrencyBackupMockData\");
-
             if (!Directory.Exists(backupDataLocation))
                 Directory.CreateDirectory(backupDataLocation);
-
             string fileName = Path.Combine(backupDataLocation, "Currencybackup.json");
-
             CurrencyInfo curr = null;
-
             using (WebClient client = new WebClient())
             {
                 string json = null;
                 try
                 {
                     json = client.DownloadString(url);
-
                     curr = (new JavaScriptSerializer().Deserialize<CurrencyInfo>(json));
                     if (curr.success != true)
                     {
@@ -59,7 +54,6 @@ namespace Airlines.XAirlines.Helpers
         public string privacy { get; set; }
         public int timestamp { get; set; }
         public string source { get; set; }
-
         public Dictionary<string, double> quotes { get; set; }
     }
 }

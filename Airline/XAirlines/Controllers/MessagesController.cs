@@ -29,15 +29,11 @@ namespace Airlines.XAirlines.Controllers
                 case ActivityTypes.Message:
                     await Conversation.SendAsync(activity, () => new RootDialog());
                     break;
-
                 case ActivityTypes.Invoke:
                     return await HandleInvokeActivity(activity);
-
                 case ActivityTypes.ConversationUpdate:
                     await HandleConversationUpdate(activity);
                     break;
-
-
             }
             return new HttpResponseMessage(HttpStatusCode.Accepted);
         }
@@ -48,23 +44,18 @@ namespace Airlines.XAirlines.Controllers
         private async Task<HttpResponseMessage> HandleInvokeActivity(Activity activity)
         {
             var activityValue = activity.Value.ToString();
-
             switch (activity.Name)
             {
                 case "signin/verifyState":
                     await Conversation.SendAsync(activity, () => new RootDialog());
                     break;
-
                 case "composeExtension/query":
                 // Handle fetching task module content
-
                 case "task/fetch":
                 // Handle fetching task module content
-
                 case "task/submit":
                     // Handle submission of task module info
                     // Run this on a task so that 
-
                     break;
             }
             return new HttpResponseMessage(HttpStatusCode.Accepted);
@@ -77,7 +68,6 @@ namespace Airlines.XAirlines.Controllers
         {
             ConnectorClient connector = new ConnectorClient(new Uri(message.ServiceUrl));
             var channelData = message.GetChannelData<TeamsChannelData>();
-
             // Treat 1:1 add/remove events as if they were add/remove of a team member
             if (channelData.EventType == null)
             {
@@ -86,7 +76,6 @@ namespace Airlines.XAirlines.Controllers
                 if (message.MembersRemoved != null)
                     channelData.EventType = "teamMemberRemoved";
             }
-
             switch (channelData.EventType)
             {
                 case "teamMemberAdded":
@@ -112,29 +101,16 @@ namespace Airlines.XAirlines.Controllers
                 // Update the team and channel info in the database when the team is rename or when channel are added/removed/renamed
                 case "teamRenamed":
                     // Rename team & channel details 
-
                     break;
-
                 case "channelCreated":
-
                     break;
                 case "channelRenamed":
-
                     break;
-
                 case "channelDeleted":
-
                     break;
-
                 default:
                     break;
             }
         }
-
-        /// <summary>
-        /// Handle messageReaction events, which indicate user liked/unliked a message sent by the bot.
-
-
     }
-
 }

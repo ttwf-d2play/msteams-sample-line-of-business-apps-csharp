@@ -11,23 +11,16 @@
         <link rel="stylesheet" href="~/Content/details.css" />
         <script type="text/javascript">
             $(document).ready(function () {
-               
                 $(".ac-action-showCard").click(function () {
                     var elements = document.getElementsByClassName("ac-action-showCard");
                     for (var i = 0; i < elements.length; i++) {
                         var idForDiv = elements[i].getAttribute('data-ac-showcardid');
                         var myele = document.getElementById(idForDiv)
-
                         myele.style.display = "none"
                     }
-             
-                   //find all buttons with .ac-action class
-                    //foreach button get element attribute data-ac-showcardid-display-block=none
                     var ele = $(this).attr('data-ac-showcardid')
                     var myele = document.getElementById(ele)
-                    
                     myele.style.display="block"
-                   
                 });
             });
         </script>

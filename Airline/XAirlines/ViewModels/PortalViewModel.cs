@@ -28,62 +28,44 @@ namespace Airlines.XAirlines.ViewModels
                     Monthly.Add(monthlySchedule);
                     weekNumber = 1;
                 }
-
                 var weeklySchedule = monthlySchedule.Weekly.FirstOrDefault(m => m.WeekNumber == weekNumber);
                 if (weeklySchedule == null)
                 {
                     weeklySchedule = new WeekSchedule() { WeekNumber = weekNumber, DayOfWeek = (int)currentDate.DayOfWeek };
                     monthlySchedule.Weekly.Add(weeklySchedule);
-
                 }
-
                 var duty = duties.FirstOrDefault(d => d.Date.Date == currentDate.Date);
                 weeklySchedule.Daily.Add(new Duty() { Date = currentDate,vacationPlan=duty.vacationPlan,isDayOff=duty.isDayOff, Details = duty?.Details });
-
                 daysCount++;
-
                 currentDate = currentDate.AddDays(1);
-
                 if (currentDate.DayOfWeek == DayOfWeek.Sunday)
                     weekNumber++;
-
             }
             while (daysCount < maxDays);
         }
-
         public List<MonthSchedule> Monthly { get; set; } = new List<MonthSchedule>();
-
         public string UserEmailId { get; set; }
-        
     }
     public class MonthSchedule
     {
         public int Month { get; set; }
-
         public string MonthName { get; set; }
-
         public int Year { get; set; }
-
-
         public List<WeekSchedule> Weekly { get; set; } = new List<WeekSchedule>();
     }
-
     public class WeekSchedule
     {
         public int DayOfWeek { get; set; }
         public int WeekNumber { get; set; }
         public List<Duty> Daily { get; set; } = new List<Duty>();
     }
-
     public class Duty
     {
         public DateTime Date { get; set; }
         public Details Details { get; set; }
         public bool vacationPlan { get; set; }
         public bool isDayOff { get; set; }
-
     }
-
     public class Details
     {
         public string DisplayText { get; set; }

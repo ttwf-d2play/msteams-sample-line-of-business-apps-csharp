@@ -12,7 +12,6 @@ namespace Airlines.XAirlines.Models
         public string dept { get; set; }
         public List<Plan> plan { get; set; }
     }
-
     public class Demographics
     {
         public string name { get; set; }
@@ -27,7 +26,6 @@ namespace Airlines.XAirlines.Models
         public string expiryDate { get; set; }
         public int licencePoints { get; set; }
     }
-
     public class Plan
     {
         public string month { get; set; }
@@ -42,7 +40,6 @@ namespace Airlines.XAirlines.Models
         public DateTime lastUpdated { get; set; }
         public FlightDetails flightDetails { get; set; }
     }
-
     public class Days
     {
         public string day { get; set; }
@@ -55,7 +52,6 @@ namespace Airlines.XAirlines.Models
         public string lastUpdated { get; set; }
         public FlightDetails flightDetails { get; set; }
     }
-
     public class FlightDetails
     {
         public string code { get; set; }

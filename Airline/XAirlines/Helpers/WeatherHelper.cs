@@ -11,10 +11,8 @@ namespace Airlines.XAirlines.Helpers
         {
             string url = string.Format("http://api.openweathermap.org/data/2.5/weather?q={0}&APPID=619590f1e4a82a6ed18ee9b109bb9c14", des);
             string backupDataLocation = System.Web.Hosting.HostingEnvironment.MapPath(@"~\TestData\WeatherBackupMockData\");
-
             if (!Directory.Exists(backupDataLocation))
                 Directory.CreateDirectory(backupDataLocation);
-
             var fileName = backupDataLocation + des + ".json";
             using (WebClient client = new WebClient())
             {
@@ -30,7 +28,6 @@ namespace Airlines.XAirlines.Helpers
                         {
                             json = File.ReadAllText(fileName);
                             weatherinfo = (new JavaScriptSerializer().Deserialize<WeatherInfo>(json));
-
                         }
                         else return null;
                     }
@@ -44,18 +41,11 @@ namespace Airlines.XAirlines.Helpers
 
                     }
                 }
-
-
-
-
-
                 File.WriteAllText(backupDataLocation + des + ".json", json);
                 return weatherinfo;
             }
         }
     }
-
-
     public class WeatherInfo
     {
         public Coord coord { get; set; }
@@ -70,13 +60,11 @@ namespace Airlines.XAirlines.Helpers
         public string name { get; set; }
         public int cod { get; set; }
     }
-
     public class Coord
     {
         public float lon { get; set; }
         public float lat { get; set; }
     }
-
     public class Main
     {
         public float temp { get; set; }
@@ -87,18 +75,15 @@ namespace Airlines.XAirlines.Helpers
         public float sea_level { get; set; }
         public float grnd_level { get; set; }
     }
-
     public class Wind
     {
         public float speed { get; set; }
         public float deg { get; set; }
     }
-
     public class Clouds
     {
         public int all { get; set; }
     }
-
     public class Sys
     {
         public float message { get; set; }
@@ -106,7 +91,6 @@ namespace Airlines.XAirlines.Helpers
         public int sunrise { get; set; }
         public int sunset { get; set; }
     }
-
     public class Weather
     {
         public int id { get; set; }
