@@ -72,5 +72,5 @@
     "identity",
     "messageTeamMembers"
   ],
-  "validDomains": [ "035b2256.ngrok.io", "airlinecabincrew.azurewebsites.net", "*.botframework.com" ]
+  "validDomains": ["airlinecabincrew.azurewebsites.net", "*.botframework.com" ]
 }
