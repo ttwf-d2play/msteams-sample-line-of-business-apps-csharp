@@ -61,7 +61,7 @@ namespace Airlines.XAirlines.Helpers
             Crew crewObject;
             if (File.Exists(filename))
             {
-                File.ReadAllText(filename);
+                data = File.ReadAllText(filename);
                 crewObject = (new JavaScriptSerializer().Deserialize<Crew>(data));
 
                 int planCount = crewObject.plan.Count;
