@@ -361,13 +361,23 @@
     <Content Include="Views\Airlines\Index.cshtml" />
     <Content Include="Views\Airlines\Portal.cshtml" />
     <Content Include="Views\Web.config" />
-    <Content Include="TestData\1.json" />
+    <Content Include="TestData\1.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Scripts\responsive-calendar.coffee" />
     <Content Include="Views\Airlines\AdaptiveCardRenderer.cshtml" />
-    <Content Include="TestData\2.json" />
-    <Content Include="TestData\3.json" />
-    <Content Include="TestData\4.json" />
-    <Content Include="TestData\5.json" />
+    <Content Include="TestData\2.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestData\3.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestData\4.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestData\5.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="TestData\CurrencyBackupMockData\" />

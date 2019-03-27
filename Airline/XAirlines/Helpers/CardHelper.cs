@@ -36,7 +36,7 @@ namespace Airlines.XAirlines.Helpers
                 item.id = i.flightDetails.flightStartDate.Date.ToString();
                 item.type = "resultItem";
                 item.icon = i.vacationPlan == true ? ApplicationSettings.BaseUrl + "/Resources/vacationicon.png" : i.isDayOff == true ? ApplicationSettings.BaseUrl + "/Resources/homeicon.png" : ApplicationSettings.BaseUrl + "/Resources/flighticon.png";
-                item.title = i.vacationPlan == true ? Convert.ToDateTime(i.vacationDate).ToString("ddd dd MMM") : i.isDayOff == true ? Convert.ToDateTime(i.flightDetails.flightStartDate).ToString("ddd dd MMM") : Convert.ToDateTime(i.flightDetails.flightStartDate).ToString("ddd dd MMM") + "-" + Convert.ToDateTime(i.flightDetails.flightEndDate).ToString("ddd dd MMM");
+                item.title = i.vacationPlan == true ? Convert.ToDateTime(i.vacationDate).ToString("ddd dd MMM") : i.isDayOff == true ? Convert.ToDateTime(i.flightDetails.flightStartDate).ToString("ddd dd MMM") : Convert.ToDateTime(i.flightDetails.flightStartDate).ToString("ddd dd MMM") + " - " + Convert.ToDateTime(i.flightDetails.flightEndDate).ToString("ddd dd MMM");
                 item.subtitle = i.vacationPlan == true ? i.vacationReason : i.isDayOff == true ? "Day Off" : i.flightDetails.sourceCode + "-" + i.flightDetails.destinationCode;
                 item.tap = i.vacationPlan == true ? null : i.isDayOff == true ? null : new Tap()
                 {
@@ -515,18 +515,6 @@ namespace Airlines.XAirlines.Helpers
         }
         public static async Task<Attachment> GetWeatherCard(WeatherInfo wInfo, DateTime ArrivalDate)
         {
-            AdaptiveCard Card = GetTabWeatherCard(wInfo, ArrivalDate.Date);
-            return new Attachment()
-            {
-                ContentType = AdaptiveCard.ContentType,
-                Content = Card
-            };
-
-
-        }
-
-        private static AdaptiveCard GetTabWeatherCard(WeatherInfo wInfo, DateTime ArrivalDate)
-        {
             var Card = new AdaptiveCard(new AdaptiveSchemaVersion("1.0"))
             {
 
@@ -557,7 +545,7 @@ namespace Airlines.XAirlines.Helpers
                                          {
                                              //Date of arrival - get it from Test json
                                              new AdaptiveTextBlock(){Text= "Date of Arrival",HorizontalAlignment=AdaptiveHorizontalAlignment.Left},
-                                             new AdaptiveTextBlock(){Text=ArrivalDate.ToShortDateString(),Weight=AdaptiveTextWeight.Bolder}
+                                             new AdaptiveTextBlock(){Text=ArrivalDate.ToString("ddd,dd MMM"),Weight=AdaptiveTextWeight.Bolder}
                                          },
 
 
@@ -603,6 +591,148 @@ namespace Airlines.XAirlines.Helpers
                                     }
                                 }
                             },
+                           new AdaptiveColumnSet()
+                            {
+                                Spacing=AdaptiveSpacing.Small,
+                                Columns=new List<AdaptiveColumn>()
+                                {
+                                    new AdaptiveColumn()
+                                    {
+                                        Items=new List<AdaptiveElement>()
+                                        {
+                                            new AdaptiveTextBlock()
+                                            {
+                                                HorizontalAlignment=AdaptiveHorizontalAlignment.Left,
+                                                Spacing=AdaptiveSpacing.Small,
+                                                Separator=true,
+                                                Weight=AdaptiveTextWeight.Lighter,
+                                                Text="Minimum",
+                                                MaxLines=1
+                                            }
+                                        }
+                                    },
+                                    new AdaptiveColumn()
+                                    {
+                                        Items=new List<AdaptiveElement>()
+                                        {
+                                            new AdaptiveTextBlock()
+                                            {
+                                                HorizontalAlignment=AdaptiveHorizontalAlignment.Right,
+                                                Spacing=AdaptiveSpacing.Small,
+                                                Separator=true,
+                                                Weight=AdaptiveTextWeight.Lighter,
+                                                Text="Maximum",
+
+                                            }
+                                        }
+                                    },
+                                }
+                            },
+
+                            new AdaptiveColumnSet()
+                            {
+                                Separator=true,
+                                Columns=new List<AdaptiveColumn>()
+                                {
+                                    new AdaptiveColumn()
+                                    {
+                                        Items=new List<AdaptiveElement>()
+                                        {
+                                            new AdaptiveContainer()
+                                            {
+                                                Items=new List<AdaptiveElement>()
+                                                {
+                                                    new AdaptiveTextBlock()
+                                                    {
+                                                        Size=AdaptiveTextSize.Medium,
+                                                        Weight=AdaptiveTextWeight.Bolder,
+                                                         Text=Math.Round(wInfo.main.temp_min-273).ToString()
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    },
+                                    new AdaptiveColumn()
+                                    {
+                                        Items=new List<AdaptiveElement>()
+                                        {
+                                            new AdaptiveTextBlock()
+                                            {
+                                                HorizontalAlignment=AdaptiveHorizontalAlignment.Right,
+                                                Size=AdaptiveTextSize.Medium,
+                                                Weight=AdaptiveTextWeight.Bolder,
+                                                Text=Math.Round(wInfo.main.temp_max-273).ToString()
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+                }
+
+            };
+            return new Attachment()
+            {
+                ContentType = AdaptiveCard.ContentType,
+                Content = Card
+            };
+
+
+        }
+
+        private static AdaptiveCard GetTabWeatherCard(WeatherInfo wInfo, DateTime ArrivalDate)
+        {            
+            var Card = new AdaptiveCard(new AdaptiveSchemaVersion("1.0"))
+            {
+
+                Body = new List<AdaptiveElement>()
+                {
+
+                    new AdaptiveContainer()
+                    {
+                        Items=new List<AdaptiveElement>()
+                        {
+                             new AdaptiveTextBlock()
+                                    {
+                                      Size=AdaptiveTextSize.Medium,
+                                      Weight=AdaptiveTextWeight.Bolder,
+                                      Text="Here is the weather report for "+wInfo.name.ToUpper()
+                                    },
+
+                            new AdaptiveColumnSet()
+                            {
+                                Columns=new List<AdaptiveColumn>()
+                                {
+
+                                    new AdaptiveColumn()
+                                    {
+
+                                         Items=new List<AdaptiveElement>()
+                                         {
+                                             //Date of arrival - get it from Test json
+                                             new AdaptiveTextBlock(){Text= "Date of Arrival",HorizontalAlignment=AdaptiveHorizontalAlignment.Left},
+                                             new AdaptiveTextBlock(){Text=ArrivalDate.ToShortDateString(),Weight=AdaptiveTextWeight.Bolder}
+                                         },
+
+
+
+                                    },
+                                    new AdaptiveColumn()
+                                    {
+                                        Items=new List<AdaptiveElement>()
+                                        {
+                                            new AdaptiveImage()
+                                            {
+                                                HorizontalAlignment=AdaptiveHorizontalAlignment.Right,
+                                                Url=wInfo.weather[0].description.Contains("rain")?new Uri(ApplicationSettings.BaseUrl+"/Resources/Rainwithcloud.png"):wInfo.main.temp_min-273>25?new Uri(ApplicationSettings.BaseUrl+"/Resources/Sun-vector.png"):new Uri(ApplicationSettings.BaseUrl+"/Resources/Sunny-cloudy-weather.png"),
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                           
                            new AdaptiveColumnSet()
                             {
                                 Spacing=AdaptiveSpacing.Small,
