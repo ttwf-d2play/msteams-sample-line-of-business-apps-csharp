@@ -45,6 +45,16 @@ The survey results are collated and delivered in an Excel file, which can then b
 
 ![43](Images/43.png)
 
+## Company Communicator App:
+
+Scenario 1: Create Message
+
+![CompanyCommunicatorCreate](Images/CompanyCommunicatorCreate.PNG)
+
+Scenario 2: Creating a survey 
+
+This app supports only multiple-choice questions. The questions and the people to whom the survey should be published are shared with the bot as an Excel file. The sample Excel sheet 
+
 Scenario 5: Sending Reminder
 
 The app checks for members who have not filled the survey and will send reminders to them.
