@@ -146,16 +146,6 @@ namespace CrossVertical.Announcement.Dialogs
                         reply.Attachments.Add(CardHelper.GetWelcomeScreen(channelData.Team != null, role));
                     }
 
-                    var exponentialBackoffRetryStrategy = new ExponentialBackoff(3, TimeSpan.FromSeconds(2),
-                     TimeSpan.FromSeconds(20), TimeSpan.FromSeconds(1));
-
-                    // Define the Retry Policy
-                    var retryPolicy = new RetryPolicy(new BotSdkTransientExceptionDetectionStrategy(), exponentialBackoffRetryStrategy);
-
-                    //await retryPolicy.ExecuteAsync(() =>
-                    //                    context.PostAsync(reply)
-                    //                    ).ConfigureAwait(false);
-
                     await context.PostAsync(reply);
                 }
             }

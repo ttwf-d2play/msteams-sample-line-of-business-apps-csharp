@@ -30,9 +30,7 @@ using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Connector;
 using Microsoft.Bot.Connector.Teams;
 using Microsoft.Bot.Connector.Teams.Models;
-using Microsoft.Practices.EnterpriseLibrary.TransientFaultHandling;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -69,16 +67,7 @@ namespace CrossVertical.Announcement.Controllers
                     break;
             }
 
-            var exponentialBackoffRetryStrategy = new ExponentialBackoff(3, TimeSpan.FromSeconds(2),
-                     TimeSpan.FromSeconds(20), TimeSpan.FromSeconds(1));
-
-            // Define the Retry Policy
-            var retryPolicy = new RetryPolicy(new BotSdkTransientExceptionDetectionStrategy(), exponentialBackoffRetryStrategy);
-
-            //return retryPolicy.ExecuteAction(() =>
-            //{
             return new HttpResponseMessage(HttpStatusCode.Accepted);
-            //});
         }
 
         /// <summary>
@@ -220,13 +209,13 @@ namespace CrossVertical.Announcement.Controllers
                     // Team member was added (user or bot)
                     if (message.MembersAdded.Any(m => m.Id.Contains(message.Recipient.Id)))
                     {
-                        if(channelData.Team == null)
+                        if (channelData.Team == null)
                         {
                             if (message.From.Id == message.Recipient.Id)
                                 return;
                             var userEmailId = await RootDialog.GetCurrentUserEmailId(message);
                             var userFromDB = await Cache.Users.GetItemAsync(userEmailId);
-                            if(userFromDB != null )
+                            if (userFromDB != null)
                                 return;
                         }
                         // Bot was added to a team: send welcome message
@@ -312,8 +301,6 @@ namespace CrossVertical.Announcement.Controllers
                     if (!messageFound && channelData.Team != null)
                         foreach (var channel in announcement.Recipients.Channels)
                         {
-                            //var user = channel.LikedUsers.FirstOrDefault(u => u.MessageId == replyToId);
-
                             if (channel.Channel.MessageId == replyToId)
                             {
                                 var EmailId = await RootDialog.GetCurrentUserEmailId(message);
@@ -327,7 +314,6 @@ namespace CrossVertical.Announcement.Controllers
                                     if (channel.LikedUsers.Contains(EmailId))
                                         channel.LikedUsers.Remove(EmailId);
                                 }
-                                // channel.Channel.LikeCount += reactionToAdd;
                                 messageFound = true;
                                 break;
 
@@ -463,18 +449,22 @@ namespace CrossVertical.Announcement.Controllers
             var userCard = CardHelper.GetWelcomeScreen(false, Role.User);
             var newUsers = new List<User>();
 
-            var startTime = DateTime.Now;
-
             await Common.ForEachAsync(members, ApplicationSettings.NoOfParallelTasks,
                 async member =>
             {
-                User userDetails = await Cache.Users.GetItemAsync(member.UserPrincipalName.ToLower());
+                var emailId = member.UserPrincipalName.ToLower().Trim();
+                if (emailId.Contains("#ext#"))
+                {
+                    // Skipping guest user.
+                    return;
+                }
+                User userDetails = await Cache.Users.GetItemAsync(emailId);
                 if (userDetails == null)
                 {
                     userDetails = new User()
                     {
                         BotConversationId = member.Id,
-                        Id = member.UserPrincipalName.ToLower().Trim(),
+                        Id = emailId,
                         Name = member.Name ?? member.GivenName
                     };
                     await Cache.Users.AddOrUpdateItemAsync(userDetails.Id, userDetails);
@@ -483,10 +473,10 @@ namespace CrossVertical.Announcement.Controllers
                 }
             });
 
-            // Save tenant details
+            // Save all the user's details in the tenant.
             await Cache.Tenants.AddOrUpdateItemAsync(tenant.Id, tenant);
 
-            if (tenant.IsAdminConsented)
+            if (tenant.IsAdminConsented && newUsers.Count > 0)
             {
 
                 var serviceUrl = message.ServiceUrl;
@@ -500,16 +490,14 @@ namespace CrossVertical.Announcement.Controllers
                     results.Add(result);
                 });
 
-                var endTime = DateTime.Now;
                 var owner = await Cache.Users.GetItemAsync(currentUser);
                 if (owner != null)
                 {
-                    var failedUsers = string.Join(",", results.Where(m => !m.IsSuccessful).Select(m => m.Name).ToArray());
                     var successCount = results.Count(m => m.IsSuccessful);
 
                     await ProactiveMessageHelper.SendPersonalNotification(serviceUrl, tenantId, owner,
-                                                $"Process completed. {(endTime - startTime).TotalSeconds} Successfully: {successCount}. " +
-                                                $"Failure: {failedUsers.Count() } [{failedUsers}].", null);
+                                                $"Process of sending welcome message completed. Successful: {successCount}. " +
+                                                $"Failure: {results.Count - successCount}.", null);
                 }
             }
         }

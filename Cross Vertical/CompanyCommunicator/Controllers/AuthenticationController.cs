@@ -63,15 +63,10 @@ namespace CrossVertical.Announcement.Controllers
         [Route("test")]
         public async Task<ActionResult> Test(string tasks)
         {
-            ApplicationSettings.NoOfParallelTasks = int.Parse(tasks);
-            var campaignId = "48601a83-0324-4f85-a54e-de203a05d8fa";
-            var campaign = await Cache.Announcements.GetItemAsync(campaignId);
-            await AnnouncementSender.SendAnnouncement(campaign);
-            return null;
-            //var token = await GraphHelper.GetAccessToken("0d9b645f-597b-41f0-a2a3-ef103fbd91bb", ApplicationSettings.AppId, ApplicationSettings.AppSecret);
-            //GraphHelper helper = new GraphHelper(token);
-            //var photo = await helper.GetUserProfilePhoto("0d9b645f-597b-41f0-a2a3-ef103fbd91bb", "mungo@blrdev.onmicrosoft.com");
-            //return View();
+            var token = await GraphHelper.GetAccessToken("0d9b645f-597b-41f0-a2a3-ef103fbd91bb", ApplicationSettings.AppId, ApplicationSettings.AppSecret);
+            GraphHelper helper = new GraphHelper(token);
+            var photo = await helper.GetUserProfilePhoto("0d9b645f-597b-41f0-a2a3-ef103fbd91bb", "mungo@blrdev.onmicrosoft.com");
+            return View();
         }
     }
 }

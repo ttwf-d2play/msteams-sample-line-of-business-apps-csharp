@@ -26,10 +26,8 @@ using CrossVertical.Announcement.Repository;
 using Microsoft.Bot.Connector;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.Linq;
-using System;
-using System.Threading;
+using System.Threading.Tasks;
 
 namespace CrossVertical.Announcement.Helpers
 {
@@ -48,7 +46,6 @@ namespace CrossVertical.Announcement.Helpers
 
         public static async Task<bool> SendAnnouncement(Models.Campaign campaign)
         {
-            // var card = campaign.GetPreviewCard().ToAttachment();
             int duplicateUsers = 0;
             var serviceURL = campaign.Recipients.ServiceUrl;
             var tenantId = campaign.Recipients.TenantId;
@@ -56,13 +53,6 @@ namespace CrossVertical.Announcement.Helpers
             var taskList = new List<Task>();
             var usersToNotify = new ConcurrentBag<PersonalMessageRecipients>();
             var appNotInstalledUsers = new List<string>();
-
-            await ProactiveMessageHelper.SendPersonalNotification(serviceURL, tenantId, owner,
-                                        $"Partitions: " + ApplicationSettings.NoOfParallelTasks, null);
-
-            var startTime = System.DateTime.Now;
-
-
 
             foreach (var group in campaign.Recipients.Groups)
             {
@@ -99,25 +89,19 @@ namespace CrossVertical.Announcement.Helpers
                   });
             }
 
-            var endTime = DateTime.Now;
-
-            await ProactiveMessageHelper.SendPersonalNotification(serviceURL, tenantId, owner,
-                                        $"Duplicate removed in: {(endTime - startTime).TotalSeconds}", null);
-
-
             if (appNotInstalledUsers.Count > 0)
             {
-                await ProactiveMessageHelper.SendPersonalNotification(serviceURL, tenantId, owner, $"App not installed by {appNotInstalledUsers.Count}", null);
+                await ProactiveMessageHelper.SendPersonalNotification(serviceURL, tenantId, owner, $"App not installed by {appNotInstalledUsers.Count} users.", null);
             }
 
-
-            startTime = DateTime.Now;
-
+            if (usersToNotify.Count > 100)
+            {
+                await ProactiveMessageHelper.SendPersonalNotification(serviceURL, tenantId, owner, $"We are sending this message to {usersToNotify.Count} which may take some time. Will notify you once process is completed.", null);
+            }
 
             var messageSendResults = new ConcurrentBag<NotificationSendStatus>();
             await Common.ForEachAsync(usersToNotify, ApplicationSettings.NoOfParallelTasks,
                 async recipient =>
-                // var lists = Partitioner.Create(usersToNotify).GetPartitions(ApplicationSettings.NoOfParallelTasks);
                 {
                     var user = recipient.UserDetails;
                     var card = campaign.GetPreviewCard().ToAttachment();
@@ -134,9 +118,6 @@ namespace CrossVertical.Announcement.Helpers
                     }
                     messageSendResults.Add(result);
                 });
-
-            ////).Start();
-            //await Task.WhenAll(taskList.ToArray());
 
             await Common.ForEachAsync(campaign.Recipients.Channels, ApplicationSettings.NoOfParallelTasks,
                async recipient =>
@@ -172,14 +153,12 @@ namespace CrossVertical.Announcement.Helpers
                     }
                 });
 
-            endTime = DateTime.Now;
-
             var failedUsers = string.Join(",", messageSendResults.Where(m => !m.IsSuccessful).Select(m => m.Name).ToArray());
             var successCount = messageSendResults.Count(m => m.IsSuccessful);
 
             await ProactiveMessageHelper.SendPersonalNotification(serviceURL, tenantId, owner,
-                                        $"Process completed in {(endTime - startTime).TotalSeconds} seconds. Success: {successCount}. " +
-                                        $"Failure: {messageSendResults.Count - successCount } {failedUsers}. Duplicate: {duplicateUsers}", null);
+                                        $"Process completed. Success: {successCount}. " +
+                                        $"Failure: {messageSendResults.Count - successCount }. Duplicate: {duplicateUsers}", null);
 
             campaign.Status = Status.Sent;
             await Cache.Announcements.AddOrUpdateItemAsync(campaign.Id, campaign);

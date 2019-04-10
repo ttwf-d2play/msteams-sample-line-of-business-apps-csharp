@@ -36,7 +36,8 @@ namespace CrossVertical.Announcement.Helpers
             foreach (var tenant in tenats)
             {
                 var tenatInfo = await Cache.Tenants.GetItemAsync(tenant.Id);
-                foreach (var announcementId in tenatInfo.Announcements)
+                var announcementIds = tenatInfo.Announcements.ToArray();
+                foreach (var announcementId in announcementIds)
                 {
                     var announcement = await Cache.Announcements.GetItemAsync(announcementId);
                     if (announcement != null &&
