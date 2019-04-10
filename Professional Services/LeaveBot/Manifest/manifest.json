@@ -34,8 +34,8 @@
     {
       "entityId": "com.contoso.LeaveBot.leaveboard",
       "name": "Leave Board",
-      "contentUrl": "https://leavebotdemo.azurewebsites.net?EmailId={loginHint}",
-      "websiteUrl": "https://leavebotdemo.azurewebsites.net?EmailId={loginHint}",
+      "contentUrl": "https://leavebotdemo.azurewebsites.net/?EmailId={loginHint}",
+      "websiteUrl": "https://leavebotdemo.azurewebsites.net",
       "scopes": [
         "personal"
       ]
@@ -76,7 +76,7 @@
           "commands": [
             {
               "title": "help",
-              "description": "Disaplys options available with Leave Bot"
+              "description": "Displays options available with Leave Bot"
             },
             {
               "title": "set manager",

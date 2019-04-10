@@ -360,7 +360,7 @@ namespace CrossVertical.Announcement.Dialogs
                 var reply = activity.CreateReply();
                 var card = campaign.GetPreviewCard().ToAttachment();
                 var userEmailId = await GetUserEmailId(activity);
-                var group = campaign.Recipients.Groups.FirstOrDefault(g => g.Users.Any(u => u.Id == userEmailId));
+                var group = campaign.Recipients.Groups.FirstOrDefault(g => g.Users.Any(u => u.Id.ToLower()== userEmailId.ToLower()));
                 if (group != null)
                 {
                     var campaignCard = CardHelper.GetCardWithAcknowledgementDetails(card, campaign.Id, userEmailId, group.GroupId);

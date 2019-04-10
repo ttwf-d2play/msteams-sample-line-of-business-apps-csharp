@@ -1,4 +1,4 @@
-﻿## Notification:
+## Notification:
 
 This application notifies select users when an event occurs. In this example, there are three types of notifications – weather update, operations delay and social events.
 ![1](Images/1.png)
@@ -61,8 +61,35 @@ The app checks for members who have not filled the survey and will send reminder
 
 ![44](Images/44.png)
 
+## Company Communicator App:
 
+Scenario 1: Welcome
 
+Start app interaction at the welcome screen
 
+![CompanyCommunicatorWelcome](Images/CompanyCommunicatorWelcome.PNG)
 
+Scenario 2: Create Message
+
+Creators / Moderators can create rich message from Create Message action button
+
+![CompanyCommunicatorCreate](Images/CompanyCommunicatorCreate.PNG)
+
+Scenario 3: Preview and Send Message
+
+Once the message is created, the same can be previewed before sending immediately or scheduled for later time.
+
+![CompanyCommunicatorSend](Images/CompanyCommunicatorSend.PNG)
+
+Scenario 4: Message Delivery
+
+Messages can be delivered in a channel or in 1:1 scope individually to all users in the audience or both.
+
+![CompanyCommunicatorChannel](Images/CompanyCommunicatorChannel.PNG)
+
+Scenario 5: View Message
+
+Full message can be viewed in detail and actions taken right inside Teams.
+
+![CompanyCommunicatorDetail](Images/CompanyCommunicatorDetail.PNG)
 
