@@ -54,7 +54,7 @@ namespace CrossVertical.Announcement.Controllers
 
             await ProactiveMessageHelper.SendPersonalNotification(adminUserDetails.ServiceUrl, tenant, userDetails, "Your app consent is successfully granted. Please go ahead and set groups & moderators.", null);
 
-            await ProactiveMessageHelper.SendPersonalNotification(adminUserDetails.ServiceUrl, tenant, userDetails, null, CardHelper.GetGroupConfigurationCard().ToAttachment());
+            await ProactiveMessageHelper.SendPersonalNotification(adminUserDetails.ServiceUrl, tenant, userDetails, null, CardHelper.GetAdminPanelCard(string.Join(",", tenantDetails.Moderators)));
 
             return View();
         }

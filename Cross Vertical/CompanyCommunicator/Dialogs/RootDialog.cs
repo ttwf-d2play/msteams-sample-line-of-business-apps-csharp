@@ -247,6 +247,10 @@ namespace CrossVertical.Announcement.Dialogs
                 case Constants.ConfigureAdminSettings:
                     await SendAdminPanelCard(context, activity, channelData);
                     break;
+                case Constants.CreateAllEmployeeGroupAndTeam:
+                    // Allow user to configure the groups.
+                    await CreateAllEmployeeGroupAndTeam(context, activity, channelData);
+                    break;
                 case Constants.ConfigureGroups:
                     // Allow user to configure the groups.
                     await SendUpdateGroupConfigurationCard(context, activity, channelData);
@@ -287,6 +291,70 @@ namespace CrossVertical.Announcement.Dialogs
                 default:
                     break;
             }
+        }
+
+        private async Task CreateAllEmployeeGroupAndTeam(IDialogContext context, Activity activity, TeamsChannelData channelData)
+        {
+            try
+            {
+                Tenant tenantData = await Common.CheckAndAddTenantDetails(channelData.Tenant.Id);
+
+                await context.PostAsync("Fetching all users present in this tenant. This may take time depending on number of employees.");
+                // Fetch access token.
+                var token = await GraphHelper.GetAccessToken(channelData.Tenant.Id, ApplicationSettings.AppId, ApplicationSettings.AppSecret);
+                var graphHelper = new GraphHelper(token);
+
+                // Fetch all team members in tenant
+                var allMembers = await graphHelper.FetchAllTenantMembersAsync();
+
+                await context.PostAsync($"Fetched {allMembers.Count} members. Now creating new group with all employees.");
+
+                // Delete existing group.
+                foreach (var groupId in tenantData.Groups)
+                {
+                    var group = await Cache.Groups.GetItemAsync(groupId);
+                    if(group != null)
+                        await Cache.Groups.DeleteItemAsync(groupId);
+                }
+                tenantData.Groups.Clear();
+
+                // Create new Group with all the members
+                Group groupDetails = new Group();
+                groupDetails.Id = Guid.NewGuid().ToString();
+                groupDetails.Name = "All Employees";
+                groupDetails.Users = allMembers.Select(u => u.userPrincipalName).ToList();
+                await Cache.Groups.AddOrUpdateItemAsync(groupDetails.Id, groupDetails);
+
+                tenantData.Groups.Add(groupDetails.Id);
+                await Cache.Tenants.AddOrUpdateItemAsync(tenantData.Id, tenantData);
+
+                await context.PostAsync($"Now creating team with all the member. This may take time, please wait.");
+
+                var maxTeamSizeSupported = 4999;
+                List<string> userIds = allMembers.Select(c => c.id).Take(maxTeamSizeSupported).ToList();
+
+                var teamId = await graphHelper.CreateNewTeam(new NewTeamDetails()
+                {
+                    TeamName = "All Employees",
+                    OwnerADIds = new List<string> { activity.From.AadObjectId },
+                    UserADIds = userIds
+                });
+
+                if (teamId != null)
+                {
+                    await context.PostAsync($"Team created successfully. Please wait till all the members are synced and then install {ApplicationSettings.AppName} app.");
+                }
+                else
+                {
+                    await context.PostAsync($"Unable to create new team. Please try again later.");
+                }
+            }
+            catch (Exception ex)
+            {
+                ErrorLogService.LogError(ex);
+                await context.PostAsync($"Process failed. Please try again.");
+            }
+            // Create a new Team with all members
         }
 
         private async Task ShowRecentAnnouncements(IDialogContext context, Activity activity, TeamsChannelData channelData)

@@ -24,6 +24,7 @@ using CrossVertical.Announcement.Helper;
 using Microsoft.Graph;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -229,10 +230,280 @@ namespace CrossVertical.Announcement.Helpers
                     }));
             return graphClient;
         }
+
+        #region Graph HTTP request
+
+        public async Task<string> CreateNewTeam(NewTeamDetails teamDetails)
+        {
+            var groupId = await CreateGroupAsyn(teamDetails);
+            if (IsValidGuid(groupId))
+            {
+                foreach (var userId in teamDetails.UserADIds)
+                {
+                    var result = await AddTeamMemberAsync(groupId, userId);
+                    if (!result)
+                        Console.WriteLine($"Failed to add {userId} to {teamDetails.TeamName}. Check if user is already part of this team.");
+                }
+
+                Console.WriteLine($"O365 Group is created for {teamDetails.TeamName}.");
+                // Sometimes Team creation fails due to internal error. Added rety mechanism.
+                var retryCount = 4;
+                string teamId = null;
+                do
+                {
+                    teamId = await CreateTeamAsyn(groupId); // getting response as 403: forbidden
+                    if (IsValidGuid(teamId))
+                    {
+                        return teamId;
+                    }
+                    else
+                    {
+                        teamId = null;
+                    }
+                    retryCount--;
+                    await Task.Delay(5000);
+                } while (retryCount > 0);
+            }
+            return null;
+        }
+
+        bool IsValidGuid(string guid)
+        {
+            Guid teamGUID;
+            return Guid.TryParse(guid, out teamGUID);
+        }
+
+        public async Task<string> CreateGroupAsyn(NewTeamDetails newTeamDetails)
+        {
+            string endpoint = ApplicationSettings.GraphApiEndpoint + "groups/";
+
+            GroupInfo groupInfo = new GroupInfo()
+            {
+                description = "Team for " + newTeamDetails.TeamName,
+                displayName = newTeamDetails.TeamName,
+                groupTypes = new string[] { "Unified" },
+                mailEnabled = true,
+                mailNickname = newTeamDetails.TeamName.Replace(" ", "").Replace("-", "") + DateTime.Now.Second,
+                securityEnabled = true,
+                ownersodatabind = newTeamDetails.OwnerADIds.Select(userId => "https://graph.microsoft.com/beta/users/" + userId).ToArray()
+            };
+
+            return await PostRequest(endpoint, JsonConvert.SerializeObject(groupInfo));
+        }
+
+
+        public async Task<bool> AddTeamMemberAsync(string teamId, string userId)
+        {
+            string endpoint = ApplicationSettings.GraphApiEndpoint + $"groups/{teamId}/members/$ref";
+
+            var userData = $"{{ \"@odata.id\": \"https://graph.microsoft.com/beta/directoryObjects/{userId}\" }}";
+
+            using (var client = new HttpClient())
+            {
+                using (var request = new HttpRequestMessage(HttpMethod.Post, endpoint))
+                {
+                    request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
+                    request.Content = new StringContent(userData, Encoding.UTF8, "application/json");
+
+                    using (HttpResponseMessage response = await client.SendAsync(request))
+                    {
+                        if (response.IsSuccessStatusCode)
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
+        public async Task<string> CreateTeamAsyn(string groupId)
+        {
+            // This might need Retries.
+            string endpoint = ApplicationSettings.GraphApiEndpoint + $"groups/{groupId}/team";
+
+            TeamSettings teamInfo = new TeamSettings()
+            {
+                funSettings = new Funsettings() { allowGiphy = true, giphyContentRating = "strict" },
+                messagingSettings = new Messagingsettings() { allowUserEditMessages = true, allowUserDeleteMessages = true },
+                memberSettings = new Membersettings() { allowCreateUpdateChannels = true }
+            };
+            return await PutRequest(endpoint, JsonConvert.SerializeObject(teamInfo));
+        }
+
+        private async Task<string> PostRequest(string endpoint, string groupInfo)
+        {
+            using (var client = new HttpClient())
+            {
+                using (var request = new HttpRequestMessage(HttpMethod.Post, endpoint))
+                {
+                    request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
+                    request.Content = new StringContent(groupInfo, Encoding.UTF8, "application/json");
+
+                    using (HttpResponseMessage response = await client.SendAsync(request))
+                    {
+                        if (response.IsSuccessStatusCode)
+                        {
+
+                            var createdGroupInfo = JsonConvert.DeserializeObject<ResponseData>(response.Content.ReadAsStringAsync().Result);
+                            return createdGroupInfo.id;
+                        }
+                        return null;
+                    }
+                }
+            }
+        }
+
+        private async Task<string> PutRequest(string endpoint, string groupInfo)
+        {
+            using (var client = new HttpClient())
+            {
+                using (var request = new HttpRequestMessage(HttpMethod.Put, endpoint))
+                {
+                    request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
+                    request.Content = new StringContent(groupInfo, Encoding.UTF8, "application/json");
+
+                    using (HttpResponseMessage response = await client.SendAsync(request))
+                    {
+                        if (response.IsSuccessStatusCode)
+                        {
+
+                            var createdGroupInfo = JsonConvert.DeserializeObject<ResponseData>(response.Content.ReadAsStringAsync().Result);
+                            return createdGroupInfo.id;
+                        }
+                        return null;
+                    }
+                }
+            }
+        }
+
+        public async Task<List<UserDetail>> FetchAllTenantMembersAsync(string nextUrl = null)
+        {
+            string endpoint = string.IsNullOrEmpty(nextUrl) ? ApplicationSettings.GraphApiEndpoint + $"users?$select=id,displayName,mail,userPrincipalName" : nextUrl;
+
+            List<UserDetail> allMembers = new List<UserDetail>();
+
+            using (var client = new HttpClient())
+            {
+
+                using (var request = new HttpRequestMessage(HttpMethod.Get, endpoint))
+                {
+
+                    request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
+
+                    using (HttpResponseMessage response = await client.SendAsync(request))
+                    {
+                        if (response.IsSuccessStatusCode)
+                        {
+                            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<TenantUserList>(await response.Content.ReadAsStringAsync());
+                            try
+                            {
+                                if (!string.IsNullOrEmpty(result.odatanextLink))
+                                {
+                                    var members = await FetchAllTenantMembersAsync(result.odatanextLink);
+                                    allMembers.AddRange(members);
+                                }
+                                allMembers.AddRange(result.value);
+
+                                return allMembers;
+                            }
+                            catch (Exception)
+                            {
+                                // Handle edge case.
+                            }
+                        }
+                        return allMembers;
+                    }
+                }
+            }
+        }
+
+        #endregion
     }
+
+
+
+    #region POCOs for team creation
 
     public class TokenResponse
     {
         public string access_token { get; set; }
     }
+
+    public class NewTeamDetails
+    {
+        // public string OwnerEmailId { get; set; }
+        public string TeamName { get; set; }
+        public List<string> ChannelNames { get; set; } = new List<string>();
+        public List<string> OwnerADIds { get; set; }
+        public List<string> UserADIds { get; set; }
+
+    }
+
+    public class ResponseData
+    {
+        public string id { get; set; }
+    }
+
+    public class TenantUserList
+    {
+        [JsonProperty("@odata.context")]
+        public string odatacontext { get; set; }
+
+        [JsonProperty("@odata.nextLink")]
+        public string odatanextLink { get; set; }
+        public UserDetail[] value { get; set; }
+    }
+
+    public class UserDetail
+    {
+        public string id { get; set; }
+        public string displayName { get; set; }
+        public string mail { get; set; }
+        public string userPrincipalName { get; set; }
+    }
+
+    public class GroupInfo
+    {
+        public string description { get; set; }
+        public string displayName { get; set; }
+        public string[] groupTypes { get; set; }
+        public bool mailEnabled { get; set; }
+        public string mailNickname { get; set; }
+        public bool securityEnabled { get; set; }
+
+        [JsonProperty("owners@odata.bind")]
+        public string[] ownersodatabind { get; set; }
+
+    }
+
+    public class TeamSettings
+    {
+        public Membersettings memberSettings { get; set; }
+        public Messagingsettings messagingSettings { get; set; }
+        public Funsettings funSettings { get; set; }
+    }
+
+    public class Membersettings
+    {
+        public bool allowCreateUpdateChannels { get; set; }
+    }
+
+    public class Messagingsettings
+    {
+        public bool allowUserEditMessages { get; set; }
+        public bool allowUserDeleteMessages { get; set; }
+    }
+
+    public class Funsettings
+    {
+        public bool allowGiphy { get; set; }
+        public string giphyContentRating { get; set; }
+    }
+    #endregion
+
 }

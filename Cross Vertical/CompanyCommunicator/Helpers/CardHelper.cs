@@ -351,6 +351,15 @@ namespace CrossVertical.Announcement.Helpers
                           {
                             new AdaptiveSubmitAction()
                             {
+                                Id = "createAllEmployeeGroupAndTeam",
+                                Title = "Create Team & Group with All Employees",
+                                Data = new ActionDetails()
+                                {
+                                    ActionType = Constants.CreateAllEmployeeGroupAndTeam,
+                                }
+                            },
+                            new AdaptiveSubmitAction()
+                            {
                                 Id = "configureGroups",
                                 Title = "Configure Groups",
                                 Data = new ActionDetails()

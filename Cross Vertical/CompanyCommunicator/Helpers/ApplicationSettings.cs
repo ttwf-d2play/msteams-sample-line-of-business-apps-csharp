@@ -37,8 +37,11 @@ namespace CrossVertical.Announcement.Helper
 
         public static string AppSecret { get; set; }
 
-        public static int NoOfParallelTasks { get; set; }
-        
+        public static int NoOfParallelTasks { get; set; } = 10;
+
+        public static string GraphApiEndpoint { get; set; } = "https://graph.microsoft.com/beta/";
+
+
         static ApplicationSettings()
         {
             ConnectionName = ConfigurationManager.AppSettings["ConnectionName"];
@@ -48,6 +51,8 @@ namespace CrossVertical.Announcement.Helper
             AppSecret = ConfigurationManager.AppSettings["MicrosoftAppPassword"];
 
             NoOfParallelTasks = int.Parse(ConfigurationManager.AppSettings["NoOfParallelTasks"]);
+
+            GraphApiEndpoint = ConfigurationManager.AppSettings["GraphEndpoint"]; 
         }
     }
 }
