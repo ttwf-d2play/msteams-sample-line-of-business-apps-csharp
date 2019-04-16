@@ -172,7 +172,6 @@ namespace CrossVertical.Announcement.Controllers
                 default:
                     break;
             }
-
             taskInfo.Card = card;
             TaskModuleResponseEnvelope taskModuleEnvelope = new TaskModuleResponseEnvelope
             {
@@ -279,7 +278,6 @@ namespace CrossVertical.Announcement.Controllers
                     var announcement = await Cache.Announcements.GetItemAsync(announcementId);
                     if (announcement?.Recipients == null)
                         continue;
-
                     if (channelData.Team == null)
                         foreach (var group in announcement.Recipients.Groups)
                         {
@@ -311,7 +309,6 @@ namespace CrossVertical.Announcement.Controllers
                                 // channel.Channel.LikeCount += reactionToAdd;
                                 messageFound = true;
                                 break;
-
                             }
                         }
                     if (messageFound)
