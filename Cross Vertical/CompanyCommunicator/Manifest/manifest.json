@@ -27,7 +27,7 @@
     {
       "entityId": "com.contoso.Announcement.history",
       "name": "My Messages",
-      "contentUrl": "https://announcement.azurewebsites.net/history?tid={tid}&emailId={loginHint}",
+      "contentUrl": "https://announcement.azurewebsites.net/history?tid={tid}&emailId={upn}",
       "websiteUrl": "https://announcement.azurewebsites.net/history",
       "scopes": [
         "personal"

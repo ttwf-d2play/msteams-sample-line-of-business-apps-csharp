@@ -40,8 +40,9 @@ table.table.table-hover {
 
 table.table {
     border-top: 2px solid white;
-    position: fixed;
-    top: 50px;
+    position: relative;
+    /* top: 50px; */
+    margin-bottom: 0px;
 }
 
 .font-color {
@@ -75,19 +76,27 @@ table.table {
     font-weight: 500;
 }
 
-/* .row {
-    margin-right: 0px !important;
-    margin-left: 0px !important;
-} */
 
-.dropdown-menu.show {
-    transform: translate3d(-100px, 30px, 0px) !important;
+.dropdown-menu.show  {
+    transform: translate3d(-155px, 30px, 0px) !important;
 }
 
 tbody {
     font-size: 14px;
     font-family: 'Segoe UI' !important;
 }
+
+/* row hide */
+
+.card-header div[aria-expanded="true"] .title-down-row {
+    display: none;
+}
+
+.card-header .collapsed .title-down-row {
+    display: block;
+}
+
+/* row hide-end */
 
 
 /* Desktop-hide */
@@ -185,12 +194,18 @@ button.favorite.styled2 {
     }
 
     img.line1 {
-        position: relative;
+        position: absolute;
         float: initial;
-        height: 25px;
-        width: 25px;
-        bottom: 10px;
-        left: 5rem;
+        height: 16px;
+        width: 16px;
+        /* bottom: 10px; */
+        /* left: 8rem; */
+    }
+
+    .dots {
+        position: relative;
+        float: right;
+        right: 18px;
     }
 
     .shape-format2 {
@@ -200,7 +215,8 @@ button.favorite.styled2 {
         top: 3px;
         bottom: 3px;
         float: left;
-        margin-left: -26px
+        margin-left: -26px;
+        padding-left:1%;
     }
 
     .col-12.three-states {
@@ -331,16 +347,21 @@ button.favorite.styled2 {
 
     .color-chg {
         background-color: #fff !important;
-        border-bottom: 2px solid rgba(0, 0, 0, .125) !important;
+        /* border-bottom: 2px solid rgba(0, 0, 0, .125) !important; */
         font-size: 14px !important;
         font-family: 'Segoe UI' !important;
-        border-top: 1px solid rgba(0, 0, 0, .125);
+        border-top: 2px solid rgba(0, 0, 0, .125);
         padding: 0.5rem 1.25rem !important;
     }
 
-    div#row1 {
-        border-top: none;
+    .card-header {
+        border-bottom: none !important;
     }
+
+    /*div#row1 {
+        border-top: none;
+        border-bottom: 1px solid rgba(0, 0, 0, .125) !important;
+    }*/
 
     span.three-states-titles {
         font-size: 14px !important;
@@ -352,17 +373,59 @@ button.favorite.styled2 {
     }
 
     .three-states {
-        overflow: auto;
         position: relative;
-        bottom: 12px;
+        bottom: 24px;
     }
 
     .card-body.length {
         padding-bottom: 0rem !important;
+        border-bottom: 0.5px solid rgba(0, 0, 0, .125) !important;
     }
 
     /* new css for dropbtn end */
+    .line-grp1,
+    .line-grp2 {
+        height: 18px;
+        width: 26px;
+    }
 
+    img.line-grp1 {
+        position: absolute;
+        left: 38%;
+    }
+
+    span.fix {
+        position: absolute;
+        left: 45%;
+        font-size: 12px;
+    }
+
+    img.line-grp2 {
+        position: absolute;
+        left: 52%;
+    }
+
+    span.fix1 {
+        position: absolute;
+        left: 60%;
+        font-size: 12px;
+    }
+
+    /* .dropdown-menu.show {
+        transform: translate3d(-12px, 20px, 0px) !important;
+    } */
+
+    .card-header div[aria-expanded="true"] .title-down-row {
+        display: none;
+    }
+
+    .card-header .collapsed .title-down-row {
+        display: block;
+    }
+
+    dropdown-menu.show  {
+        transform: translate3d(-155px, 30px, 0px) !important;
+    }
 }
 
 @media only screen and (max-width: 375px) {
@@ -373,6 +436,8 @@ button.favorite.styled2 {
     span.title,
     .three-states-titles {
         font-size: 14px;
+        font-weight:500;
+        font-family:'Segoe UI'
     }
 
     .count-msg {
@@ -388,8 +453,45 @@ button.favorite.styled2 {
         left: 138px;
     }
 
-    img.line1 {
-        left: 1rem;
+    /* img.line1 {
+        left: 5rem;
+    } */
+    .dots {
+        right: 18px;
+    }
+    .dropdown-menu.show  {
+        transform: translate3d(-155px, 30px, 0px) !important;
+    }
+}
+
+@media only screen and (max-width: 320px) {
+    img.line-grp1 {
+        left: 43%;
+    }
+
+    span.fix {
+        left: 52%;
+    }
+
+    img.line-grp2 {
+        left: 59%;
+    }
+
+    span.fix1 {
+        left: 68%;
+    }
+    /* img.line1 {
+        left: 2rem;
+    } */
+    .dropdown-menu.show  {
+        transform: translate3d(-155px, 30px, 0px) !important;
+    }
+    .dots {
+        right: 10px;
+    }
+
+    .dropdown-menu.show {
+        transform: translate3d(-146px, 20px, 0px) !important;
     }
 }
 
@@ -397,6 +499,10 @@ button.favorite.styled2 {
     button.favorite.styled {
         left: 85%;
     }
+
+    /* .dropdown-menu.show {
+        transform: translate3d(-124px, 20px, 0px) !important;
+    } */
 }
 
 @media only screen and (max-width: 1280px) {
@@ -417,3 +523,4 @@ button.favorite.styled2 {
         padding: 2px 9px !important;
     }
 }
+/* Ngrok.exe http 8080 --host-header=localhost */
