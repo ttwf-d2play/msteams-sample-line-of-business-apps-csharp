@@ -1,6 +1,6 @@
 {
-  "@type": "MessageCard",
-  "@context": "https://schema.org/extensions",
+  "@@type": "MessageCard",
+  "@@context": "https://schema.org/extensions",
   "summary": "Cab Request for Your Approval",
   "themeColor": "0075FF",
   "sections": [

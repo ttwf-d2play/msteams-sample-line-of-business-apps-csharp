@@ -1,6 +1,6 @@
 {
-  "@type": "MessageCard",
-  "@context": "https://schema.org/extensions",
+  "@@type": "MessageCard",
+  "@@context": "https://schema.org/extensions",
   "summary": "Cab Request for Your Approval",
   "themeColor": "0075FF",
   "sections": [
@@ -28,11 +28,11 @@
     {
       "potentialAction": [
         {
-          "@type": "ActionCard",
+          "@@type": "ActionCard",
           "name": "Approve",
           "inputs": [
             {
-              "@type": "TextInput",
+              "@@type": "TextInput",
               "id": "ApproveComment",
               "isMultiline": true,
               "title": "Reason (optional)"
@@ -40,7 +40,7 @@
           ],
           "actions": [
             {
-              "@type": "HttpPOST",
+              "@@type": "HttpPOST",
               "name": "Submit",
               "target": "https://prod-27.westcentralus.logic.azure.com:443/workflows/f76fc00e7be54154b3e58284b495da03/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=2YDDnTDZ-ZEpVvpq36vYfpI6dgc1SGMPrwB4JvvWjQA",
               "headers": [
@@ -59,7 +59,7 @@
           ]
         },
         {
-          "@type": "ActionCard",
+          "@@type": "ActionCard",
           "name": "Reject",
           "inputs": [
             {
@@ -71,7 +71,7 @@
           ],
           "actions": [
             {
-              "@type": "HttpPOST",
+              "@@type": "HttpPOST",
               "name": "Submit",
               "target": "https://prod-27.westcentralus.logic.azure.com:443/workflows/f76fc00e7be54154b3e58284b495da03/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=2YDDnTDZ-ZEpVvpq36vYfpI6dgc1SGMPrwB4JvvWjQA",
               "headers": [

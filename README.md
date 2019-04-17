@@ -53,6 +53,7 @@ All these samples are deployed on Microsoft Azure and you can try it yourself by
 [Baggage Info Bot](Airline/BaggageInfo/Manifest/Baggage%20Info%20App%20Manifest.zip)<br>
 [Flight Team Creation Bot](Airline/FlightTeamCreation/Manifest/Flight%20Team%20Creation%20App%20Manifest.zip)<br>
 [Fleet Bot](Airline/FleetInfoBot/Manifest/FleetInfo%20App%20Manifest.zip)<br>
+[Cabin Crew Roaster Bot](Airline/XAirlines/Manifest/Airlines%20Manifest.zip)<br>
 [Notification Bot](Cross%20Vertical/NotificationBot/Manifest/Notification%20App.zip)<br>
 [Employee survey / Polling bot](Cross%20Vertical/PollingBot/Manifest/Polling%20App%20Manifest.zip)<br>
 [Inventory Bot](Manufacturing/InventoryBot/Manifest/Inventory%20App%20Manifest.zip)<br>
