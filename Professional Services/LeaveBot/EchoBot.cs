@@ -1087,24 +1087,24 @@ namespace ProfessionalServices.LeaveBot
 
         public static Attachment PublicHolidays()
         {
-            DateTime nextholiday=DateTime.Now;
-            string title=string.Empty;
+            DateTime nextholiday = DateTime.Now;
+            string title = string.Empty;
             var month = DateTime.Now.Month;
             List<PublicHoliday> displayList = new List<PublicHoliday>();
-                foreach (var item in PublicHolidaysList.HolidayList)
+            foreach (var item in PublicHolidaysList.HolidayList)
+            {
+
+                if (item.Date.Date > DateTime.Now.Date)
                 {
-                
-                    if (item.Date.Date > DateTime.Now.Date)
-                    {
                     displayList.Add(item);
-                    }
+                }
                 if (displayList.Count == 2)
                     break;
-                    
 
-                }
-            
-            
+
+            }
+
+
             var PublicHolidaysCard = new AdaptiveCard()
             {
                 Body = new List<AdaptiveElement>()

@@ -1,0 +1,480 @@
+﻿@{ Layout = null;}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" media="screen" href="~/Content/main.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="~/Scripts/main.js"></script>
+</head>
+
+<body>
+    <div>
+
+        @if (Model.Role != CrossVertical.Announcement.Models.Role.User && Model.Posts.Count != 0)
+        {
+            <div>
+                <button onclick="submit('create');" class="favorite styled">
+                    <i class="fas fa-edit"></i>
+                    New Post
+                </button>
+            </div>
+        }
+        @if (Model.Posts != null && Model.Posts.Count != 0)
+        {
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th class="hide-mb"></th>
+                        <th class='font-color'>Title</th>
+                        <th class='font-color'>Recipients</th>
+                        <th class='font-color'>Responses</th>
+                        <th class='font-color'>State</th>
+                        <th class='font-color'>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Posts)
+                    {
+                        <tr class="bor">
+                            @if (item.MessageSensitivity == CrossVertical.Announcement.Models.MessageSensitivity.Emergency)
+                            {
+                                <td></td>
+                            }
+                            else if (item.MessageSensitivity == CrossVertical.Announcement.Models.MessageSensitivity.Important)
+                            {
+                                <td>
+                                    <img src="~/Resources/exclamation.PNG" class="shape-format1" alt="group">
+                                </td>
+                            }
+                            else
+                            {
+                                <td></td>
+                            }
+                            <td class='align' onclick="submit('preview', '@item.Id')">@item.Title</td>
+                            @if (item.Recipients == string.Empty || item.Recipients == ", ")
+                            {
+                                <td onclick="submit('viewGroupAudiance', '@item.Id')" class='col-width'>
+                                    <img src="~/Resources/channel.PNG" class="shape-format" alt="group">
+                                    <span id='count'>@item.RecipientCount</span>
+                                    <span class='info'>@item.RecipientChannelNames</span>
+                                </td>
+                            }
+                            else if (item.RecipientChannelNames == string.Empty || item.RecipientChannelNames == ",")
+                            {
+                                <td onclick="submit('viewGroupAudiance', '@item.Id')" class='col-width'>
+                                    <img src="~/Resources/group.PNG" class="shape-format" alt="group">
+                                    <span id='count'>@item.RecipientCount</span>
+                                    <span class='info'>@item.Recipients</span>
+                                </td>
+                            }
+                            else
+                            {
+                                <td class='col-width'>
+                                    <img onclick="submit('viewGroupAudiance', '@item.Id')" src="~/Resources/group.PNG" class="shape-format" alt="group">
+                                    <span id='count' onclick="submit('viewGroupAudiance', '@item.Id')">@item.RecipientCount</span>
+                                    <span class='info' onclick="submit('viewGroupAudiance', '@item.Id')">@item.Recipients</span><br />
+                                    <img onclick="submit('viewChannelAudiance', '@item.Id')" src="~/Resources/channel.PNG" class="shape-format" alt="group">
+                                    <span onclick="submit('viewChannelAudiance', '@item.Id')" class='count'>@item.RecipientChannelCount</span>
+
+                                    <span class='info' onclick="submit('viewChannelAudiance', '@item.Id')">@item.RecipientChannelNames</span>
+                                </td>
+                            }
+                            <td>
+                                <div class="row">
+                                    @if (item.AckCount == 0)
+                                    {
+                                        <div class="col-4">
+                                            <img src="~/Resources/ack.PNG" class="shape-format1" alt="group">
+                                            <span id='count2'>@item.AckCount</span>
+                                        </div>
+                                    }
+                                    else
+                                    {    //need to make this clickable
+                                        <div class="col-4" onclick="submit('viewAckAnalytics', '@item.Id')">
+                                            <img src="~/Resources/ack.PNG" class="shape-format1" alt="group">
+                                            <span id='count2'>@item.AckCount</span>
+                                        </div>
+                                    }
+                                    @if (item.LikeCount == 0)
+                                    {
+                                        <div class="col-4">
+                                            <img src="~/Resources/Likes.PNG" class="shape-format1" alt="group">
+                                            <span id='count3'>@item.LikeCount</span>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        //need to make this clickable
+                                        <div class="col-4" onclick="submit('viewReactionAnalytics', '@item.Id')">
+                                            <img src="~/Resources/Likes.PNG" class="shape-format1" alt="group">
+                                            <span id='count3'>@item.LikeCount</span>
+                                        </div>
+                                    }
+                                </div>
+                            </td>
+                            <td>
+                                @if (item.Status == CrossVertical.Announcement.Models.Status.Draft)
+                                {
+                                    <img src="~/Resources/Draft.PNG" class="shape-format1" alt="group">
+                                }
+                                else if (item.Status == CrossVertical.Announcement.Models.Status.Sent)
+                                {
+                                    <img src="~/Resources/sent.PNG" class="shape-format1" alt="group">
+                                }
+                                else
+                                {
+                                    <img src="~/Resources/schedule.PNG" class="shape-format1" alt="group">
+                                }
+                                <span id='date'>@item.Date.ToString("MM/dd/yyyy")</span>
+                                <span class='sent'>@item.Status</span>
+
+                            </td>
+                            <td>
+
+                                <span class="dropdown">
+                                    <img src="~/Resources/Action.PNG" class="shape-format1" id="dLabel" type="button" data-toggle="dropdown"
+                                         aria-haspopup="true" aria-expanded="false" alt="group">
+                                    <div class="dropdown-menu"style="transform: translate3d(-150px, 19px, 0px);">
+                                        @if (item.Status != CrossVertical.Announcement.Models.Status.Sent && Model.Role != CrossVertical.Announcement.Models.Role.User)
+                                        {
+
+                                            <a class="dropdown-item" onclick="submit('edit', '@item.Id')">
+
+                                                <img src="~/Resources/edit2.PNG" class="shape-format1" alt="group">
+                                                Edit Message
+
+
+                                            </a>
+
+                                        }
+                                        @if ((item.Status == CrossVertical.Announcement.Models.Status.Sent && item.LikeCount != 0 && item.AckCount != 0) || (item.Status == CrossVertical.Announcement.Models.Status.Sent && item.LikeCount != 0 && item.AckCount == 0) || (item.Status == CrossVertical.Announcement.Models.Status.Sent && item.LikeCount == 0 && item.AckCount != 0))
+                                        {
+                                            <a class="dropdown-item" href="#" onclick="submit('viewAckAnalytics', '@item.Id')">
+                                                <img src="~/Resources/anal.PNG" class="shape-format1" alt="group">
+                                                View Analytics
+                                            </a>
+                                        }
+                                        @if (item.Status == CrossVertical.Announcement.Models.Status.Scheduled)
+                                        {
+                                            <a class="dropdown-item" href="#" onclick="submit('schedule', '@item.Id')">
+                                                <img src="~/Resources/sched.PNG" class="shape-format1" alt="group">
+                                                Modify Schedule
+                                            </a>
+                                        }
+                                        @if (Model.Role != CrossVertical.Announcement.Models.Role.User)
+                                        {
+                                            <a class="dropdown-item" href="#" onclick="submit('template', '@item.Id')">
+                                                <img src="~/Resources/temp.PNG" class="shape-format1" alt="group">
+                                                Use as template
+                                            </a>
+                                        }
+
+
+                                    </div>
+                                </span>
+                            </td>
+                        </tr>
+                    }
+
+                </tbody>
+            </table>
+            <div class="table mobile-title">
+                <div class='mobile-border'>
+                    <div class="accordion" id="company-communicator">
+                        @foreach (var item in Model.Posts)
+                        {
+                        <div class="card-header color-chg @(item.Id)" id="row1">
+                            <div data-toggle="collapse" data-target="#collapseOne@(item.Id)" aria-expanded="false"
+                                 aria-controls="collapseOne">
+                                @if (item.MessageSensitivity == CrossVertical.Announcement.Models.MessageSensitivity.Important)
+                                {
+                                    <img class="shape-format2" src="~/Resources/exclamation.PNG" />
+                                }
+                                    <span class="title"onclick="submit('preview', '@item.Id')">@item.Title</span>
+                                <div class="dropdown dots">
+                                    <img src="~/Resources/vertical.png" class="line1" id="dLabel" type="image"
+                                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" alt="group">
+                                    <div class="dropdown-menu">
+                                        @if ((item.Status == CrossVertical.Announcement.Models.Status.Sent && item.LikeCount != 0 && item.AckCount != 0) || (item.Status == CrossVertical.Announcement.Models.Status.Sent && item.LikeCount != 0 && item.AckCount == 0) || (item.Status == CrossVertical.Announcement.Models.Status.Sent && item.LikeCount == 0 && item.AckCount != 0))
+                                        {
+                                            <a class="dropdown-item" onclick="submit('viewAckAnalytics', '@item.Id')">
+                                                <img src="~/Resources/analytics.PNG" class="shape-format1" alt="group">
+                                                View Analytics
+                                            </a>
+                                        }
+                                        @if (item.Status != CrossVertical.Announcement.Models.Status.Sent && Model.Role != CrossVertical.Announcement.Models.Role.User)
+                                        {
+                                            <a class="dropdown-item" onclick="submit('edit', '@item.Id')">
+                                                <img src="~/Resources/edit.PNG" class="shape-format1" alt="group">
+                                                Edit Message
+                                            </a>
+                                        }
+                                        @if (item.Status == CrossVertical.Announcement.Models.Status.Scheduled)
+                                        {
+                                            <a class="dropdown-item" onclick="submit('schedule', '@item.Id')">
+                                                <img src="~/Resources/schedule.PNG" class="shape-format1" alt="group">
+                                                Modify Schedule
+                                            </a>
+                                        }
+                                        @if (Model.Role != CrossVertical.Announcement.Models.Role.User)
+                                        {
+                                            <a class="dropdown-item" onclick="submit('template', '@item.Id')">
+                                                <img src="~/Resources/temp.PNG" class="shape-format1" alt="group">
+                                                Use as template
+                                            </a>
+                                        }
+                                        </div>
+                                </div>
+                                <div class="title-down-row" id="@(item.Id)">
+                                    @if (item.Status == CrossVertical.Announcement.Models.Status.Draft)
+                                    {
+                                        <img src="~/Resources/Draft.PNG" class='draft-grp' alt="Draft-img">
+                                    }
+                                    else if (item.Status == CrossVertical.Announcement.Models.Status.Sent)
+                                    {
+                                        <img src="~/Resources/sent.PNG" class='draft-grp' alt="Draft-img">
+                                    }
+                                    else
+                                    {
+                                        <img src="~/Resources/schedule.PNG" class='draft-grp' alt="Draft-img">
+                                    }
+                                    <span id='date'>@item.Date.ToString("MM/dd/yyyy")</span>
+                                    <span id='mail-msg'>@item.Status</span>
+
+                                    <span>
+                                        <img src="~/Resources/line.PNG" class='line' alt="line-img">
+                                    </span>
+                                    @if (item.Recipients == string.Empty || item.Recipients == ", ")
+                                    {
+                                        <span>
+                                            <img src="~/Resources/channel.PNG" class='line-grp2' alt="grp1-img" onclick="submit('viewChannelAudiance', '@item.Id')">
+                                        </span>
+                                        <span class="fix1">@item.RecipientCount</span>
+                                    }
+                                    else if (item.RecipientChannelNames == string.Empty || item.RecipientChannelNames == ",")
+                                    {
+                                        <span>
+                                            <img src="~/Resources/group.PNG" class='line-grp1' alt="grp-img" onclick="submit('viewGroupAudiance', '@item.Id')">
+                                        </span>
+                                        <span class="fix" onclick="submit('viewGroupAudiance', '@item.Id')">@item.RecipientCount</span>
+                                    }
+                                    else
+                                    {
+                                        <span>
+                                            <img src="~/Resources/channel.PNG" class='line-grp2' alt="grp1-img" onclick="submit('viewChannelAudiance', '@item.Id')">
+                                        </span>
+                                        <span class="fix1">@item.RecipientCount</span>
+                                        <span>
+                                            <img src="~/Resources/group.PNG" class='line-grp1' alt="grp-img" onclick="submit('viewGroupAudiance', '@item.Id')">
+                                        </span>
+                                        <span class="fix" onclick="submit('viewGroupAudiance', '@item.Id')">@item.RecipientCount</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="collapseOne@(item.Id)" class="collapse" aria-labelledby="row1" data-parent="#company-communicator">
+                            <div class="card-body length">
+                                <div class="three-states">
+                                    <div>
+                                        <span class="three-states-titles">State:</span>
+                                        @if (item.Status == CrossVertical.Announcement.Models.Status.Draft)
+                                        {
+                                            <img src="~/Resources/Draft.PNG" class='draft-grp-three-states' alt="Draft-img">
+                                        }
+                                        else if (item.Status == CrossVertical.Announcement.Models.Status.Sent)
+                                        {
+                                            <img src="~/Resources/sent.PNG" class='draft-grp-three-states' alt="Draft-img">
+                                        }
+                                        else
+                                        {
+                                            <img src="~/Resources/schedule.PNG" class='draft-grp-three-states' alt="Draft-img">
+                                        }
+                                            <span id='date-three-states'>@item.Date.ToString("MM/dd/yyyy")</span>
+                                            <span id='mail-msg-three-states'>@item.Status</span>
+                                    </div>
+                                    <div>
+                                        @if (item.Recipients == string.Empty || item.Recipients == ", ")
+                                        {
+                                            <div class="count-msg">
+                                                <span>
+                                                    <img src="~/Resources/channel.PNG" class='line-grp-three-states' alt="grp1-img" onclick="submit('viewChannelAudiance', '@item.Id')">
+                                                </span>
+                                                <span id='mb-count2-three-states' onclick="submit('viewGroupAudiance', '@item.Id')">@item.RecipientCount</span>
+                                                <span class="three-states-msg" onclick="submit('viewChannelAudiance', '@item.Id')">@item.RecipientChannelNames</span>
+                                            </div>
+                                        }
+                                        else if (item.RecipientChannelNames == string.Empty || item.RecipientChannelNames == ",")
+                                        {
+                                            <div>
+                                                <span class="three-states-titles">
+                                                    Recipients:
+                                                    <img src="~/Resources/group.PNG" class='line-grp-three-states' alt="grp-img" onclick="submit('viewGroupAudiance', '@item.Id')">
+                                                </span>
+                                                <span id='mb-count1-three-states' onclick="submit('viewGroupAudiance', '@item.Id')">@item.RecipientCount</span>
+                                                <span class="three-states-msg" onclick="submit('viewGroupAudiance', '@item.Id')">@item.Recipients</span>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div>
+                                                <span class="three-states-titles">
+                                                    Recipients:
+                                                    <img src="~/Resources/group.PNG" class='line-grp-three-states' alt="grp-img" onclick="submit('viewGroupAudiance', '@item.Id')">
+                                                </span>
+                                                <span id='mb-count1-three-states' onclick="submit('viewGroupAudiance', '@item.Id')">@item.RecipientCount</span>
+                                                <span class="three-states-msg" onclick="submit('viewGroupAudiance', '@item.Id')">@item.Recipients</span>
+                                            </div>
+                                            <div class="count-msg">
+                                                <span>
+                                                    <img src="~/Resources/channel.PNG" class='line-grp-three-states' alt="grp1-img" onclick="submit('viewChannelAudiance', '@item.Id')">
+                                                </span>
+                                                <span id='mb-count2-three-states' onclick="submit('viewGroupAudiance', '@item.Id')">@item.RecipientCount</span>
+                                                <span class="three-states-msg" onclick="submit('viewChannelAudiance', '@item.Id')">@item.RecipientChannelNames</span>
+                                            </div>
+                                        }
+                                    </div>
+                                    <div>
+                                        <span class="three-states-titles">
+                                            Responses:
+                                            <img src="~/Resources/ack.PNG" class='line-grp-three-states' alt="grp-img"onclick="submit('viewAckAnalytics', '@item.Id')">
+                                        </span>
+                                        <span id='mb-ack-three-states'onclick="submit('viewAckAnalytics', '@item.Id')">@item.AckCount</span>
+                                        <span>
+                                            <img src="~/Resources/Likes.PNG" class='line-grp-three-states' alt="grp1-img"onclick="submit('viewReactionAnalytics', '@item.Id')">
+                                        </span>
+                                        <span id='mb-likes-three-states'onclick="submit('viewReactionAnalytics', '@item.Id')">@item.LikeCount</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                         }
+                    </div>
+                </div>
+            </div>
+           
+        }
+        else if (Model.Role != CrossVertical.Announcement.Models.Role.User && Model.Posts.Count == 0)
+        {
+            <center>
+                You don't seem to have any messages either sent or received to be shown here. Please go ahead and create one.<br style="line-height:25px;" />
+
+                <span><button onclick="submit('create');" class="rectangle"><i style="font-size:10px" class="glyphicon glyphicon-edit"></i>
+            </center>
+
+
+        }
+        else if (Model.Role == CrossVertical.Announcement.Models.Role.User)
+        {
+            <center>
+                You don't seem to have any messages received to be shown here. Hang on!
+            </center>
+        }
+
+
+
+
+
+    </div>
+    @if (Model.Role != CrossVertical.Announcement.Models.Role.User && Model.Posts.Count != 0)
+    {
+        <button class="favorite styled2"onclick="submit('create');">
+            <i class="fas fa-edit"></i>
+            Create a new message
+        </button>
+    }
+    <script src="@(" https://unpkg.com/@microsoft/teams-js@1.3.4/dist/MicrosoftTeams.min.js")"></script>
+
+    <script>
+        microsoftTeams.initialize();
+        var tenantId;
+        microsoftTeams.getContext(function (context) {
+            tenantId = context.tid;
+          
+        });
+        function submit(type, id) {
+           
+            let taskInfo = {
+                title: null,
+                height: null,
+                width: null,
+                url: null,
+                card: null,
+                fallbackUrl: null,
+                completionBotId: null,
+            };
+            // Set task moduel basic details.
+            taskInfo.title = "Task Module Demo";
+            taskInfo.height = "medium";
+            taskInfo.width = "medium";
+            taskInfo.completionBotId = "@(CrossVertical.Announcement.Helper.ApplicationSettings.AppId)";
+            taskInfo.height = "900";
+            taskInfo.width = "600";
+            var url = '/getCreateNewCard?tid=' + tenantId;
+            if (type.includes('create')) {
+                url = '/getCreateNewCard?tid=' + tenantId;
+                taskInfo.title = "Create New";
+            }
+            else if (type.includes('edit')) {
+                url = '/getEditCard?id=' + id + '&tid=' + tenantId;
+                taskInfo.title = "Edit a message";
+            }
+            else if (type.includes('preview')) {
+                url = '/getPreviewCard?id=' + id;
+                taskInfo.height = "500";
+                taskInfo.title = "Details";
+            }
+            else if (type.includes('template')) {
+                url = '/getTemplateCard?id=' + id + '&tid=' + tenantId;
+                taskInfo.title = "Create New";
+            }
+            else if (type.includes('schedule')) {
+                url = '/getModifyScheduleCard?id=' + id;
+                taskInfo.title = "Modify Schedule";
+                taskInfo.height = "200";
+                taskInfo.width = "400";
+            }
+            if (type == "viewAckAnalytics" ||
+                type == "viewReactionAnalytics") {
+                taskInfo.title = "View Analytics";
+                taskInfo.height = "400";
+                taskInfo.width = "470";
+                taskInfo.url = '@(CrossVertical.Announcement.Helper.ApplicationSettings.BaseUrl)' + '/viewAnalytics?id=' + id + '&tid=' + tenantId + "&page=" + type;
+                microsoftTeams.tasks.startTask(taskInfo);
+            }
+            else if (type == "viewGroupAudiance" ||
+                type == "viewChannelAudiance") {
+                taskInfo.title = "View Audience";
+                taskInfo.height = "400";
+                taskInfo.width = "450";
+                taskInfo.url = '@(CrossVertical.Announcement.Helper.ApplicationSettings.BaseUrl)' + '/viewAudiance?id=' + id + '&tid=' + tenantId + "&page=" + type;
+                microsoftTeams.tasks.startTask(taskInfo);
+            }
+            else {
+                $.ajax({
+                    url: url,
+                    type: 'get',
+                    contentType: 'application/json',
+                    success: function (data, textStatus, jQxhr) {
+                        taskInfo.card = data;
+                        microsoftTeams.tasks.startTask(taskInfo);
+                    },
+                    error: function (jqXhr, textStatus, errorThrown) {
+                        console.log('error', errorThrown);
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>
+
