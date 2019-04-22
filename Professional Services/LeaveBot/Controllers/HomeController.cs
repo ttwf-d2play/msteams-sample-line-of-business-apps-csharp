@@ -37,9 +37,7 @@ namespace ProfessionalServices.LeaveBot.Controllers
             if (Emailid != null)
 
             {
-
                 Emailid = Emailid.ToLower();
-
                 var readEmployee = await DocumentDBRepository.GetItemAsync<Employee>(Emailid);
 
                 DateTime nextholiday;

@@ -210,27 +210,18 @@ namespace ProfessionalServices.LeaveBot.Dialogs
 
                     reply.Attachments.Add(EchoBot.WelcomeLeaveCard(employee.DisplayName, isManager));
 
-
-
                     try
-
                     {
-
                         await context.PostAsync(reply);
-
                     }
-
                     catch (Exception ex)
-
                     {
-
                         Console.WriteLine(ex);
-
                         throw;
-
                     }
-
                 }
+            }
+        }
 
             }
 
@@ -1133,9 +1124,7 @@ namespace ProfessionalServices.LeaveBot.Dialogs
             ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
 
             var members = await connector.Conversations.GetConversationMembersAsync(activity.Conversation.Id);
-
             return members.Where(m => m.Id == activity.From.Id).First().AsTeamsChannelAccount().UserPrincipalName.ToLower();
-
         }
 
 
@@ -1309,9 +1298,7 @@ namespace ProfessionalServices.LeaveBot.Dialogs
             {
 
                 Name = me.DisplayName,
-
                 EmailId = me.UserPrincipalName.ToLower(),
-
                 UserUniqueId = context.Activity.From.Id, // For proactive messages
 
                 TenantId = channelData.Tenant.Id,
