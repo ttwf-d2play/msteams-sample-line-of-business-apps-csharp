@@ -349,16 +349,7 @@ namespace CrossVertical.Announcement.Helpers
                 },
                 Actions = new List<AdaptiveAction>()
                           {
-                            new AdaptiveSubmitAction()
-                            {
-                                Id = "createAllEmployeeGroupAndTeam",
-                                Title = "Create Team & Group with All Employees",
-                                Data = new ActionDetails()
-                                {
-                                    ActionType = Constants.CreateAllEmployeeGroupAndTeam,
-                                }
-                            },
-                            new AdaptiveSubmitAction()
+                    new AdaptiveSubmitAction()
                             {
                                 Id = "configureGroups",
                                 Title = "Configure Groups",
@@ -402,7 +393,26 @@ namespace CrossVertical.Announcement.Helpers
                                       }
                                     }
                                 }
-                              }
+                              },
+                            new AdaptiveSubmitAction()
+                            {
+                                Id = "createGroupWithAllEmployees",
+                                Title = "Create Group of All Employees",
+                                Data = new ActionDetails()
+                                {
+                                    ActionType = Constants.CreateGroupWithAllEmployees,
+                                }
+                            },
+                            new AdaptiveSubmitAction()
+                            {
+                                Id = "createTeamsWithAllEmployees",
+                                Title = "Create Team of All Employees",
+                                Data = new ActionDetails()
+                                {
+                                    ActionType = Constants.CreateTeamsWithAllEmployees,
+                                }
+                            }
+                            
                           }
             };
 

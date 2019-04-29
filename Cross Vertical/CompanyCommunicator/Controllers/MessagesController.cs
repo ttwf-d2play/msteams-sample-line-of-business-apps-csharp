@@ -443,14 +443,13 @@ namespace CrossVertical.Announcement.Controllers
         private static async Task SendWelcomeMessageToAllMembers(Tenant tenant, Activity message, TeamsChannelData channelData, IEnumerable<TeamsChannelAccount> members)
         {
             var tid = channelData.Tenant.Id;
-            var currentUser = await RootDialog.GetCurrentUserEmailId(message);
+            var currentUser = members.FirstOrDefault(m => m.Id == message.From.Id)?.AsTeamsChannelAccount()?.UserPrincipalName?.ToLower();
             var tenatInfo = await Cache.Tenants.GetItemAsync(tid);
             var moderatorCard = CardHelper.GetWelcomeScreen(false, Role.Moderator);
             var userCard = CardHelper.GetWelcomeScreen(false, Role.User);
             var newUsers = new List<User>();
 
-            await Common.ForEachAsync(members, ApplicationSettings.NoOfParallelTasks,
-                async member =>
+            foreach (var member in members)
             {
                 var emailId = member.UserPrincipalName.ToLower().Trim();
                 if (emailId.Contains("#ext#"))
@@ -458,24 +457,29 @@ namespace CrossVertical.Announcement.Controllers
                     // Skipping guest user.
                     return;
                 }
-                User userDetails = await Cache.Users.GetItemAsync(emailId);
-                if (userDetails == null)
+                if (!tenatInfo.Users.Contains(emailId))
                 {
-                    userDetails = new User()
+                    var userDetails = new User()
                     {
                         BotConversationId = member.Id,
                         Id = emailId,
                         Name = member.Name ?? member.GivenName
                     };
-                    await Cache.Users.AddOrUpdateItemAsync(userDetails.Id, userDetails);
                     tenant.Users.Add(userDetails.Id);
                     newUsers.Add(userDetails);
                 }
-            });
+            }
+
+            var importResult = await DocumentDBRepository.BulkExecutor.BulkImportAsync(newUsers);
+            if (importResult.NumberOfDocumentsImported != newUsers.Count)
+            {
+                // TODO: Take action
+            }
 
             // Save all the user's details in the tenant.
             await Cache.Tenants.AddOrUpdateItemAsync(tenant.Id, tenant);
 
+            // Comment this if you don't want to send welcome message to each new user.
             if (tenant.IsAdminConsented && newUsers.Count > 0)
             {
 

@@ -238,12 +238,14 @@ namespace CrossVertical.Announcement.Helpers
             var groupId = await CreateGroupAsyn(teamDetails);
             if (IsValidGuid(groupId))
             {
-                foreach (var userId in teamDetails.UserADIds)
-                {
-                    var result = await AddTeamMemberAsync(groupId, userId);
-                    if (!result)
-                        Console.WriteLine($"Failed to add {userId} to {teamDetails.TeamName}. Check if user is already part of this team.");
-                }
+                await Common.ForEachAsync(teamDetails.UserADIds, 10,
+                  async userid =>
+                  {
+                      var result = await AddTeamMemberAsync(groupId, userid);
+                      if (!result)
+                          Console.WriteLine($"Failed to add {userid} to {teamDetails.TeamName}. Check if user is already part of this team.");
+                  }
+                   );
 
                 Console.WriteLine($"O365 Group is created for {teamDetails.TeamName}.");
                 // Sometimes Team creation fails due to internal error. Added rety mechanism.
@@ -285,7 +287,7 @@ namespace CrossVertical.Announcement.Helpers
                 mailEnabled = true,
                 mailNickname = newTeamDetails.TeamName.Replace(" ", "").Replace("-", "") + DateTime.Now.Second,
                 securityEnabled = true,
-                ownersodatabind = newTeamDetails.OwnerADIds.Select(userId => "https://graph.microsoft.com/beta/users/" + userId).ToArray()
+                ownersodatabind = newTeamDetails.OwnerADIds.Select(userId => "https://graph.microsoft.com/v1.0/users/" + userId).ToArray()
             };
 
             return await PostRequest(endpoint, JsonConvert.SerializeObject(groupInfo));
@@ -296,7 +298,7 @@ namespace CrossVertical.Announcement.Helpers
         {
             string endpoint = ApplicationSettings.GraphApiEndpoint + $"groups/{teamId}/members/$ref";
 
-            var userData = $"{{ \"@odata.id\": \"https://graph.microsoft.com/beta/directoryObjects/{userId}\" }}";
+            var userData = $"{{ \"@odata.id\": \"https://graph.microsoft.com/v1.0/users/{userId}\" }}";
 
             using (var client = new HttpClient())
             {

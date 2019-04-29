@@ -20,6 +20,7 @@
 // LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+using Microsoft.Azure.CosmosDB.BulkExecutor;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using Microsoft.Azure.Documents.Linq;
@@ -37,6 +38,8 @@ namespace CrossVertical.Announcement.Repository
         private static readonly string DatabaseId = ConfigurationManager.AppSettings["database"];
         private static readonly string CollectionId = ConfigurationManager.AppSettings["collection"];
         private static DocumentClient client;
+        public static BulkExecutor BulkExecutor { get; set; }
+
 
         public static async Task<T> GetItemAsync<T>(string id) where T : class
         {
@@ -94,7 +97,9 @@ namespace CrossVertical.Announcement.Repository
         {
             client = new DocumentClient(new Uri(ConfigurationManager.AppSettings["endpoint"]), ConfigurationManager.AppSettings["authKey"]);
             await CreateDatabaseIfNotExistsAsync();
-            await CreateCollectionIfNotExistsAsync();
+            var docCollection = await CreateCollectionIfNotExistsAsync();
+            BulkExecutor = new BulkExecutor(client, docCollection);
+            await BulkExecutor.InitializeAsync();
         }
 
         private static async Task CreateDatabaseIfNotExistsAsync()
@@ -116,20 +121,22 @@ namespace CrossVertical.Announcement.Repository
             }
         }
 
-        private static async Task CreateCollectionIfNotExistsAsync()
+        private static async Task<DocumentCollection> CreateCollectionIfNotExistsAsync()
         {
             try
             {
-                await client.ReadDocumentCollectionAsync(UriFactory.CreateDocumentCollectionUri(DatabaseId, CollectionId));
+                var result = await client.ReadDocumentCollectionAsync(UriFactory.CreateDocumentCollectionUri(DatabaseId, CollectionId));
+                return result;
             }
             catch (DocumentClientException e)
             {
                 if (e.StatusCode == System.Net.HttpStatusCode.NotFound)
                 {
-                    await client.CreateDocumentCollectionAsync(
+                    var result =  await client.CreateDocumentCollectionAsync(
                         UriFactory.CreateDatabaseUri(DatabaseId),
                         new DocumentCollection { Id = CollectionId },
-                        new RequestOptions { OfferThroughput = 1000 });
+                        new RequestOptions { OfferThroughput = 10000 });
+                    return result;
                 }
                 else
                 {

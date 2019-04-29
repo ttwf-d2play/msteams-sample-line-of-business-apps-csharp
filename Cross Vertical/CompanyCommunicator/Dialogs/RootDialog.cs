@@ -247,9 +247,13 @@ namespace CrossVertical.Announcement.Dialogs
                 case Constants.ConfigureAdminSettings:
                     await SendAdminPanelCard(context, activity, channelData);
                     break;
-                case Constants.CreateAllEmployeeGroupAndTeam:
+                case Constants.CreateGroupWithAllEmployees:
                     // Allow user to configure the groups.
-                    await CreateAllEmployeeGroupAndTeam(context, activity, channelData);
+                    await CreateGroupWithAllEmployees(context, activity, channelData);
+                    break;
+                case Constants.CreateTeamsWithAllEmployees:
+                    // Allow user to configure the groups.
+                    await CreateAllEmployeeTeam(context, activity, channelData);
                     break;
                 case Constants.ConfigureGroups:
                     // Allow user to configure the groups.
@@ -293,61 +297,53 @@ namespace CrossVertical.Announcement.Dialogs
             }
         }
 
-        private async Task CreateAllEmployeeGroupAndTeam(IDialogContext context, Activity activity, TeamsChannelData channelData)
+        private async Task CreateAllEmployeeTeam(IDialogContext context, Activity activity, TeamsChannelData channelData)
         {
             try
             {
+                var startTime = DateTime.Now;
                 Tenant tenantData = await Common.CheckAndAddTenantDetails(channelData.Tenant.Id);
 
                 await context.PostAsync("Fetching all users present in this tenant. This may take time depending on number of employees.");
                 // Fetch access token.
-                var token = await GraphHelper.GetAccessToken(channelData.Tenant.Id, ApplicationSettings.AppId, ApplicationSettings.AppSecret);
-                var graphHelper = new GraphHelper(token);
 
                 // Fetch all team members in tenant
-                var allMembers = await graphHelper.FetchAllTenantMembersAsync();
-
-                await context.PostAsync($"Fetched {allMembers.Count} members. Now creating new group with all employees.");
-
-                // Delete existing group.
-                foreach (var groupId in tenantData.Groups)
-                {
-                    var group = await Cache.Groups.GetItemAsync(groupId);
-                    if(group != null)
-                        await Cache.Groups.DeleteItemAsync(groupId);
-                }
-                tenantData.Groups.Clear();
-
-                // Create new Group with all the members
-                Group groupDetails = new Group();
-                groupDetails.Id = Guid.NewGuid().ToString();
-                groupDetails.Name = "All Employees";
-                groupDetails.Users = allMembers.Select(u => u.userPrincipalName).ToList();
-                await Cache.Groups.AddOrUpdateItemAsync(groupDetails.Id, groupDetails);
-
-                tenantData.Groups.Add(groupDetails.Id);
-                await Cache.Tenants.AddOrUpdateItemAsync(tenantData.Id, tenantData);
-
-                await context.PostAsync($"Now creating team with all the member. This may take time, please wait.");
-
+                var allMembers = await GetAllEmployees(channelData);
                 var maxTeamSizeSupported = 4999;
-                List<string> userIds = allMembers.Select(c => c.id).Take(maxTeamSizeSupported).ToList();
 
-                var teamId = await graphHelper.CreateNewTeam(new NewTeamDetails()
-                {
-                    TeamName = "All Employees",
-                    OwnerADIds = new List<string> { activity.From.AadObjectId },
-                    UserADIds = userIds
-                });
+                await context.PostAsync($"Fetched {allMembers.Count} members. Now creating { Math.Ceiling(((decimal)allMembers.Count / maxTeamSizeSupported))} team/s with all the member. This may take time, please wait.");
 
-                if (teamId != null)
+                var startIndex = 0;
+
+                int TeamCount = 0;
+                while (startIndex < allMembers.Count)
                 {
-                    await context.PostAsync($"Team created successfully. Please wait till all the members are synced and then install {ApplicationSettings.AppName} app.");
+                    List<string> userIds = allMembers.Skip(startIndex).Take(maxTeamSizeSupported).Select(c => c.id).ToList();
+                    var teamName = "All Employees" + (TeamCount == 0 ? "" : " " + TeamCount);
+                    var teamId = await graphHelper.CreateNewTeam(new NewTeamDetails()
+                    {
+                        TeamName = teamName,
+                        OwnerADIds = new List<string> { activity.From.AadObjectId },
+                        UserADIds = userIds
+                    });
+
+                    if (teamId == null)
+                    {
+                        await context.PostAsync($"Unable to create new team. Please try again later.");
+                    }
+                    else
+                    {
+                        await context.PostAsync($"Team \"{teamName}\" created with {userIds.Count} members. Please wait till all the members are synced and then install {ApplicationSettings.AppName} app.");
+                    }
+
+                    startIndex += maxTeamSizeSupported;
+                    TeamCount++;
                 }
-                else
-                {
-                    await context.PostAsync($"Unable to create new team. Please try again later.");
-                }
+                var endTime = DateTime.Now;
+                var difference = endTime - startTime;
+
+                await context.PostAsync($"Team created successfully. \n\n Teams created: {TeamCount} \n\n Users Added: {allMembers.Count} \n\n  Time taken: { difference.Minutes}");
+
             }
             catch (Exception ex)
             {
@@ -355,6 +351,61 @@ namespace CrossVertical.Announcement.Dialogs
                 await context.PostAsync($"Process failed. Please try again.");
             }
             // Create a new Team with all members
+        }
+
+        private async Task CreateGroupWithAllEmployees(IDialogContext context, Activity activity, TeamsChannelData channelData)
+        {
+            try
+            {
+                var startTime = DateTime.Now;
+                Tenant tenantData = await Common.CheckAndAddTenantDetails(channelData.Tenant.Id);
+
+                await context.PostAsync("Fetching all users present in this tenant. This may take time depending on number of employees.");
+                // Fetch access token.
+                List<UserDetail> allMembers = await GetAllEmployees(channelData);
+
+                await context.PostAsync($"Fetched {allMembers.Count} members.");
+
+                // Delete existing group.
+                foreach (var groupId in tenantData.Groups)
+                {
+                    var group = await Cache.Groups.GetItemAsync(groupId);
+                    if (group != null)
+                        await Cache.Groups.DeleteItemAsync(groupId);
+                }
+                tenantData.Groups.Clear();
+
+                // Create new Group with all the members
+                Group groupDetails = new Group
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = "All Employees",
+                    Users = allMembers.Select(u => u.userPrincipalName.ToLower()).ToList()
+                };
+
+                await Cache.Groups.AddOrUpdateItemAsync(groupDetails.Id, groupDetails);
+
+                tenantData.Groups.Add(groupDetails.Id);
+                await Cache.Tenants.AddOrUpdateItemAsync(tenantData.Id, tenantData);
+
+                await context.PostAsync($"Created new group with all employees ({allMembers.Count}).");
+            }
+            catch (Exception ex)
+            {
+                ErrorLogService.LogError(ex);
+                await context.PostAsync($"Process failed. Please try again.");
+            }
+            // Create a new Team with all members
+        }
+
+        private static async Task<List<UserDetail>> GetAllEmployees(TeamsChannelData channelData)
+        {
+            var token = await GraphHelper.GetAccessToken(channelData.Tenant.Id, ApplicationSettings.AppId, ApplicationSettings.AppSecret);
+            var graphHelper = new GraphHelper(token);
+
+            // Fetch all team members in tenant
+            var allMembers = await graphHelper.FetchAllTenantMembersAsync();
+            return allMembers;
         }
 
         private async Task ShowRecentAnnouncements(IDialogContext context, Activity activity, TeamsChannelData channelData)
@@ -1058,17 +1109,17 @@ namespace CrossVertical.Announcement.Dialogs
             using (ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl)))
                 try
                 {
-                    var exponentialBackoffRetryStrategy = new ExponentialBackoff(3, TimeSpan.FromSeconds(2),
-                           TimeSpan.FromSeconds(20), TimeSpan.FromSeconds(1));
+                    //var exponentialBackoffRetryStrategy = new ExponentialBackoff(3, TimeSpan.FromSeconds(2),
+                    //       TimeSpan.FromSeconds(20), TimeSpan.FromSeconds(1));
 
-                    // Define the Retry Policy
-                    var retryPolicy = new RetryPolicy(new BotSdkTransientExceptionDetectionStrategy(), exponentialBackoffRetryStrategy);
+                    //// Define the Retry Policy
+                    //var retryPolicy = new RetryPolicy(new BotSdkTransientExceptionDetectionStrategy(), exponentialBackoffRetryStrategy);
 
-                    var members = await retryPolicy.ExecuteAsync(() =>
-                                                connector.Conversations.GetConversationMembersAsync(activity.Conversation.Id)
-                                                ).ConfigureAwait(false);
+                    //var members = await retryPolicy.ExecuteAsync(() =>
+                    //                            connector.Conversations.GetConversationMembersAsync(activity.Conversation.Id)
+                    //                            ).ConfigureAwait(false);
 
-                    // var members = await connector.Conversations.GetConversationMembersAsync(activity.Conversation.Id);
+                    var members = await connector.Conversations.GetConversationMembersAsync(activity.Conversation.Id);
                     if (members.Count == 0)
                         return null;
                     return members.FirstOrDefault(m => m.Id == activity.From.Id)?.AsTeamsChannelAccount()?.UserPrincipalName?.ToLower();

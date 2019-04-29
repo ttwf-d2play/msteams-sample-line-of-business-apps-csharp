@@ -42,7 +42,11 @@ namespace CrossVertical.Announcement.Models
         public DateTime CreatedTime { get; set; }
 
         public RecipientInfo Recipients { get; set; } = new RecipientInfo();
+
+        [JsonProperty("schedule")]
         public Schedule Schedule { get; set; }
+
+        [JsonProperty("status")]
         public Status Status { get; set; }
 
         bool IsAcknowledgementRequested { get; set; }
