@@ -305,10 +305,14 @@ namespace CrossVertical.Announcement.Dialogs
                 Tenant tenantData = await Common.CheckAndAddTenantDetails(channelData.Tenant.Id);
 
                 await context.PostAsync("Fetching all users present in this tenant. This may take time depending on number of employees.");
+
                 // Fetch access token.
+                var token = await GraphHelper.GetAccessToken(channelData.Tenant.Id, ApplicationSettings.AppId, ApplicationSettings.AppSecret);
+                var graphHelper = new GraphHelper(token);
 
                 // Fetch all team members in tenant
-                var allMembers = await GetAllEmployees(channelData);
+                var allMembers = await graphHelper.FetchAllTenantMembersAsync();
+
                 var maxTeamSizeSupported = 4999;
 
                 await context.PostAsync($"Fetched {allMembers.Count} members. Now creating { Math.Ceiling(((decimal)allMembers.Count / maxTeamSizeSupported))} team/s with all the member. This may take time, please wait.");
@@ -361,8 +365,12 @@ namespace CrossVertical.Announcement.Dialogs
                 Tenant tenantData = await Common.CheckAndAddTenantDetails(channelData.Tenant.Id);
 
                 await context.PostAsync("Fetching all users present in this tenant. This may take time depending on number of employees.");
-                // Fetch access token.
-                List<UserDetail> allMembers = await GetAllEmployees(channelData);
+
+                var token = await GraphHelper.GetAccessToken(channelData.Tenant.Id, ApplicationSettings.AppId, ApplicationSettings.AppSecret);
+                var graphHelper = new GraphHelper(token);
+
+                // Fetch all team members in tenant
+                var allMembers = await graphHelper.FetchAllTenantMembersAsync();
 
                 await context.PostAsync($"Fetched {allMembers.Count} members.");
 
@@ -396,16 +404,6 @@ namespace CrossVertical.Announcement.Dialogs
                 await context.PostAsync($"Process failed. Please try again.");
             }
             // Create a new Team with all members
-        }
-
-        private static async Task<List<UserDetail>> GetAllEmployees(TeamsChannelData channelData)
-        {
-            var token = await GraphHelper.GetAccessToken(channelData.Tenant.Id, ApplicationSettings.AppId, ApplicationSettings.AppSecret);
-            var graphHelper = new GraphHelper(token);
-
-            // Fetch all team members in tenant
-            var allMembers = await graphHelper.FetchAllTenantMembersAsync();
-            return allMembers;
         }
 
         private async Task ShowRecentAnnouncements(IDialogContext context, Activity activity, TeamsChannelData channelData)
