@@ -1,4 +1,32 @@
 ﻿/* button */
+html,
+body {
+    height: 100%
+}
+
+.container {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: "Segoe UI";
+}
+
+button.favorite.styledtest {
+    background-color: #6264a7;
+    color: #fff;
+    border: 1px solid rgba(37, 36, 36, 0.15);
+    border-radius: 2px;
+    box-shadow: 0 2px 4px -0.75px rgba(0, 0, 0, 0.1);
+    padding: 4px 10px 4px 10px;
+    font-size: 14px;
+    cursor: pointer;
+    font-family: "Segoe UI";
+    float: left;
+    position: absolute;
+    top: 52%;
+}
+
 button.favorite.styled {
     background-color: #6264a7;
     color: #fff;
@@ -13,6 +41,11 @@ button.favorite.styled {
     float: left;
     position: relative;
     left: 88%;
+}
+
+.message {
+    font-size: 14px;
+    text-align: justify;
 }
 
 tr.bor {
@@ -77,7 +110,7 @@ table.table {
 }
 
 
-.dropdown-menu.show  {
+.dropdown-menu.show {
     transform: translate3d(-155px, 30px, 0px) !important;
 }
 
@@ -216,7 +249,7 @@ button.favorite.styled2 {
         bottom: 3px;
         float: left;
         margin-left: -26px;
-        padding-left:1%;
+        padding-left: 1%;
     }
 
     .col-12.three-states {
@@ -423,7 +456,7 @@ button.favorite.styled2 {
         display: block;
     }
 
-    dropdown-menu.show  {
+    dropdown-menu.show {
         transform: translate3d(-155px, 30px, 0px) !important;
     }
 }
@@ -436,8 +469,8 @@ button.favorite.styled2 {
     span.title,
     .three-states-titles {
         font-size: 14px;
-        font-weight:500;
-        font-family:'Segoe UI'
+        font-weight: 500;
+        font-family: 'Segoe UI'
     }
 
     .count-msg {
@@ -459,7 +492,8 @@ button.favorite.styled2 {
     .dots {
         right: 18px;
     }
-    .dropdown-menu.show  {
+
+    .dropdown-menu.show {
         transform: translate3d(-155px, 30px, 0px) !important;
     }
 }
@@ -483,15 +517,23 @@ button.favorite.styled2 {
     /* img.line1 {
         left: 2rem;
     } */
-    .dropdown-menu.show  {
+    .dropdown-menu.show {
         transform: translate3d(-155px, 30px, 0px) !important;
     }
+
     .dots {
         right: 10px;
     }
 
     .dropdown-menu.show {
         transform: translate3d(-146px, 20px, 0px) !important;
+    }
+}
+
+@media screen and (max-width:320px) {
+
+    button.favorite.styled {
+        top: 58%;
     }
 }
 
@@ -523,4 +565,16 @@ button.favorite.styled2 {
         padding: 2px 9px !important;
     }
 }
-/* Ngrok.exe http 8080 --host-header=localhost */
+
+@media screen and (max-width:475px) {
+    button.favorite.styledtest {
+        top: 57%;
+    }
+}
+
+@media screen and (max-width:320px) {
+
+    button.favorite.styledtest {
+        top: 58%;
+    }
+}
