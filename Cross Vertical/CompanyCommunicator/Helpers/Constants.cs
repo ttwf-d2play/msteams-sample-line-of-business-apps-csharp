@@ -27,6 +27,8 @@ namespace CrossVertical.Announcement.Helpers
 {
     public class Constants
     {
+        public const string AllEmployeesGroupAndTeamName = "All Employees";
+
         public const string ConfigureAdminSettings = "ConfigureAdminSettings";
         public const string ShowAllDrafts = "ShowDrafts";
         public const string ShowAnnouncement = "ShowAnnouncementDraft";
@@ -40,6 +42,9 @@ namespace CrossVertical.Announcement.Helpers
         public const string ShowMoreDetails = "ShowMoreDetails";
         public const string SendAnnouncement = "SendAnnouncement";
 
+        public const string CreateGroupWithAllEmployees = "CreateGroupWithAllEmployee";
+        public const string CreateTeamsWithAllEmployees = "CreateTeamsWithAllEmployees";
+        
         public const string ConfigureGroups = "ConfigureGroups";
         public const string SetModerators = "SetModerators";
 

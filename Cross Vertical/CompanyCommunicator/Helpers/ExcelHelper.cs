@@ -56,6 +56,13 @@ namespace CrossVertical.Announcement.Helpers
                             groupDetails.Name = row[0].ToString();
                             var users = row[1].ToString().Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(user => user.ToLower().Trim()).ToList();
                             groupDetails.Users = users;
+
+                            if (table.Columns.Count>2)
+                            {
+                                // Check if DL is passed
+                                var distributionLists = row[2].ToString().Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(dl => dl.ToLower().Trim()).ToList();
+                                groupDetails.DistributionLists = distributionLists;
+                            }
                             groups.Add(groupDetails);
                         }
                         // The result of each spreadsheet is in result.Tables
