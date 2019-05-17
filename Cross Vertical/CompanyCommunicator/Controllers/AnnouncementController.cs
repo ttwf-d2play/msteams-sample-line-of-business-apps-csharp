@@ -315,7 +315,7 @@ namespace CrossVertical.Announcement.Controllers
                     audianceInfo.SecondTab.Items.Add(
                          new ViewModels.Item()
                          {
-                             Id = team.Id,
+                             Id = team.AadObjectId,
                              ImageUrl = ApplicationSettings.BaseUrl + "/Resources/Team.png",
                              Title = channelDetails.Name,
                              SubTitle = team.Name,

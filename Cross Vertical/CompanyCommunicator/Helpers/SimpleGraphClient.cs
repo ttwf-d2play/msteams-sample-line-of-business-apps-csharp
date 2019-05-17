@@ -111,6 +111,41 @@ namespace CrossVertical.Announcement.Helpers
             return null;
         }
 
+        public async Task<Group> GetGroup(string groupName)
+        {
+            var graphClient = GetAuthenticatedClient();
+            // Get the user.
+            try
+            {
+                var searchParameter = groupName.Contains("@") ? "mail" : "displayName";
+                var filteredGroups = await graphClient.Groups.Request()
+                    .Filter($"startsWith({searchParameter},'{groupName}')")
+                    .GetAsync();
+                return filteredGroups.FirstOrDefault();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+
+            return null;
+        }
+
+        public async Task<List<User>> GetAllMembersOfGroup(string groupName)
+        {
+            var listOfMembers = new List<User>();
+            var group = await GetGroup(groupName);
+            if (group == null)
+                return listOfMembers;
+
+            var graphClient = GetAuthenticatedClient();
+
+            var members = await graphClient.Groups[group.Id].Members.Request().GetAsync();
+
+            listOfMembers.AddRange(members.Select(m => m as User));
+            return listOfMembers;
+        }
+
         public async Task<string> GetUserProfilePhoto(string tenantId, string userId)
         {
             var graphClient = GetAuthenticatedClient();

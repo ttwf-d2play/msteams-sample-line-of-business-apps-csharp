@@ -255,13 +255,17 @@ namespace CrossVertical.Announcement.Helpers
             var groups = new List<Group>();
             foreach (var groupID in tenant.Groups)
             {
-                groups.Add(await Cache.Groups.GetItemAsync(groupID));
+                var group = await Cache.Groups.GetItemAsync(groupID);
+                if (group != null)
+                    groups.Add(group);
             }
 
             var teams = new List<Team>();
             foreach (var teamID in tenant.Teams)
             {
-                teams.Add(await Cache.Teams.GetItemAsync(teamID));
+                var team = await Cache.Teams.GetItemAsync(teamID);
+                if (team != null)
+                    teams.Add(team);
             }
             return new Campaign().GetCreateNewCard(groups, teams, false).ToAttachment();
         }
@@ -349,13 +353,104 @@ namespace CrossVertical.Announcement.Helpers
                 },
                 Actions = new List<AdaptiveAction>()
                           {
-                    new AdaptiveSubmitAction()
-                            {
-                                Id = "configureGroups",
-                                Title = "Configure Groups",
-                                Data = new ActionDetails()
+                    new AdaptiveShowCardAction(){
+                         Id = "configureGroups",
+                         Title = "Configure Groups",
+                         Card=new AdaptiveCard(new AdaptiveSchemaVersion("1.0"))
                                 {
-                                    ActionType = Constants.ConfigureGroups,
+                                    Body=new List<AdaptiveElement>()
+                                    {
+                                        new AdaptiveContainer()
+                                        {
+                                            Items=new List<AdaptiveElement>()
+                                            {
+                                                new AdaptiveTextBlock()
+                                                {
+                                                    Text=$"This option allows you to create logical group of employees which can be selected as audience while seding {ApplicationSettings.AppFeature}s:",
+                                                    Wrap = true
+
+                                                },
+                                                new AdaptiveImage()
+                                                {
+                                                     Url=new System.Uri(ApplicationSettings.BaseUrl + "/Resources/SelectGroups.png")
+                                                }
+                                            }
+                                        }
+                                    },
+                                    Actions=new List<AdaptiveAction>()
+                                    {
+                                      new AdaptiveShowCardAction(){
+                                      Id = "configureGroups",
+                                      Title = "From Excel",
+                                      Card=new AdaptiveCard(new AdaptiveSchemaVersion("1.0"))
+                                      {
+                                        Body=new List<AdaptiveElement>()
+                                        {
+                                            new AdaptiveContainer()
+                                            {
+                                                Items=new List<AdaptiveElement>()
+                                                {
+                                                    new AdaptiveTextBlock()
+                                                    {
+                                                        Text=$"This allows you to upload an excel with Group Name, Users or Distribution Lists to create logical group for App to send {ApplicationSettings.AppFeature}s.\n\nExample:",
+                                                        Wrap = true
+
+                                                    },
+                                                    new AdaptiveImage()
+                                                    {
+                                                         Url=new System.Uri(ApplicationSettings.BaseUrl + "/Resources/ConfigureGroups.png")
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        Actions=new List<AdaptiveAction>()
+                                        {
+                                          new AdaptiveSubmitAction()
+                                          {
+                                              Id= "configureGroups",
+                                              Title="Upload Excel",
+                                              Data =  new ActionDetails()
+                                                {
+                                                    ActionType = Constants.ConfigureGroups,
+                                                }
+                                          }
+                                        }
+                                        }
+                                    },
+                                      new AdaptiveShowCardAction(){
+                                    Id = "createGroupWithAllEmployees",
+                                    Title = "From Azure AD",
+                                    Card=new AdaptiveCard(new AdaptiveSchemaVersion("1.0"))
+                                    {
+                                        Body=new List<AdaptiveElement>()
+                                        {
+                                            new AdaptiveContainer()
+                                            {
+                                                Items=new List<AdaptiveElement>()
+                                                {
+                                                    new AdaptiveTextBlock()
+                                                    {
+                                                        Text=$"This will fetch all the users present in Azure Active Directory and create logical group of name \"All Employees\" which can be selected as audiance to send {ApplicationSettings.AppFeature}s",
+                                                        Wrap = true
+                                                    }
+                                                }
+                                            }
+                                        },
+                                    Actions=new List<AdaptiveAction>()
+                                    {
+                                      new AdaptiveSubmitAction()
+                                      {
+                                            Id = "createGroupWithAllEmployees",
+                                            Title = "Create/Update Group",
+                                            Data = new ActionDetails()
+                                            {
+                                                ActionType = Constants.CreateGroupWithAllEmployees,
+                                            }
+                                      }
+                                    }
+                                }
+                            }
+                                    }
                                 }
                             },
                             new AdaptiveShowCardAction()
@@ -372,7 +467,9 @@ namespace CrossVertical.Announcement.Helpers
                                             {
                                                 new AdaptiveTextBlock()
                                                 {
-                                                    Text=$"Please set list of moderators. "
+                                                    Text=$"Please set list of moderators who gets option to create and send {ApplicationSettings.AppFeature} . ",
+                                                    Wrap  = true
+
                                                 },
                                                 new AdaptiveTextInput()
                                                 {
@@ -394,25 +491,40 @@ namespace CrossVertical.Announcement.Helpers
                                     }
                                 }
                               },
-                            new AdaptiveSubmitAction()
-                            {
-                                Id = "createGroupWithAllEmployees",
-                                Title = "Create Group of All Employees",
-                                Data = new ActionDetails()
+                            new AdaptiveShowCardAction(){
+                                            Id = "createTeamsWithAllEmployees",
+                                            Title = "Create Team of All Employees",
+                             Card=new AdaptiveCard(new AdaptiveSchemaVersion("1.0"))
                                 {
-                                    ActionType = Constants.CreateGroupWithAllEmployees,
-                                }
-                            },
-                            new AdaptiveSubmitAction()
-                            {
-                                Id = "createTeamsWithAllEmployees",
-                                Title = "Create Team of All Employees",
-                                Data = new ActionDetails()
-                                {
-                                    ActionType = Constants.CreateTeamsWithAllEmployees,
+                                    Body=new List<AdaptiveElement>()
+                                    {
+                                        new AdaptiveContainer()
+                                        {
+                                            Items=new List<AdaptiveElement>()
+                                            {
+                                                new AdaptiveTextBlock()
+                                                {
+                                                    Text=$"This creates one or more new teams with of All Employees in tenant fetched from Azure Active Directory. This is a workaround to get app installed for all the employees present in tenant. Once this step is completed, please wait for all the members to sync in Teams and then install {ApplicationSettings.AppName} in newly created team.",
+                                                    Wrap = true
+                                                }
+                                            }
+                                        }
+                                    },
+                                    Actions=new List<AdaptiveAction>()
+                                    {
+                                      new AdaptiveSubmitAction()
+                                        {
+                                            Id = "createTeamsWithAllEmployees",
+                                            Title = "Create",
+                                            Data = new ActionDetails()
+                                            {
+                                                ActionType = Constants.CreateTeamsWithAllEmployees,
+                                            }
+                                        }
+                                    }
                                 }
                             }
-                            
+
                           }
             };
 
@@ -668,8 +780,9 @@ namespace CrossVertical.Announcement.Helpers
                 Text = @"Please go ahead and upload the excel file with Group details in following format:  
                         <ol>
                         <li><strong>Group Name</strong>: String eg: <pre>All Employees</pre></li>
-                        <li><strong>Members</strong>  : Comma separated user emails eg: <pre>user1@org.com, user2@org.com</pre></li></ol>
-                        </br> <strong>Note: Please keep first row header as described above. You can provide details for multiple teams row by row. Members/Channels columns can be empty.</strong>",
+                        <li><strong>Members</strong>  : Comma separated user emails eg: <pre>user1@org.com, user2@org.com</pre></li>
+                        <li><strong>Distribution Lists</strong>  : Comma separated distribution list name or email eg: <pre>All External Staff, EmployeeInSeattle@org.com</pre></li></ol>
+                        </br> <strong>Note: Please keep first row header as described above. You can provide details for multiple teams row by row. Users/Distribution Lists columns can be empty.</strong>",
             };
         }
     }

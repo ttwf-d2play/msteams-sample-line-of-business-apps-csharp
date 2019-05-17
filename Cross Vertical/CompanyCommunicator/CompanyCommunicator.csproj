@@ -343,6 +343,7 @@
     <Compile Include="Models\Channel.cs" />
     <Compile Include="Models\DatabaseItem.cs" />
     <Compile Include="Models\Group.cs" />
+    <Compile Include="Models\TeamsChannelInfoExt.cs" />
     <Compile Include="ViewModels\HistoryViewModel.cs" />
     <Compile Include="Models\ListCard.cs" />
     <Compile Include="Models\MessageSensitivity.cs" />
@@ -384,6 +385,7 @@
     <Content Include="Resources\arrow.PNG" />
     <Content Include="Resources\channel.PNG" />
     <Content Include="Resources\chat.PNG" />
+    <Content Include="Resources\ConfigureGroups.png" />
     <Content Include="Resources\CreateMessageHeader.png" />
     <Content Include="Resources\download.jpg" />
     <Content Include="Resources\Draft.PNG" />
@@ -399,6 +401,7 @@
     <Content Include="Resources\Person.png" />
     <Content Include="Resources\sched.PNG" />
     <Content Include="Resources\schedule.PNG" />
+    <Content Include="Resources\SelectGroups.png" />
     <Content Include="Resources\sent.PNG" />
     <Content Include="Resources\Team.png" />
     <Content Include="Resources\temp.PNG" />

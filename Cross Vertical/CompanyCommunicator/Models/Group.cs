@@ -33,5 +33,9 @@ namespace CrossVertical.Announcement.Models
         public string Name { get; set; }
 
         public List<string> Users { get; set; }
+
+        [JsonIgnore]
+        public List<string> DistributionLists { get; set; }
+
     }
 }

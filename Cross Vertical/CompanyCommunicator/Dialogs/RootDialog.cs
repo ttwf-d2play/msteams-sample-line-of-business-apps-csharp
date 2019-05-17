@@ -63,12 +63,6 @@ namespace CrossVertical.Announcement.Dialogs
         {
             var activity = await result as Activity;
 
-            // Send typing indicator...
-            var typingMsg = context.MakeMessage();
-            typingMsg.Type = ActivityTypes.Typing;
-            typingMsg.Text = null;
-            await context.PostAsync(typingMsg);
-
             string message = string.Empty;
             if (activity.Text != null)
                 message = Microsoft.Bot.Connector.Teams.ActivityExtensions.GetTextWithoutMentions(activity).ToLowerInvariant();
@@ -323,7 +317,7 @@ namespace CrossVertical.Announcement.Dialogs
                 while (startIndex < allMembers.Count)
                 {
                     List<string> userIds = allMembers.Skip(startIndex).Take(maxTeamSizeSupported).Select(c => c.id).ToList();
-                    var teamName = "All Employees" + (TeamCount == 0 ? "" : " " + TeamCount);
+                    var teamName = Constants.AllEmployeesGroupAndTeamName + (TeamCount == 0 ? "" : " " + TeamCount);
                     var teamId = await graphHelper.CreateNewTeam(new NewTeamDetails()
                     {
                         TeamName = teamName,
@@ -346,7 +340,7 @@ namespace CrossVertical.Announcement.Dialogs
                 var endTime = DateTime.Now;
                 var difference = endTime - startTime;
 
-                await context.PostAsync($"Team created successfully. \n\n Teams created: {TeamCount} \n\n Users Added: {allMembers.Count} \n\n  Time taken: { difference.Minutes}");
+                await context.PostAsync($"All teams created successfully. \n\n Teams created: {TeamCount} \n\n Users Added: {allMembers.Count} \n\n  Time taken: { difference.Minutes} mins");
 
             }
             catch (Exception ex)
@@ -374,29 +368,20 @@ namespace CrossVertical.Announcement.Dialogs
 
                 await context.PostAsync($"Fetched {allMembers.Count} members.");
 
-                // Delete existing group.
-                foreach (var groupId in tenantData.Groups)
-                {
-                    var group = await Cache.Groups.GetItemAsync(groupId);
-                    if (group != null)
-                        await Cache.Groups.DeleteItemAsync(groupId);
-                }
-                tenantData.Groups.Clear();
-
                 // Create new Group with all the members
                 Group groupDetails = new Group
                 {
                     Id = Guid.NewGuid().ToString(),
-                    Name = "All Employees",
-                    Users = allMembers.Select(u => u.userPrincipalName.ToLower()).ToList()
+                    Name = Constants.AllEmployeesGroupAndTeamName,
+                    Users = allMembers.Select(u => Common.RemoveHashFromGuestUserUPN(u.userPrincipalName.ToLower())).ToList()
                 };
 
-                await Cache.Groups.AddOrUpdateItemAsync(groupDetails.Id, groupDetails);
+                // Update existing group if exists.
+                await Common.CreateOrUpdateExistingGroups(new List<Group>() { groupDetails }, tenantData, false);
 
-                tenantData.Groups.Add(groupDetails.Id);
                 await Cache.Tenants.AddOrUpdateItemAsync(tenantData.Id, tenantData);
 
-                await context.PostAsync($"Created new group with all employees ({allMembers.Count}).");
+                await context.PostAsync($"Successfully created new group with all employees ({allMembers.Count}).");
             }
             catch (Exception ex)
             {
@@ -1002,7 +987,9 @@ namespace CrossVertical.Announcement.Dialogs
                 {
                     BotConversationId = activity.From.Id,
                     Id = currentUser.UserPrincipalName.ToLower(),
-                    Name = currentUser.Name ?? currentUser.GivenName
+                    Name = currentUser.Name ?? currentUser.GivenName,
+                    AadObjectId = currentUser.AadObjectId
+
                 };
                 await Cache.Users.AddOrUpdateItemAsync(userDetails.Id, userDetails);
 
@@ -1043,41 +1030,26 @@ namespace CrossVertical.Announcement.Dialogs
                         var groupDetails = ExcelHelper.GetAddTeamDetails(filePath);
                         if (groupDetails != null)
                         {
+                            // Code to check if DLs are passed in Excel and fetch user lists
+                            if (groupDetails.Any(g => g.DistributionLists != null && g.DistributionLists.Count > 0))
+                            {
+                                var token = await GraphHelper.GetAccessToken(channelData.Tenant.Id, ApplicationSettings.AppId, ApplicationSettings.AppSecret);
+                                var graphHelper = new GraphHelper(token);
+
+                                foreach (var group in groupDetails)
+                                {
+                                    if (group.DistributionLists != null && group.DistributionLists.Count > 0)
+                                        foreach (var possibleDL in group.DistributionLists)
+                                        {
+                                            var DLMembers = await graphHelper.GetAllMembersOfGroup(possibleDL);
+                                            group.Users.AddRange(DLMembers.Select(m => Common.RemoveHashFromGuestUserUPN(m.UserPrincipalName.ToLower())));
+                                            group.Users = group.Users.Distinct().ToList();
+                                        }
+                                }
+                            }
                             var tenantData = await Common.CheckAndAddTenantDetails(channelData.Tenant.Id);
 
-                            List<Group> oldGroups = new List<Group>();
-                            foreach (var groupId in tenantData.Groups)
-                            {
-                                var group = await Cache.Groups.GetItemAsync(groupId);
-                                if (group != null)
-                                    oldGroups.Add(group);
-                            }
-
-                            foreach (var groupDetail in groupDetails)
-                            {
-                                // Check if old group with same name exist, then replace user details.
-                                var oldGroup = oldGroups.FirstOrDefault(g => string.Equals(g.Name, groupDetail.Name, StringComparison.InvariantCultureIgnoreCase));
-                                if (oldGroup != null)
-                                {
-                                    groupDetail.Id = oldGroup.Id;
-                                    oldGroups.Remove(oldGroup);
-                                }
-
-                                await Cache.Groups.AddOrUpdateItemAsync(groupDetail.Id, groupDetail);
-                                if (!tenantData.Groups.Contains(groupDetail.Id))
-                                    tenantData.Groups.Add(groupDetail.Id);
-
-                            }
-
-                            // Clean the groups which are not added in new excel.
-                            foreach (var oldGroup in oldGroups)
-                            {
-                                await Cache.Groups.DeleteItemAsync(oldGroup.Id);
-                                if (tenantData.Groups.Contains(oldGroup.Id))
-                                    tenantData.Groups.Remove(oldGroup.Id);
-                            }
-
-                            await Cache.Tenants.AddOrUpdateItemAsync(tenantData.Id, tenantData);
+                            await Common.CreateOrUpdateExistingGroups(groupDetails, tenantData, true);
 
                             await context.PostAsync($"Successfully updated Group details for your tenant.");
 
@@ -1096,6 +1068,7 @@ namespace CrossVertical.Announcement.Dialogs
             }
         }
 
+
         private static string GetKey(IActivity activity, string key)
         {
             return activity.From.Id + key;
@@ -1107,20 +1080,20 @@ namespace CrossVertical.Announcement.Dialogs
             using (ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl)))
                 try
                 {
-                    //var exponentialBackoffRetryStrategy = new ExponentialBackoff(3, TimeSpan.FromSeconds(2),
-                    //       TimeSpan.FromSeconds(20), TimeSpan.FromSeconds(1));
+                    var exponentialBackoffRetryStrategy = new ExponentialBackoff(3, TimeSpan.FromSeconds(2),
+                           TimeSpan.FromSeconds(20), TimeSpan.FromSeconds(1));
 
-                    //// Define the Retry Policy
-                    //var retryPolicy = new RetryPolicy(new BotSdkTransientExceptionDetectionStrategy(), exponentialBackoffRetryStrategy);
+                    // Define the Retry Policy
+                    var retryPolicy = new RetryPolicy(new BotSdkTransientExceptionDetectionStrategy(), exponentialBackoffRetryStrategy);
 
-                    //var members = await retryPolicy.ExecuteAsync(() =>
-                    //                            connector.Conversations.GetConversationMembersAsync(activity.Conversation.Id)
-                    //                            ).ConfigureAwait(false);
+                    var members = await retryPolicy.ExecuteAsync(() =>
+                                                connector.Conversations.GetConversationMembersAsync(activity.Conversation.Id)
+                                                ).ConfigureAwait(false);
 
-                    var members = await connector.Conversations.GetConversationMembersAsync(activity.Conversation.Id);
                     if (members.Count == 0)
                         return null;
-                    return members.FirstOrDefault(m => m.Id == activity.From.Id)?.AsTeamsChannelAccount()?.UserPrincipalName?.ToLower();
+                    var upn = members.FirstOrDefault(m => m.Id == activity.From.Id)?.AsTeamsChannelAccount()?.UserPrincipalName?.ToLower();
+                    return Common.RemoveHashFromGuestUserUPN(upn);
                 }
                 catch (Exception)
                 {
@@ -1141,7 +1114,7 @@ namespace CrossVertical.Announcement.Dialogs
             GraphHelper helper = new GraphHelper(token);
 
             var emailId = await helper.GetUserEmailId(activity.From.AadObjectId);
-            return emailId;
+            return Common.RemoveHashFromGuestUserUPN(emailId);
         }
 
         public static async Task<TeamsChannelAccount> GetCurrentUser(Activity activity)

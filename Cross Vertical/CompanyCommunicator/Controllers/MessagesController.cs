@@ -413,9 +413,11 @@ namespace CrossVertical.Announcement.Controllers
                 }
                 else
                 {
+                    var teamChannelData = message.GetChannelData<TeamsChannelDataExt>();
                     team = new Team
                     {
-                        Id = channelData.Team.Id
+                        Id = channelData.Team.Id,
+                        AadObjectId = teamChannelData.Team.AADGroupId
                     };
                 }
 
@@ -452,18 +454,18 @@ namespace CrossVertical.Announcement.Controllers
             foreach (var member in members)
             {
                 var emailId = member.UserPrincipalName.ToLower().Trim();
-                if (emailId.Contains("#ext#"))
-                {
-                    // Skipping guest user.
-                    return;
-                }
+
+                emailId = Common.RemoveHashFromGuestUserUPN(emailId);
+
                 if (!tenatInfo.Users.Contains(emailId))
                 {
                     var userDetails = new User()
                     {
                         BotConversationId = member.Id,
                         Id = emailId,
-                        Name = member.Name ?? member.GivenName
+                        Name = member.Name ?? member.GivenName,
+                        AadObjectId = member.AadObjectId
+                        
                     };
                     tenant.Users.Add(userDetails.Id);
                     newUsers.Add(userDetails);
@@ -500,7 +502,7 @@ namespace CrossVertical.Announcement.Controllers
                     var successCount = results.Count(m => m.IsSuccessful);
 
                     await ProactiveMessageHelper.SendPersonalNotification(serviceUrl, tenantId, owner,
-                                                $"Process of sending welcome message completed. Successful: {successCount}. " +
+                                                $"Process of sending welcome message to all members of {channelData.Team.Name} completed. Successful: {successCount}. " +
                                                 $"Failure: {results.Count - successCount}.", null);
                 }
             }

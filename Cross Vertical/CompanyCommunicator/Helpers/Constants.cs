@@ -27,6 +27,8 @@ namespace CrossVertical.Announcement.Helpers
 {
     public class Constants
     {
+        public const string AllEmployeesGroupAndTeamName = "All Employees";
+
         public const string ConfigureAdminSettings = "ConfigureAdminSettings";
         public const string ShowAllDrafts = "ShowDrafts";
         public const string ShowAnnouncement = "ShowAnnouncementDraft";

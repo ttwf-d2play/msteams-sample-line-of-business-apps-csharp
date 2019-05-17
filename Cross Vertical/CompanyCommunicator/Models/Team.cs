@@ -32,6 +32,9 @@ namespace CrossVertical.Announcement.Models
 
         public string Name { get; set; }
 
+        [JsonProperty("aadObjectId")]
+        public string AadObjectId { get; set; }
+
         public List<Channel> Channels { get; set; } = new List<Channel>();
 
         public List<string> Members { get; set; } = new List<string>();
