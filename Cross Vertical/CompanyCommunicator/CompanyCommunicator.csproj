@@ -346,6 +346,8 @@
     <Content Include="Resources\ack.PNG" />
     <Content Include="Manifest\color.png" />
     <Content Include="Manifest\outline.png" />
+    <Content Include="fonts\TeamsAssets-Light.woff" />
+    <Content Include="fonts\TeamsAssets-Light.woff2" />
     <None Include="Properties\PublishProfiles\announcement - Web Deploy.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Resources\Action.PNG" />
