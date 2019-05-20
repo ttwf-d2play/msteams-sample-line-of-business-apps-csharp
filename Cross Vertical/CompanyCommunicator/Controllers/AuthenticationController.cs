@@ -38,7 +38,7 @@ namespace CrossVertical.Announcement.Controllers
         [Route("adminconsent")]
         public async Task<ActionResult> ConsentPage(string tenant, string admin_consent, string state)
         {
-            
+
             if (string.IsNullOrEmpty(tenant))
             {
                 return HttpNotFound();
@@ -52,16 +52,16 @@ namespace CrossVertical.Announcement.Controllers
 
             var userDetails = await Cache.Users.GetItemAsync(adminUserDetails.UserEmailId);
 
-            await ProactiveMessageHelper.SendNotification(adminUserDetails.ServiceUrl, tenant, userDetails.BotConversationId, "Your app consent is successfully granted. Please go ahead and set groups & moderators." , null);
+            await ProactiveMessageHelper.SendPersonalNotification(adminUserDetails.ServiceUrl, tenant, userDetails, "Your app consent is successfully granted. Please go ahead and set groups & moderators.", null);
 
-            await ProactiveMessageHelper.SendNotification(adminUserDetails.ServiceUrl, tenant, userDetails.BotConversationId, null, CardHelper.GetGroupConfigurationCard().ToAttachment());
+            await ProactiveMessageHelper.SendPersonalNotification(adminUserDetails.ServiceUrl, tenant, userDetails, null, CardHelper.GetAdminPanelCard(string.Join(",", tenantDetails.Moderators)));
 
             return View();
         }
 
         // GET: Authentication
         [Route("test")]
-        public async Task<ActionResult> Test()
+        public async Task<ActionResult> Test(string tasks)
         {
             var token = await GraphHelper.GetAccessToken("0d9b645f-597b-41f0-a2a3-ef103fbd91bb", ApplicationSettings.AppId, ApplicationSettings.AppSecret);
             GraphHelper helper = new GraphHelper(token);

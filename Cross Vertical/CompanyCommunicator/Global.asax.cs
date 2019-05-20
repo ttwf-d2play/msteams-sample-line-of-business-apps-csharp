@@ -41,11 +41,13 @@ namespace CrossVertical.Announcement
     {
         protected void Application_Start()
         {
+
             new Task(async () =>
             {
                 await DocumentDBRepository.Initialize();
                 await AnnouncementScheduler.InitializeSchedulesFromDB();
             }).Start();
+
 
             AreaRegistration.RegisterAllAreas();
             GlobalConfiguration.Configure(WebApiConfig.Register);

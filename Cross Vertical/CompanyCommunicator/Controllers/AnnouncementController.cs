@@ -257,8 +257,8 @@ namespace CrossVertical.Announcement.Controllers
                 Title = userDetails.Name,
                 SubTitle = "",
                 EnableLikeButton = false,
-                // ChatUrl = $"https://teams.microsoft.com/l/chat/0/0?users={userDetails.UserPrincipalName}"
-                ChatUrl = $"https://teams.microsoft.com/_#/conversations/8:orgid:{userDetails.Id}?ctx=chat"
+                ChatUrl = $"https://teams.microsoft.com/l/chat/0/0?users={userDetails.Id}"
+                // ChatUrl = $"https://teams.microsoft.com/_#/conversations/8:orgid:{userDetails.Id}?ctx=chat"
             };
         }
 
@@ -315,7 +315,7 @@ namespace CrossVertical.Announcement.Controllers
                     audianceInfo.SecondTab.Items.Add(
                          new ViewModels.Item()
                          {
-                             Id = team.Id,
+                             Id = team.AadObjectId,
                              ImageUrl = ApplicationSettings.BaseUrl + "/Resources/Team.png",
                              Title = channelDetails.Name,
                              SubTitle = team.Name,

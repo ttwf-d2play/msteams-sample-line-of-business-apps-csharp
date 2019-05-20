@@ -37,6 +37,13 @@ namespace CrossVertical.Announcement.Models
         
     }
 
+    public class PersonalMessageRecipients
+    {
+        public RecipientDetails RecipientDetails { get; set; }
+        public User UserDetails { get; set; }
+        public string GroupId { get; set; }
+    }
+
     public class GroupRecipient
     {
         public string GroupId { get; set; }

@@ -21,9 +21,12 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 using CrossVertical.Announcement.Helper;
+using CrossVertical.Announcement.Models;
 using CrossVertical.Announcement.Repository;
 using Microsoft.Bot.Connector;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace CrossVertical.Announcement.Helpers
@@ -41,95 +44,126 @@ namespace CrossVertical.Announcement.Helpers
             await SendAnnouncement(campaign);
         }
 
-        public static async Task SendAnnouncement(Models.Campaign campaign)
+        public static async Task<bool> SendAnnouncement(Models.Campaign campaign)
         {
-            var card = campaign.GetPreviewCard().ToAttachment();
-
-            int successCount = 0;
-            int failureCount = 0;
             int duplicateUsers = 0;
-            List<string> notifiedUsers = new List<string>();
-            var ownerId = (await Cache.Users.GetItemAsync(campaign.OwnerId)).BotConversationId;
+            var serviceURL = campaign.Recipients.ServiceUrl;
+            var tenantId = campaign.Recipients.TenantId;
+            var owner = await Cache.Users.GetItemAsync(campaign.OwnerId);
+            var taskList = new List<Task>();
+            var usersToNotify = new ConcurrentBag<PersonalMessageRecipients>();
+            var appNotInstalledUsers = new List<string>();
+
             foreach (var group in campaign.Recipients.Groups)
             {
-                foreach (var recipient in group.Users)
+                //foreach (var recipient in group.Users)
+                await Common.ForEachAsync(group.Users, ApplicationSettings.NoOfParallelTasks,
+                  async recipient =>
+                  {
+                      var user = await Cache.Users.GetItemAsync(recipient.Id);
+                      if (user == null)
+                      {
+                          recipient.FailureMessage = "App not installed";
+                          appNotInstalledUsers.Add(recipient.Id);
+                      }
+                      else
+                      {
+                          if (usersToNotify.Any(g => g.RecipientDetails.Id == recipient.Id))
+                          {
+                              // Remove check for temporary
+                              recipient.FailureMessage = "Duplicated. Message already sent.";
+                              duplicateUsers++;
+                              // continue;
+                              return;
+                          }
+                          else
+                          {
+                              usersToNotify.Add(new PersonalMessageRecipients()
+                              {
+                                  GroupId = group.GroupId,
+                                  UserDetails = user,
+                                  RecipientDetails = recipient
+                              });
+                          }
+                      }
+                  });
+            }
+
+            if (appNotInstalledUsers.Count > 0)
+            {
+                await ProactiveMessageHelper.SendPersonalNotification(serviceURL, tenantId, owner, $"App not installed by {appNotInstalledUsers.Count} users.", null);
+            }
+
+            if (usersToNotify.Count > 100)
+            {
+                await ProactiveMessageHelper.SendPersonalNotification(serviceURL, tenantId, owner, $"We are sending this message to {usersToNotify.Count} which may take some time. Will notify you once process is completed.", null);
+            }
+
+            var messageSendResults = new ConcurrentBag<NotificationSendStatus>();
+            await Common.ForEachAsync(usersToNotify, ApplicationSettings.NoOfParallelTasks,
+                async recipient =>
                 {
-                    var user = await Cache.Users.GetItemAsync(recipient.Id);
-                    if (user == null)
+                    var user = recipient.UserDetails;
+                    var card = campaign.GetPreviewCard().ToAttachment();
+                    var campaignCard = CardHelper.GetCardWithAcknowledgementDetails(card, campaign.Id, user.Id, recipient.GroupId);
+                    var result = await ProactiveMessageHelper.SendPersonalNotification(serviceURL, tenantId, user, null, card);
+                    result.Name = user.Name; // Addd name of use for reporting.
+                    if (result.IsSuccessful)
                     {
-                        recipient.FailureMessage = "App not installed";
-                        failureCount++;
-                        await ProactiveMessageHelper.SendNotification(campaign.Recipients.ServiceUrl, campaign.Recipients.TenantId, ownerId, "App not installed by " + recipient.Id, null);
+                        recipient.RecipientDetails.MessageId = result.MessageId;
                     }
                     else
                     {
-                        if (notifiedUsers.Contains(recipient.Id))
-                        {
-                            recipient.FailureMessage = "Duplicated. Message already sent.";
-                            duplicateUsers++;
-                            continue;
-                        }
+                        recipient.RecipientDetails.FailureMessage = result.FailureMessage;
+                    }
+                    messageSendResults.Add(result);
+                });
 
-                        var campaignCard = CardHelper.GetCardWithAcknowledgementDetails(card, campaign.Id, user.Id, group.GroupId);
-                        var response = await ProactiveMessageHelper.SendNotification(campaign.Recipients.ServiceUrl, campaign.Recipients.TenantId, user.BotConversationId, null, card);
-                        if (response.IsSuccessful)
+            await Common.ForEachAsync(campaign.Recipients.Channels, ApplicationSettings.NoOfParallelTasks,
+               async recipient =>
+                {
+                    var team = await Cache.Teams.GetItemAsync(recipient.TeamId);
+                    if (team == null)
+                    {
+                        recipient.Channel.FailureMessage = "App not installed";
+                        messageSendResults.Add(new NotificationSendStatus()
                         {
-                            recipient.MessageId = response.MessageId;
-                            successCount++;
-                            notifiedUsers.Add(recipient.Id);
+                            IsSuccessful = false,
+                            FailureMessage = "App not installed",
+                            Name = recipient.Channel.Id
+                        });
+                    }
+                    else
+                    {
+                        var botAccount = new ChannelAccount(ApplicationSettings.AppId);
+                        var card = campaign.GetPreviewCard().ToAttachment();
+                        var campaignCard = CardHelper.GetCardWithoutAcknowledgementAction(card);
+
+                        var result = await ProactiveMessageHelper.SendChannelNotification(botAccount, serviceURL, recipient.Channel.Id, null, card);
+                        result.Name = team.Name;
+                        if (result.IsSuccessful)
+                        {
+                            recipient.Channel.MessageId = result.MessageId;
                         }
                         else
                         {
-                            recipient.FailureMessage = response.FailureMessage;
-                            failureCount++;
-                            await ProactiveMessageHelper.SendNotification(campaign.Recipients.ServiceUrl, campaign.Recipients.TenantId, ownerId, $"User: {user.Name}. Error: " + recipient.FailureMessage,  null);
+                            recipient.Channel.FailureMessage = result.FailureMessage;
                         }
+                        messageSendResults.Add(result);
                     }
-                }
-            }
+                });
 
-            var botAccount = new ChannelAccount(ApplicationSettings.AppId);
-            foreach (var recipient in campaign.Recipients.Channels)
-            {
-                var team = await Cache.Teams.GetItemAsync(recipient.TeamId);
-                if (team == null)
-                {
-                    recipient.Channel.FailureMessage = "App not installed";
-                    failureCount++;
-                    await ProactiveMessageHelper.SendNotification(campaign.Recipients.ServiceUrl, campaign.Recipients.TenantId, ownerId, "App not installed in team: " + recipient.TeamId, null);
-                }
-                else
-                {
-                    var campaignCard = CardHelper.GetCardWithoutAcknowledgementAction(card);
+            var failedUsers = string.Join(",", messageSendResults.Where(m => !m.IsSuccessful).Select(m => m.Name).ToArray());
+            var successCount = messageSendResults.Count(m => m.IsSuccessful);
 
-                    if (notifiedUsers.Contains(recipient.Channel.Id))
-                    {
-                        recipient.Channel.FailureMessage = "Duplicated. Message already sent.";
-                        duplicateUsers++;
-                        continue;
-                    }
+            await ProactiveMessageHelper.SendPersonalNotification(serviceURL, tenantId, owner,
+                                        $"Process completed. Success: {successCount}. " +
+                                        $"Failure: {messageSendResults.Count - successCount }. Duplicate: {duplicateUsers}", null);
 
-                    var response = await ProactiveMessageHelper.SendChannelNotification(botAccount, campaign.Recipients.ServiceUrl, recipient.Channel.Id, null, card);
-                    if (response.IsSuccessful)
-                    {
-                        recipient.Channel.MessageId = response.MessageId;
-                        successCount++;
-                        notifiedUsers.Add(recipient.Channel.Id);
-                    }
-                    else
-                    {
-                        recipient.Channel.FailureMessage = response.FailureMessage;
-                        failureCount++;
-                        await ProactiveMessageHelper.SendNotification(campaign.Recipients.ServiceUrl, campaign.Recipients.TenantId, ownerId, $"Team: {team.Name}. Error: " + recipient.Channel.FailureMessage, null); ;
-                    }
-                }
-            }
-
-            await ProactiveMessageHelper.SendNotification(campaign.Recipients.ServiceUrl, campaign.Recipients.TenantId, ownerId,
-                                        $"Process completed. Successful: {successCount}. Failure: {failureCount}. Duplicate: {duplicateUsers}",  null); 
-
-            campaign.Status = Models.Status.Sent;
+            campaign.Status = Status.Sent;
             await Cache.Announcements.AddOrUpdateItemAsync(campaign.Id, campaign);
+            return true;
         }
+
     }
 }

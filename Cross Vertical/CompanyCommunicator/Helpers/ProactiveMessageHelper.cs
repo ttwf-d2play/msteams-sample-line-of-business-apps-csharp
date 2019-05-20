@@ -20,9 +20,12 @@
 // LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+using CrossVertical.Announcement.Helper;
 using CrossVertical.Announcement.Models;
+using CrossVertical.Announcement.Repository;
 using Microsoft.Bot.Connector;
 using Microsoft.Bot.Connector.Teams.Models;
+using Microsoft.Practices.EnterpriseLibrary.TransientFaultHandling;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,33 +36,117 @@ namespace CrossVertical.Announcement.Helpers
 {
     public class ProactiveMessageHelper
     {
-        public static async Task<NotificationSendStatus> SendNotification(string serviceUrl, string tenantId, string userId, string messageText, Attachment attachment)
-        {
-            var connectorClient = new ConnectorClient(new Uri(serviceUrl));
 
+        public static async Task<NotificationSendStatus> SendPersonalNotification(string serviceUrl, string tenantId, User userDetails, string messageText, Attachment attachment)
+        {
+            MicrosoftAppCredentials.TrustServiceUrl(serviceUrl, DateTime.MaxValue);
+            var connectorClient = new ConnectorClient(new Uri(serviceUrl));
+            if (string.IsNullOrEmpty(userDetails.PersonalConversationId))
+            {
+                var createConversationResult = await GetConversationId(connectorClient, tenantId, userDetails.BotConversationId);
+                if (createConversationResult.IsSuccessful)
+                {
+                    userDetails.PersonalConversationId = createConversationResult.MessageId;
+                    await Cache.Users.AddOrUpdateItemAsync(userDetails.Id, userDetails);
+                }
+                else
+                    return createConversationResult; // Failed
+            }
+
+            return await SendNotificationToConversationId(connectorClient, tenantId, userDetails.PersonalConversationId, messageText, attachment);
+
+        }
+
+        //public static async Task<NotificationSendStatus> SendPersonalNotificationNew(ConnectorClient connectorClient, string tenantId, User userDetails, string messageText, Attachment attachment)
+        //{
+        //    //MicrosoftAppCredentials.TrustServiceUrl(serviceUrl, DateTime.MaxValue);
+        //    //var connectorClient = new ConnectorClient(new Uri(serviceUrl));
+        //    if (string.IsNullOrEmpty(userDetails.PersonalConversationId))
+        //    {
+        //        var createConversationResult = await GetConversationId(connectorClient, tenantId, userDetails.BotConversationId);
+        //        if (createConversationResult.IsSuccessful)
+        //        {
+        //            userDetails.PersonalConversationId = createConversationResult.MessageId;
+        //            //await Cache.Users.AddOrUpdateItemAsync(userDetails.Id, userDetails);
+        //        }
+        //        else
+        //            return createConversationResult; // Failed
+        //    }
+
+        //    return await SendNotificationToConversationId(connectorClient, tenantId, userDetails.PersonalConversationId, messageText, attachment);
+
+        //}
+
+        private static async Task<NotificationSendStatus> SendNotificationToConversationId(ConnectorClient connectorClient, string tenantId, string conversationId, string messageText, Attachment attachment)
+        {
+
+            try
+            {
+                var replyMessage = Activity.CreateMessageActivity();
+
+                replyMessage.Conversation = new ConversationAccount(id: conversationId);
+                replyMessage.ChannelData = new TeamsChannelData() { Notification = new NotificationInfo(true) };
+                replyMessage.Text = messageText;
+                if (attachment != null)
+                    replyMessage.Attachments.Add(attachment);
+
+                var exponentialBackoffRetryStrategy = new ExponentialBackoff(5, TimeSpan.FromSeconds(2),
+                       TimeSpan.FromSeconds(20), TimeSpan.FromSeconds(1));
+
+                // Define the Retry Policy
+                var retryPolicy = new RetryPolicy(new BotSdkTransientExceptionDetectionStrategy(), exponentialBackoffRetryStrategy);
+
+                var resourceResponse = await retryPolicy.ExecuteAsync(() =>
+                                        connectorClient.Conversations.SendToConversationAsync(conversationId, (Activity)replyMessage)
+                                        ).ConfigureAwait(false);
+
+                //var resourceResponse = await
+                //                       connectorClient.Conversations.SendToConversationAsync(conversationId, (Activity)replyMessage)
+                //                       ;
+
+                return new NotificationSendStatus() { MessageId = resourceResponse.Id, IsSuccessful = true };
+            }
+            catch (Exception ex)
+            {
+                ErrorLogService.LogError(ex);
+                return new NotificationSendStatus() { IsSuccessful = false, FailureMessage = ex.Message };
+            }
+
+        }
+
+        private static async Task<NotificationSendStatus> GetConversationId(ConnectorClient connectorClient, string tenantId, string userId)
+        {
             var parameters = new ConversationParameters
             {
                 Members = new ChannelAccount[] { new ChannelAccount(userId) },
                 ChannelData = new TeamsChannelData
                 {
                     Tenant = new TenantInfo(tenantId),
-                    Notification = new NotificationInfo() { Alert = true }
-                }
+                    Notification = new NotificationInfo() { Alert = true },
+
+                },
+                IsGroup = false,
+                Bot = new ChannelAccount(ApplicationSettings.AppId)
             };
 
             try
             {
-                var conversationResource = await connectorClient.Conversations.CreateConversationAsync(parameters);
-                var replyMessage = Activity.CreateMessageActivity();
-                replyMessage.Conversation = new ConversationAccount(id: conversationResource.Id.ToString());
-                replyMessage.ChannelData = new TeamsChannelData() { Notification = new NotificationInfo(true) };
-                replyMessage.Text = messageText;
-                if (attachment != null)
-                    replyMessage.Attachments.Add(attachment);
+                var exponentialBackoffRetryStrategy = new ExponentialBackoff(5, TimeSpan.FromSeconds(2),
+                        TimeSpan.FromSeconds(20), TimeSpan.FromSeconds(1));
 
-                var resourceResponse = await connectorClient.Conversations.SendToConversationAsync(conversationResource.Id, (Activity)replyMessage);
-                return new NotificationSendStatus() { MessageId = resourceResponse.Id, IsSuccessful = true };
 
+                // Define the Retry Policy
+                var retryPolicy = new RetryPolicy(new BotSdkTransientExceptionDetectionStrategy(), exponentialBackoffRetryStrategy);
+
+                var conversationResource = await retryPolicy.ExecuteAsync(() =>
+                                            connectorClient.Conversations.CreateConversationAsync(parameters)
+                                            ).ConfigureAwait(false);
+
+                //var conversationResource = await
+                //                            connectorClient.Conversations.CreateConversationAsync(parameters)
+                //                            ;
+
+                return new NotificationSendStatus() { MessageId = conversationResource.Id, IsSuccessful = true };
             }
             catch (Exception ex)
             {
@@ -67,6 +154,7 @@ namespace CrossVertical.Announcement.Helpers
                 ErrorLogService.LogError(ex);
                 return new NotificationSendStatus() { IsSuccessful = false, FailureMessage = ex.Message };
             }
+
         }
 
         public static async Task<NotificationSendStatus> SendChannelNotification(ChannelAccount botAccount, string serviceUrl, string channelId, string messageText, Attachment attachment)
@@ -79,22 +167,37 @@ namespace CrossVertical.Announcement.Helpers
                 if (attachment != null)
                     replyMessage.Attachments.Add(attachment);
 
-                var connectorClient = new ConnectorClient(new Uri(serviceUrl));
-
-                var parameters = new ConversationParameters
+                using (var connectorClient = new ConnectorClient(new Uri(serviceUrl)))
                 {
-                    Bot = botAccount,
-                    ChannelData = new TeamsChannelData
+                    var parameters = new ConversationParameters
                     {
-                        Channel = new ChannelInfo(channelId),
-                        Notification = new NotificationInfo() { Alert = true }
-                    },
-                    IsGroup = true,
-                    Activity = (Activity)replyMessage
-                };
+                        Bot = botAccount,
+                        ChannelData = new TeamsChannelData
+                        {
+                            Channel = new ChannelInfo(channelId),
+                            Notification = new NotificationInfo() { Alert = true }
+                        },
+                        IsGroup = true,
+                        Activity = (Activity)replyMessage
+                    };
 
-                var conversationResource = await connectorClient.Conversations.CreateConversationAsync(parameters);
-                return new NotificationSendStatus() { MessageId = conversationResource.Id, IsSuccessful = true };
+                    var exponentialBackoffRetryStrategy = new ExponentialBackoff(3, TimeSpan.FromSeconds(2),
+                        TimeSpan.FromSeconds(20), TimeSpan.FromSeconds(1));
+
+
+                    // Define the Retry Policy
+                    var retryPolicy = new RetryPolicy(new BotSdkTransientExceptionDetectionStrategy(), exponentialBackoffRetryStrategy);
+
+                    //var conversationResource = await retryPolicy.ExecuteAsync(() =>
+                    //                        connectorClient.Conversations.CreateConversationAsync(parameters)
+                    //                        ).ConfigureAwait(false);
+
+                    var conversationResource = await
+                                            connectorClient.Conversations.CreateConversationAsync(parameters)
+                                            ;
+
+                    return new NotificationSendStatus() { MessageId = conversationResource.Id, IsSuccessful = true };
+                }
             }
             catch (Exception ex)
             {
