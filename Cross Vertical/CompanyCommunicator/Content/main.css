@@ -1,4 +1,176 @@
 ﻿/* button */
+@font-face {
+    font-family: 'Teams Assets';
+    src: url('/fonts/TeamsAssets-Light.woff2') format('woff2'), url('/fonts/TeamsAssets-Light.woff') format('woff');
+    font-weight: 300;
+    font-style: normal;
+}
+
+.shape-format-exclamtion::before {
+    top:4px;
+    position: relative;
+    font-family: "Teams Assets";
+    content: "\E62B";
+}
+.shape-format::before {
+    position: relative;
+    top: 7px;
+    font-size: 16px;
+    font-family: "Teams Assets";
+    content: "\E20B";
+}
+
+.shape-format-allemployees::before {
+    position: relative;
+    top: 2px;
+    font-size: 16px;
+    font-family: "Teams Assets";
+    content: "\E202";
+}
+.line1::before {
+    position: absolute;
+    float: initial;
+    font-family: "Teams Assets";
+    content: "\E325";
+    font-size: 19px;
+}
+.shape-format-count1::before {
+    position: relative;
+    top: 3px;
+    font-size: 16px;
+    font-family: "Teams Assets";
+    content: "\E428";
+}
+
+.shape-format-count2::before {
+    position: relative;
+    top: 3px;
+    font-size: 16px;
+    font-family: "Teams Assets";
+    content: "\E329";
+}
+
+.shape-format-count3::before {
+    position: relative;
+    top: 2px;
+    font-size: 16px;
+    font-family: "Teams Assets";
+    content: "\E912";
+}
+
+.shape-format-schedule::before {
+    position: relative;
+    top: 2px;
+    font-size: 16px;
+    font-family: "Teams Assets";
+    content: "\E115";
+}
+.shape-format-draft::before {
+    position: relative;
+    top: 2px;
+    font-size: 16px;
+    font-family: "Teams Assets";
+    content: "\E346";
+}
+
+.shape-format-tick::before {
+    position: relative;
+    top: 2px;
+    font-size: 16px;
+    font-family: "Teams Assets";
+    content: "\E412";
+}
+
+.shape-format-pencil::before {
+    position: relative;
+    top: 2px;
+    font-size: 16px;
+    font-family: "Teams Assets";
+    content: "\E40D";
+}
+
+.shape-format-dots::before {
+    position: relative;
+    left: 5px;
+    font-family: "Teams Assets";
+    content: "\E94F";
+}
+
+[type="button"] {
+    -webkit-appearance: none !important;
+}
+
+.shape-format-first::before {
+    position: relative;
+    top: 2px;
+    padding-right: 5px;
+    font-size: 18px;
+    font-family: "Teams Assets";
+    content: "\E442";
+}
+
+.shape-format-second::before {
+    position: relative;
+    top: 2px;
+    padding-right: 5px;
+    font-size: 18px;
+    font-family: "Teams Assets";
+    content: "\E328";
+}
+
+.shape-format-third::before {
+    position: relative;
+    top: 2px;
+    padding-right: 5px;
+    font-size: 18px;
+    font-family: "Teams Assets";
+    content: "\E115";
+}
+
+.shape-format-four::before {
+    position: relative;
+    top: 2px;
+    padding-right: 5px;
+    font-size: 18px;
+    font-family: "Teams Assets";
+    content: "\E131";
+}
+.line-grp2::before {
+    position: absolute;
+    font-family: "Teams Assets";
+    font-size: 14px;
+    content: "\E20B";
+    left: 54%;
+}
+
+html,
+body {
+    height: 100%
+}
+
+.container {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: "Segoe UI";
+}
+
+button.favorite.styledtest {
+    background-color: #6264a7;
+    color: #fff;
+    border: 1px solid rgba(37, 36, 36, 0.15);
+    border-radius: 2px;
+    box-shadow: 0 2px 4px -0.75px rgba(0, 0, 0, 0.1);
+    padding: 4px 10px 4px 10px;
+    font-size: 14px;
+    cursor: pointer;
+    font-family: "Segoe UI";
+    float: left;
+    position: absolute;
+    top: 52%;
+}
+
 button.favorite.styled {
     background-color: #6264a7;
     color: #fff;
@@ -13,6 +185,11 @@ button.favorite.styled {
     float: left;
     position: relative;
     left: 88%;
+}
+
+.message {
+    font-size: 14px;
+    text-align: justify;
 }
 
 tr.bor {
@@ -77,7 +254,7 @@ table.table {
 }
 
 
-.dropdown-menu.show  {
+.dropdown-menu.show {
     transform: translate3d(-155px, 30px, 0px) !important;
 }
 
@@ -132,19 +309,19 @@ button.favorite.styled2 {
 
     span#date {
         position: relative;
-        right: 18px;
+        /*right: 18px;*/
         font-size: 12px;
     }
 
     span#mail-msg {
         position: relative;
-        right: 10px;
+        /*right: 10px;*/
         font-size: 12px;
     }
 
     img.line {
         position: relative;
-        right: 18px;
+        right: 9px;
         height: 25px;
         width: 30px;
     }
@@ -170,13 +347,24 @@ button.favorite.styled2 {
         right: 32px;
     }
 
-    .draft-grp {
+    .draft-grp::before {
         position: relative;
-        right: 19px;
-        height: 18px;
-        width: 22px;
+        font-family: "Teams Assets";
+        content: "\E346";
+        font-size: 14px;
     }
-
+    .sent-grp::before {
+        position: relative;
+        font-family: "Teams Assets";
+        content: "\E412";
+        font-size: 14px;
+    }
+    .schedule-grp::before {
+        position: relative;
+        font-family: "Teams Assets";
+        content: "\E115";
+        font-size: 14px;
+    }
     button.favorite.styled2 {
         background-color: #6264a7;
         color: #fff;
@@ -216,25 +404,79 @@ button.favorite.styled2 {
         bottom: 3px;
         float: left;
         margin-left: -26px;
-        padding-left:1%;
+        padding-left: 1%;
     }
 
     .col-12.three-states {
         position: relative;
         right: 14px;
     }
-
-    .draft-grp-three-states {
+    .draft-grp-three-states::before {
+        position: relative;
+        left: 2px;
+        top: 4px;
+        font-family: "Teams Assets";
+        content: "\E346";
+        font-size: 14px;
+    }
+    .sent-grp-three-states::before {
+        position: relative;
+        left: 2px;
+        top: 4px;
+        font-family: "Teams Assets";
+        content: "\E412";
+        font-size: 14px;
+    }
+    .schedule-grp-three-states::before {
+        position: relative;
+        left: 2px;
+        top: 4px;
+        font-family: "Teams Assets";
+        content: "\E115";
+        font-size: 14px;
+    }
+    /*.draft-grp-three-states {
         position: relative;
         height: 18px;
         width: 22px;
-    }
+    }*/
 
-    .line-grp-three-states {
+    /*.line-grp-three-states {
         position: relative;
         height: 18px;
         width: 26px;
         bottom: 2px;
+    }*/
+     .line-grp-three-states::before {
+            position: relative;
+            top: 2px;
+            font-family: "Teams Assets";
+            font-size: 14px;
+            content: "\E202";
+     }
+
+    .line-grp-three-states1::before {
+        position: relative;
+        top: 2px;
+        font-family: "Teams Assets";
+        font-size: 14px;
+        content: "\E20B";
+    }
+
+    .line-grp-three-states2::before {
+        position: relative;
+        top: 2px;
+        font-family: "Teams Assets";
+        font-size: 14px;
+        content: "\E329";
+    }
+
+    .line-grp-three-states3::before {
+        position: relative;
+        top: 2px;
+        font-family: "Teams Assets";
+        font-size: 14px;
+        content: "\E912";
     }
 
     .line1-three-states {
@@ -383,7 +625,22 @@ button.favorite.styled2 {
     }
 
     /* new css for dropbtn end */
-    .line-grp1,
+    .line-grp1::before {
+        position: absolute;
+        font-family: "Teams Assets";
+        font-size: 14px;
+        content: "\E202";
+        left: 39%;
+    }
+
+    .line-grp2::before {
+        position: absolute;
+        font-family: "Teams Assets";
+        font-size: 14px;
+        content: "\E20B";
+        left: 54%;
+    }
+    /*.line-grp1,
     .line-grp2 {
         height: 18px;
         width: 26px;
@@ -392,9 +649,10 @@ button.favorite.styled2 {
     img.line-grp1 {
         position: absolute;
         left: 38%;
-    }
+    }*/
 
     span.fix {
+        top:2px;
         position: absolute;
         left: 45%;
         font-size: 12px;
@@ -406,6 +664,7 @@ button.favorite.styled2 {
     }
 
     span.fix1 {
+        top: 2px;
         position: absolute;
         left: 60%;
         font-size: 12px;
@@ -423,7 +682,7 @@ button.favorite.styled2 {
         display: block;
     }
 
-    dropdown-menu.show  {
+    dropdown-menu.show {
         transform: translate3d(-155px, 30px, 0px) !important;
     }
 }
@@ -436,8 +695,8 @@ button.favorite.styled2 {
     span.title,
     .three-states-titles {
         font-size: 14px;
-        font-weight:500;
-        font-family:'Segoe UI'
+        font-weight: 500;
+        font-family: 'Segoe UI'
     }
 
     .count-msg {
@@ -459,7 +718,8 @@ button.favorite.styled2 {
     .dots {
         right: 18px;
     }
-    .dropdown-menu.show  {
+
+    .dropdown-menu.show {
         transform: translate3d(-155px, 30px, 0px) !important;
     }
 }
@@ -483,15 +743,23 @@ button.favorite.styled2 {
     /* img.line1 {
         left: 2rem;
     } */
-    .dropdown-menu.show  {
+    .dropdown-menu.show {
         transform: translate3d(-155px, 30px, 0px) !important;
     }
+
     .dots {
         right: 10px;
     }
 
     .dropdown-menu.show {
         transform: translate3d(-146px, 20px, 0px) !important;
+    }
+}
+
+@media screen and (max-width:320px) {
+
+    button.favorite.styled {
+        top: 58%;
     }
 }
 
@@ -513,8 +781,6 @@ button.favorite.styled2 {
 
 @media only screen and (max-width: 1440px) {
 
-    span#count3,
-    span#count2,
     span#count1 {
         position: absolute;
     }
@@ -523,4 +789,16 @@ button.favorite.styled2 {
         padding: 2px 9px !important;
     }
 }
-/* Ngrok.exe http 8080 --host-header=localhost */
+
+@media screen and (max-width:475px) {
+    button.favorite.styledtest {
+        top: 57%;
+    }
+}
+
+@media screen and (max-width:320px) {
+
+    button.favorite.styledtest {
+        top: 58%;
+    }
+}
