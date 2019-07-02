@@ -21,7 +21,6 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 using AdaptiveCards;
-using AdaptiveCards.Rendering.Html;
 using CrossVertical.Announcement.Helper;
 using CrossVertical.Announcement.Helpers;
 using System;
@@ -63,6 +62,47 @@ namespace CrossVertical.Announcement.Models
             {
                 channelRecipients = string.Join(",", Recipients.Channels.Select(g => g.TeamId + ";" + g.Channel.Id));
             }
+
+
+            AdaptiveElement channelsAdaptiveCardInput;
+            if (channels.Count > 0)
+                channelsAdaptiveCardInput = new AdaptiveChoiceSetInput()
+                {
+                    Id = "channels",
+                    Spacing = AdaptiveSpacing.None,
+                    Value = isEditCard ? channelRecipients : "",
+                    Choices = new List<AdaptiveChoice>(channels),
+                    IsMultiSelect = true,
+                    Style = AdaptiveChoiceInputStyle.Compact
+
+                };
+            else
+                channelsAdaptiveCardInput = new AdaptiveTextBlock()
+                {
+                    Text = "No channels configured!",
+                    Wrap = true,
+                    HorizontalAlignment = AdaptiveHorizontalAlignment.Left,
+                };
+
+            AdaptiveElement groupsAdaptiveCardInput;
+            if (groups.Count > 0)
+                groupsAdaptiveCardInput = new AdaptiveChoiceSetInput()
+                {
+                    Id = "groups",
+                    Spacing = AdaptiveSpacing.None,
+
+                    Choices = new List<AdaptiveChoice>(employeGroups),
+                    IsMultiSelect = true,
+                    Style = AdaptiveChoiceInputStyle.Compact,
+                    Value = isEditCard ? groupRecipients : ""
+                };
+            else
+                groupsAdaptiveCardInput = new AdaptiveTextBlock()
+                {
+                    Text = "No groups configured!",
+                    Wrap = true,
+                    HorizontalAlignment = AdaptiveHorizontalAlignment.Left,
+                };
 
             var messageTypeChoices = new List<AdaptiveChoice>();
             messageTypeChoices.Add(new AdaptiveChoice() { Title = "❕ Important", Value = "Important" });
@@ -113,6 +153,7 @@ namespace CrossVertical.Announcement.Models
                                            new AdaptiveTextBlock()
                                            {
                                                Text="Choose group(s) of people",
+                                               Wrap = true,
                                                HorizontalAlignment=AdaptiveHorizontalAlignment.Left,
                                            }
                                         },
@@ -122,16 +163,7 @@ namespace CrossVertical.Announcement.Models
                                     {
                                         Items=new List<AdaptiveElement>()
                                         {
-                                            new AdaptiveChoiceSetInput()
-                                            {
-                                               Id="groups",
-                                               Spacing=AdaptiveSpacing.None,
-
-                                               Choices=new List<AdaptiveChoice>(employeGroups),
-                                               IsMultiSelect=true,
-                                               Style=AdaptiveChoiceInputStyle.Compact,
-                                               Value = isEditCard? groupRecipients:""
-                                            },
+                                            groupsAdaptiveCardInput
                                         },
                                         Width="50"
                                     }
@@ -148,6 +180,7 @@ namespace CrossVertical.Announcement.Models
                                            new AdaptiveTextBlock()
                                            {
                                                Text="Choose channel(s) in Teams",
+                                               Wrap = true,
                                                HorizontalAlignment=AdaptiveHorizontalAlignment.Left,
                                            }
                                         },
@@ -157,16 +190,7 @@ namespace CrossVertical.Announcement.Models
                                     {
                                         Items=new List<AdaptiveElement>()
                                         {
-                                            new AdaptiveChoiceSetInput()
-                                            {
-                                               Id="channels",
-                                               Spacing=AdaptiveSpacing.None,
-                                               Value = isEditCard? channelRecipients:"",
-                                               Choices =new List<AdaptiveChoice>(channels),
-                                               IsMultiSelect=true,
-                                               Style=AdaptiveChoiceInputStyle.Compact
-
-                                            },
+                                            channelsAdaptiveCardInput
                                         },
                                         Width="50"
                                     }
@@ -583,11 +607,11 @@ namespace CrossVertical.Announcement.Models
                                          {
                                              new AdaptiveTextBlock(){
                                                  Id = "authorName",
-                                                 Text = Author?.Name, // "SERENA RIBEIRO",
+                                                 Text = Author?.Name??string.Empty, // "SERENA RIBEIRO",
                                                  Weight =AdaptiveTextWeight.Bolder,Wrap=true},
                                              new AdaptiveTextBlock(){
                                                  Id = "authorRole",
-                                                 Text = Author?.Role, //"Chief of Staff, Contoso Management",
+                                                 Text = Author?.Role??string.Empty, //"Chief of Staff, Contoso Management",
                                                  Size =AdaptiveTextSize.Small,Spacing=AdaptiveSpacing.None,IsSubtle=true,Wrap=true}
                                          }
                                     }
@@ -610,7 +634,7 @@ namespace CrossVertical.Announcement.Models
 
             // Image element without url does not render on phone. Remove empty images.
             AdaptiveElement adaptiveElement = previewCard.Body.FirstOrDefault(i => i.Id == "bannerImage");
-            if(!Uri.IsWellFormedUriString(ImageUrl, UriKind.Absolute) && adaptiveElement != null )
+            if (!Uri.IsWellFormedUriString(ImageUrl, UriKind.Absolute) && adaptiveElement != null)
             {
                 previewCard.Body.Remove(adaptiveElement);
             }
