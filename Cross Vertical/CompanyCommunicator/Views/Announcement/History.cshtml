@@ -197,7 +197,7 @@
                                 {
                                     <span class="shape-format-exclamtion" alt="group"></span>
                                 }
-                                <span class="title" onclick="submit('preview', '@item.Id')">@item.Title</span>
+                                <span class="title">@item.Title</span>
                                 <div class="dropdown dots">
                                     <span class="line1" id="dLabel" type="image"
                                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" alt="group"></span>
@@ -255,27 +255,27 @@
                                     @if (item.Recipients == string.Empty || item.Recipients == ", ")
                                     {
                                         <span>
-                                            <span class='line-grp2' alt="grp1-img" onclick="submit('viewChannelAudiance', '@item.Id')"></span>
+                                            <span class='line-grp2' alt="grp1-img"></span>
                                         </span>
                                         <span class="fix1">@item.RecipientCount</span>
                                     }
                                     else if (item.RecipientChannelNames == string.Empty || item.RecipientChannelNames == ",")
                                     {
                                         <span>
-                                            <span class='line-grp1' alt="grp-img" onclick="submit('viewGroupAudiance', '@item.Id')"></span>
+                                            <span class='line-grp1' alt="grp-img" ></span>
                                         </span>
-                                        <span class="fix" onclick="submit('viewGroupAudiance', '@item.Id')">@item.RecipientCount</span>
+                                        <span class="fix">@item.RecipientCount</span>
                                     }
                                     else
                                     {
                                         <span>
-                                            <span class='line-grp2' alt="grp1-img" onclick="submit('viewChannelAudiance', '@item.Id')"></span>
+                                            <span class='line-grp2' alt="grp1-img" ></span>
                                         </span>
                                         <span class="fix1">@item.RecipientCount</span>
                                         <span>
-                                            <span class='line-grp1' alt="grp-img" onclick="submit('viewGroupAudiance', '@item.Id')"></span>
+                                            <span class='line-grp1' alt="grp-img"></span>
                                         </span>
-                                        <span class="fix" onclick="submit('viewGroupAudiance', '@item.Id')">@item.RecipientCount</span>
+                                        <span class="fix" >@item.RecipientCount</span>
                                     }
                                 </div>
                             </div>
