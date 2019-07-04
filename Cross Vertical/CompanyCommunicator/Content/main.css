@@ -7,11 +7,12 @@
 }
 
 .shape-format-exclamtion::before {
-    top:4px;
+    top: 4px;
     position: relative;
     font-family: "Teams Assets";
     content: "\E62B";
 }
+
 .shape-format::before {
     position: relative;
     top: 7px;
@@ -26,7 +27,9 @@
     font-size: 16px;
     font-family: "Teams Assets";
     content: "\E202";
+    cursor: pointer;
 }
+
 .line1::before {
     position: absolute;
     float: initial;
@@ -34,6 +37,7 @@
     content: "\E325";
     font-size: 19px;
 }
+
 .shape-format-count1::before {
     position: relative;
     top: 3px;
@@ -48,9 +52,27 @@
     font-size: 16px;
     font-family: "Teams Assets";
     content: "\E329";
+    cursor: pointer;
+}
+
+.shape-format-count4::before {
+    position: relative;
+    top: 3px;
+    font-size: 16px;
+    font-family: "Teams Assets";
+    content: "\E329";
 }
 
 .shape-format-count3::before {
+    position: relative;
+    top: 2px;
+    font-size: 16px;
+    font-family: "Teams Assets";
+    content: "\E912";
+    cursor: pointer;
+}
+
+.shape-format-count5::before {
     position: relative;
     top: 2px;
     font-size: 16px;
@@ -65,6 +87,7 @@
     font-family: "Teams Assets";
     content: "\E115";
 }
+
 .shape-format-draft::before {
     position: relative;
     top: 2px;
@@ -135,6 +158,7 @@
     font-family: "Teams Assets";
     content: "\E131";
 }
+
 .line-grp2::before {
     position: absolute;
     font-family: "Teams Assets";
@@ -193,7 +217,7 @@ button.favorite.styled {
 }
 
 tr.bor {
-    cursor: pointer;
+    /*cursor: pointer;*/
     font-family: "Segoe UI";
 }
 
@@ -206,6 +230,7 @@ table.table.table-hover {
     width: 35px;
     position: relative;
     bottom: 5px;
+    cursor: pointer;
 }
 
 .shape-format1 {
@@ -232,6 +257,7 @@ table.table {
 .info {
     position: relative;
     left: 20px;
+    cursor: pointer;
 }
 
 .both,
@@ -251,6 +277,7 @@ table.table {
 .align {
     font-kerning: auto;
     font-weight: 500;
+    cursor: pointer;
 }
 
 
@@ -353,18 +380,21 @@ button.favorite.styled2 {
         content: "\E346";
         font-size: 14px;
     }
+
     .sent-grp::before {
         position: relative;
         font-family: "Teams Assets";
         content: "\E412";
         font-size: 14px;
     }
+
     .schedule-grp::before {
         position: relative;
         font-family: "Teams Assets";
         content: "\E115";
         font-size: 14px;
     }
+
     button.favorite.styled2 {
         background-color: #6264a7;
         color: #fff;
@@ -411,6 +441,7 @@ button.favorite.styled2 {
         position: relative;
         right: 14px;
     }
+
     .draft-grp-three-states::before {
         position: relative;
         left: 2px;
@@ -419,6 +450,7 @@ button.favorite.styled2 {
         content: "\E346";
         font-size: 14px;
     }
+
     .sent-grp-three-states::before {
         position: relative;
         left: 2px;
@@ -427,6 +459,7 @@ button.favorite.styled2 {
         content: "\E412";
         font-size: 14px;
     }
+
     .schedule-grp-three-states::before {
         position: relative;
         left: 2px;
@@ -447,13 +480,13 @@ button.favorite.styled2 {
         width: 26px;
         bottom: 2px;
     }*/
-     .line-grp-three-states::before {
-            position: relative;
-            top: 2px;
-            font-family: "Teams Assets";
-            font-size: 14px;
-            content: "\E202";
-     }
+    .line-grp-three-states::before {
+        position: relative;
+        top: 2px;
+        font-family: "Teams Assets";
+        font-size: 14px;
+        content: "\E202";
+    }
 
     .line-grp-three-states1::before {
         position: relative;
@@ -652,7 +685,7 @@ button.favorite.styled2 {
     }*/
 
     span.fix {
-        top:2px;
+        top: 2px;
         position: absolute;
         left: 45%;
         font-size: 12px;

@@ -91,8 +91,8 @@
                                 @if (item.AckCount == 0)
                                 {
                                     <div class="col-4">
-                                        <span class="shape-format-count2" alt="group"></span>
-                                        <span id='count2'>@item.AckCount</span>
+                                        <span class="shape-format-count4" alt="group"></span>
+                                        <span id='count4'>@item.AckCount</span>
                                     </div>
                                 }
                                 else
@@ -105,8 +105,8 @@
                                 @if (item.LikeCount == 0)
                                 {
                                     <div class="col-4">
-                                        <span class="shape-format-count3" alt="group"></span>
-                                        <span id='count3'>@item.LikeCount</span>
+                                        <span class="shape-format-count5" alt="group"></span>
+                                        <span id='count5'>@item.LikeCount</span>
                                     </div>
                                 }
                                 else
@@ -262,20 +262,20 @@
                                     else if (item.RecipientChannelNames == string.Empty || item.RecipientChannelNames == ",")
                                     {
                                         <span>
-                                            <span class='line-grp1' alt="grp-img" ></span>
+                                            <span class='line-grp1' alt="grp-img"></span>
                                         </span>
                                         <span class="fix">@item.RecipientCount</span>
                                     }
                                     else
                                     {
                                         <span>
-                                            <span class='line-grp2' alt="grp1-img" ></span>
+                                            <span class='line-grp2' alt="grp1-img"></span>
                                         </span>
                                         <span class="fix1">@item.RecipientCount</span>
                                         <span>
-                                            <span class='line-grp1' alt="grp-img"></span>
+                                            <span class='line-grp1' alt="grp-img" ></span>
                                         </span>
-                                        <span class="fix" >@item.RecipientCount</span>
+                                        <span class="fix">@item.RecipientCount</span>
                                     }
                                 </div>
                             </div>
@@ -345,13 +345,32 @@
                                     <div>
                                         <span class="three-states-titles">
                                             Responses:
+                                        </span>
+                                        @if (item.AckCount == 0)
+                                        {
+                                            <span class='line-grp-three-states2' alt="grp-img"></span>
+                                            <span id='mb-ack-three-states'>@item.AckCount</span>
+                                        }
+                                        else
+                                        {
+
                                             <span class='line-grp-three-states2' alt="grp-img" onclick="submit('viewAckAnalytics', '@item.Id')"></span>
-                                        </span>
-                                        <span id='mb-ack-three-states' onclick="submit('viewAckAnalytics', '@item.Id')">@item.AckCount</span>
-                                        <span>
-                                            <span class='line-grp-three-states3' alt="grp1-img" onclick="submit('viewReactionAnalytics', '@item.Id')"></span>
-                                        </span>
-                                        <span id='mb-likes-three-states' onclick="submit('viewReactionAnalytics', '@item.Id')">@item.LikeCount</span>
+                                            <span id='mb-ack-three-states' onclick="submit('viewAckAnalytics', '@item.Id')">@item.AckCount</span>
+                                        }
+                                        @if (item.LikeCount == 0)
+                                        {
+                                            <span>
+                                                <span class='line-grp-three-states3' alt="grp1-img"></span>
+                                            </span>
+                                            <span id='mb-likes-three-states'>@item.LikeCount</span>
+                                        }
+                                        else
+                                        {
+                                            <span>
+                                                <span class='line-grp-three-states3' alt="grp1-img" onclick="submit('viewReactionAnalytics', '@item.Id')"></span>
+                                            </span>
+                                            <span id='mb-likes-three-states' onclick="submit('viewReactionAnalytics', '@item.Id')">@item.LikeCount</span>
+                                        }
                                     </div>
                                 </div>
                             </div>

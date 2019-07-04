@@ -1059,7 +1059,7 @@ namespace CrossVertical.Announcement.Dialogs
                                 var group = await Cache.Groups.GetItemAsync(groupId);
                                 if (group != null)
                                 {
-                                    groupInfoString.Append($"Group Name: **{group.Name}**  User count: **{ group.Users.Count}**");
+                                    groupInfoString.Append($"Group Name: **{group.Name}**  User count: **{ group.Users.Count}**\n\n");
                                 }
                             }
                             await context.PostAsync($"Successfully updated Group details for your tenant. Here are group details:\n\n" + groupInfoString.ToString());
