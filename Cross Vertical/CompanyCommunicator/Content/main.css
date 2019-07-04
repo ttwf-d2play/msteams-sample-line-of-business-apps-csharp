@@ -11,6 +11,7 @@
     position: relative;
     font-family: "Teams Assets";
     content: "\E62B";
+    
 }
 .shape-format::before {
     position: relative;
@@ -26,6 +27,7 @@
     font-size: 16px;
     font-family: "Teams Assets";
     content: "\E202";
+    cursor:pointer;
 }
 .line1::before {
     position: absolute;
@@ -48,9 +50,25 @@
     font-size: 16px;
     font-family: "Teams Assets";
     content: "\E329";
+    cursor:pointer;
+}
+.shape-format-count4::before {
+    position: relative;
+    top: 3px;
+    font-size: 16px;
+    font-family: "Teams Assets";
+    content: "\E329";
 }
 
 .shape-format-count3::before {
+    position: relative;
+    top: 2px;
+    font-size: 16px;
+    font-family: "Teams Assets";
+    content: "\E912";
+    cursor:pointer;
+}
+.shape-format-count5::before {
     position: relative;
     top: 2px;
     font-size: 16px;
@@ -193,7 +211,7 @@ button.favorite.styled {
 }
 
 tr.bor {
-    cursor: pointer;
+    /*cursor: pointer;*/
     font-family: "Segoe UI";
 }
 
@@ -206,6 +224,8 @@ table.table.table-hover {
     width: 35px;
     position: relative;
     bottom: 5px;
+    cursor:pointer;
+    
 }
 
 .shape-format1 {
@@ -232,6 +252,7 @@ table.table {
 .info {
     position: relative;
     left: 20px;
+    cursor:pointer;
 }
 
 .both,
@@ -251,6 +272,7 @@ table.table {
 .align {
     font-kerning: auto;
     font-weight: 500;
+    cursor:pointer;
 }
 
 
