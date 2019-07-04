@@ -36,6 +36,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace CrossVertical.Announcement.Dialogs
@@ -1042,7 +1043,7 @@ namespace CrossVertical.Announcement.Dialogs
                                         foreach (var possibleDL in group.DistributionLists)
                                         {
                                             var DLMembers = await graphHelper.GetAllMembersOfGroup(possibleDL);
-                                            group.Users.AddRange(DLMembers.Select(m => Common.RemoveHashFromGuestUserUPN(m.UserPrincipalName.ToLower())));
+                                            group.Users.AddRange(DLMembers.Select(m => Common.RemoveHashFromGuestUserUPN(m.userPrincipalName.ToLower())));
                                             group.Users = group.Users.Distinct().ToList();
                                         }
                                 }
@@ -1051,7 +1052,17 @@ namespace CrossVertical.Announcement.Dialogs
 
                             await Common.CreateOrUpdateExistingGroups(groupDetails, tenantData, true);
 
-                            await context.PostAsync($"Successfully updated Group details for your tenant.");
+                            var groups = new List<Group>();
+                            StringBuilder groupInfoString = new StringBuilder();
+                            foreach (var groupId in tenantData.Groups)
+                            {
+                                var group = await Cache.Groups.GetItemAsync(groupId);
+                                if (group != null)
+                                {
+                                    groupInfoString.Append($"Group Name: **{group.Name}**  User count: **{ group.Users.Count}**\n\n");
+                                }
+                            }
+                            await context.PostAsync($"Successfully updated Group details for your tenant. Here are group details:\n\n" + groupInfoString.ToString());
 
                             var reply = context.MakeMessage();
                             reply.Attachments.Add(CardHelper.GetWelcomeScreen(channelData.Team != null, Role.Admin));

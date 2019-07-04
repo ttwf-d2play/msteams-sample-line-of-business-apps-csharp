@@ -131,19 +131,14 @@ namespace CrossVertical.Announcement.Helpers
             return null;
         }
 
-        public async Task<List<User>> GetAllMembersOfGroup(string groupName)
+        public async Task<List<UserDetail>> GetAllMembersOfGroup(string groupName)
         {
-            var listOfMembers = new List<User>();
+            var listOfMembers = new List<UserDetail>();
             var group = await GetGroup(groupName);
             if (group == null)
                 return listOfMembers;
 
-            var graphClient = GetAuthenticatedClient();
-
-            var members = await graphClient.Groups[group.Id].Members.Request().GetAsync();
-
-            listOfMembers.AddRange(members.Select(m => m as User));
-            return listOfMembers;
+            return await FetchAllGroupMembersAsync(group.Id, null);
         }
 
         public async Task<string> GetUserProfilePhoto(string tenantId, string userId)
@@ -420,6 +415,48 @@ namespace CrossVertical.Announcement.Helpers
         public async Task<List<UserDetail>> FetchAllTenantMembersAsync(string nextUrl = null)
         {
             string endpoint = string.IsNullOrEmpty(nextUrl) ? ApplicationSettings.GraphApiEndpoint + $"users?$select=id,displayName,mail,userPrincipalName" : nextUrl;
+
+            List<UserDetail> allMembers = new List<UserDetail>();
+
+            using (var client = new HttpClient())
+            {
+
+                using (var request = new HttpRequestMessage(HttpMethod.Get, endpoint))
+                {
+
+                    request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
+
+                    using (HttpResponseMessage response = await client.SendAsync(request))
+                    {
+                        if (response.IsSuccessStatusCode)
+                        {
+                            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<TenantUserList>(await response.Content.ReadAsStringAsync());
+                            try
+                            {
+                                if (!string.IsNullOrEmpty(result.odatanextLink))
+                                {
+                                    var members = await FetchAllTenantMembersAsync(result.odatanextLink);
+                                    allMembers.AddRange(members);
+                                }
+                                allMembers.AddRange(result.value);
+
+                                return allMembers;
+                            }
+                            catch (Exception)
+                            {
+                                // Handle edge case.
+                            }
+                        }
+                        return allMembers;
+                    }
+                }
+            }
+        }
+
+        public async Task<List<UserDetail>> FetchAllGroupMembersAsync(string groupId, string nextUrl = null)
+        {
+            string endpoint = string.IsNullOrEmpty(nextUrl) ? ApplicationSettings.GraphApiEndpoint + $"groups/{groupId}/members?$select=id,displayName,mail,userPrincipalName" : nextUrl;
 
             List<UserDetail> allMembers = new List<UserDetail>();
 

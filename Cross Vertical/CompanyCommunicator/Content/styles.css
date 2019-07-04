@@ -257,8 +257,8 @@ center {
     cursor: pointer;
 }
 .rectpage {
-    padding: 6PX;
-    height: 34px;
+    /*padding: 6PX;*/
+    height: 47px;
     color: #6264A7;
     border: 1px solid #6264A7;
     border-radius: 2px;
