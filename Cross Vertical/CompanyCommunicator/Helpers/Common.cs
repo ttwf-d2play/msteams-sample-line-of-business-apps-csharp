@@ -82,7 +82,6 @@ namespace CrossVertical.Announcement.Helpers
             {
                 tenantData.Groups.Remove(nullGroup);
             }
-            await Cache.Tenants.AddOrUpdateItemAsync(tenantData.Id, tenantData);
         }
 
         public static Role GetUserRole(string emailId, Tenant tenatInfo)
