@@ -50,5 +50,19 @@ namespace CrossVertical.Announcement.Helpers
                 await Cache.Announcements.AddOrUpdateItemAsync(announcement.Id, announcement);
             }
         }
+
+        public static async Task CleanUpOldSchedules()
+        {
+            var allScheduledTask = await Cache.Announcements.GetAllItemsAsync(announcement =>
+                        announcement.Type == typeof(Models.Campaign).Name &&
+                        announcement != null &&
+                        announcement.Schedule != null &&
+                        announcement.Status == Models.Status.Scheduled);
+
+            foreach (var announcement in allScheduledTask)
+            {
+                Scheduler.RemoveSchedule(announcement.Id);
+            }
+        }
     }
 }

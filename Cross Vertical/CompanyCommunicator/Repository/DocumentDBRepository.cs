@@ -144,5 +144,20 @@ namespace CrossVertical.Announcement.Repository
                 }
             }
         }
+
+        public static async Task CleanUpAsync()
+        {
+            try
+            {
+                await client.DeleteDocumentCollectionAsync(UriFactory.CreateDocumentCollectionUri(DatabaseId, CollectionId));
+            }
+            catch (DocumentClientException e)
+            {
+                if (e.StatusCode != System.Net.HttpStatusCode.NotFound)
+                {
+                    throw;
+                }
+            }
+        }
     }
 }

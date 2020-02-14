@@ -26,8 +26,12 @@ using CrossVertical.Announcement.Helpers;
 using CrossVertical.Announcement.Models;
 using CrossVertical.Announcement.Repository;
 using CrossVertical.Announcement.ViewModels;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Table;
+using Microsoft.WindowsAzure.Storage.Table.Protocol;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Mvc;
@@ -368,6 +372,63 @@ namespace CrossVertical.Announcement.Controllers
 
             }
             return JObject.FromObject(item);
+        }
+
+        [Route("CleanDatabase")]
+        [HttpPost]
+        public async Task<ActionResult> CleanDatabase()
+        {
+            var authRequestHeader = Request.Headers["AuthKey"];
+            if (!string.IsNullOrEmpty(authRequestHeader) && ConfigurationManager.AppSettings["AuthKey"] == authRequestHeader)
+            {
+
+                // Clean up Schedules
+                await AnnouncementScheduler.CleanUpOldSchedules();
+                // Cleanup up database
+                await DocumentDBRepository.CleanUpAsync();
+                // Cleanup cached.
+                Cache.Clear();
+                // Delete profile photos
+                var baseDirectory = System.Web.Hosting.HostingEnvironment.MapPath($"~/ProfilePhotos/");
+                if (System.IO.Directory.Exists(baseDirectory))
+                {
+                    // Delete directory and then create it.
+                    System.IO.Directory.Delete(baseDirectory, true);
+                    System.IO.Directory.CreateDirectory(baseDirectory);
+                }
+
+                // Cleanup TableStorage
+                var storageAccountConnectionString = ConfigurationManager.AppSettings["AzureWebJobsStorage"];
+                var storageAccount = CloudStorageAccount.Parse(storageAccountConnectionString);
+                var tableClient = storageAccount.CreateCloudTableClient();
+                var table = tableClient.GetTableReference("botdata");
+                await table.DeleteIfExistsAsync();
+
+                // Recreate DB Collection
+                await DocumentDBRepository.Initialize();
+                await SafeCreateIfNotExists(table);
+                return new HttpStatusCodeResult(System.Net.HttpStatusCode.OK);
+            }
+            else
+                return new HttpStatusCodeResult(System.Net.HttpStatusCode.Forbidden, "Auth key does not match.");
+        }
+
+        public static async Task<bool> SafeCreateIfNotExists(CloudTable table, TableRequestOptions requestOptions = null, OperationContext operationContext = null)
+        {
+            do
+            {
+                try
+                {
+                    return table.CreateIfNotExists(requestOptions, operationContext);
+                }
+                catch (StorageException e)
+                {
+                    if ((e.RequestInformation.HttpStatusCode == 409) && (e.RequestInformation.ExtendedErrorInformation.ErrorCode.Equals(TableErrorCodeStrings.TableBeingDeleted)))
+                        await Task.Delay(2000);// The table is currently being deleted. Try again until it works.
+                    else
+                        throw;
+                }
+            } while (true);
         }
 
         #endregion

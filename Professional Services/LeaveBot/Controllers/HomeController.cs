@@ -195,6 +195,15 @@ namespace ProfessionalServices.LeaveBot.Controllers
                 // Cleanup up database
                 await DocumentDBRepository.CleanUpAsync();
 
+                // Delete profile photos
+                var baseDirectory = System.Web.Hosting.HostingEnvironment.MapPath($"~/ProfilePhotos/");
+                if (System.IO.Directory.Exists(baseDirectory))
+                {
+                    // Delete directory and then create it.
+                    System.IO.Directory.Delete(baseDirectory, true);
+                    System.IO.Directory.CreateDirectory(baseDirectory);
+                }
+
                 // Cleanup TableStorage
                 var storageAccountConnectionString = ConfigurationManager.AppSettings["AzureWebJobsStorage"];
                 var storageAccount = CloudStorageAccount.Parse(storageAccountConnectionString);
