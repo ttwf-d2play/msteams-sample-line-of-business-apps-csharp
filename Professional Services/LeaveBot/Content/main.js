@@ -21,7 +21,6 @@
             $("#allow-leave-paid").hide();
             $("#allow-leave-sick").hide();
             $("#allow-leave-carried").hide();
-
         } else if (text == "Remaining") {
             $("#remaining-paid-leaves").show();
             $("#remaining-paid-sick-leaves").show();

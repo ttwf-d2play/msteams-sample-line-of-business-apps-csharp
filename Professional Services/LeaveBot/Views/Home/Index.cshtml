@@ -13,22 +13,22 @@
           crossorigin="anonymous" />
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ"
           crossorigin="anonymous">
-   <link rel="stylesheet" href="~/Content/main.css" />
-   <title>Leave Bot</title>
+    <link rel="stylesheet" href="~/Content/main.css" />
+    <title>Leave Bot</title>
 </head>
 <body>
     @if (Model != null)
     {
-        <div class="container-fluid">
-            <div class="row">
-                @Html.Partial("_LeaveRight", Model)
-                @Html.Partial("_LeaveLeft", Model)
-            </div>
+    <div class="container-fluid">
+        <div class="row">
+            @Html.Partial("_LeaveRight", Model)
+            @Html.Partial("_LeaveLeft", Model)
         </div>
+    </div>
     }
     else
     {
-        <p style="font-weight:700;font-size:14px;">User details not found. Please go to bot</p>
+    <p style="font-weight:700;font-size:14px;">User details not found. Please go to bot</p>
     }
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
@@ -71,14 +71,14 @@
                                             return hex;
                                         }
                                         function _guid() {
-                                            var cryptoObj = window.crypto || window.msCrypto; 
+                                            var cryptoObj = window.crypto || window.msCrypto;
                                             if (cryptoObj && cryptoObj.getRandomValues) {
                                                 var buffer = new Uint8Array(16);
                                                 cryptoObj.getRandomValues(buffer);
-                                                buffer[6] |= 0x40; 
-                                                buffer[6] &= 0x4f; 
-                                                buffer[8] |= 0x80; 
-                                                buffer[8] &= 0xbf; 
+                                                buffer[6] |= 0x40;
+                                                buffer[6] &= 0x4f;
+                                                buffer[8] |= 0x80;
+                                                buffer[8] &= 0xbf;
                                                 return _decimalToHex(buffer[0]) + _decimalToHex(buffer[1]) + _decimalToHex(buffer[2]) + _decimalToHex(buffer[3]) + '-' + _decimalToHex(buffer[4]) + _decimalToHex(buffer[5]) + '-' + _decimalToHex(buffer[6]) + _decimalToHex(buffer[7]) + '-' +
 
                                                     _decimalToHex(buffer[8]) + _decimalToHex(buffer[9]) + '-' + _decimalToHex(buffer[10]) + _decimalToHex(buffer[11]) + _decimalToHex(buffer[12]) + _decimalToHex(buffer[13]) + _decimalToHex(buffer[14]) + _decimalToHex(buffer[15]);
@@ -96,7 +96,7 @@
                                                     if (guidHolder[i] === 'x') {
                                                         guidResponse += hex[r];
                                                     } else if (guidHolder[i] === 'y') {
-                                                        r &= 0x3; 
+                                                        r &= 0x3;
                                                         r |= 0x8;
                                                         guidResponse += hex[r];
                                                     } else {
@@ -144,5 +144,4 @@
                             }
     </script>
 </body>
-
 </html>

@@ -1,8 +1,8 @@
-﻿using System.Web.Http;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using ProfessionalServices.LeaveBot.Helpers;
+using System.Web.Http;
 
 namespace ProfessionalServices.LeaveBot
 {

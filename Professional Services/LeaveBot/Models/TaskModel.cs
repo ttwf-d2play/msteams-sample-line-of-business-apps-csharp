@@ -26,7 +26,6 @@ namespace TaskModule
 
         [JsonProperty("completionBotId")]
         public string CompletionBotId { get; set; }
-
     }
 
     public class TaskEnvelope

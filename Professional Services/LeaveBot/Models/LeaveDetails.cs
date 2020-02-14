@@ -50,13 +50,13 @@ namespace ProfessionalServices.LeaveBot.Models
 
         [JsonProperty(PropertyName = "conversationId")]
         public string ConversationId { get; set; }
-
     }
 
     public class UpdateMessageInfo
     {
         [JsonProperty(PropertyName = "employee")]
         public string Employee { get; set; }
+
         [JsonProperty(PropertyName = "manager")]
         public string Manager { get; set; }
     }
@@ -83,7 +83,6 @@ namespace ProfessionalServices.LeaveBot.Models
         Personal,
         Other
     }
-    
 
     public enum LeaveType
     {
@@ -120,13 +119,9 @@ namespace ProfessionalServices.LeaveBot.Models
         public string lastUsed { get; set; }
 
         public string BaseUri { get; set; }
-
-       
-
-        
     }
 
-    public class ManagerDetails:LeaveDetails
+    public class ManagerDetails : LeaveDetails
     {
         public bool IsManager { get; set; }
 
@@ -138,6 +133,7 @@ namespace ProfessionalServices.LeaveBot.Models
         public string nextholiday { get; set; }
 
         public string mgrEndDateVal { get; set; }
+
         public List<LeaveExtended> mgrLeaveData
         {
             get; set;

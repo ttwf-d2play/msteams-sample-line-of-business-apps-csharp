@@ -1,4 +1,5 @@
 ﻿using System.Configuration;
+
 namespace ProfessionalServices.LeaveBot.Helper
 {
     public static class ApplicationSettings
