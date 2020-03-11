@@ -21,8 +21,10 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 using CrossVertical.Announcement.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace CrossVertical.Announcement.Repository
@@ -53,6 +55,17 @@ namespace CrossVertical.Announcement.Repository
             return CachedItems.Values.ToList();
         }
 
+        public async Task<List<T>> GetAllItemsAsync(Expression<Func<T, bool>> predicate)
+        {
+            var items = await DocumentDBRepository.GetItemsAsync<T>(predicate);
+            foreach (T item in items)
+            {
+                if (!CachedItems.ContainsKey(item.Id))
+                    CachedItems.Add(item.Id, item);
+            }
+            return items.ToList();
+        }
+
         public async Task<T> GetItemAsync(string id)
         {
             if (string.IsNullOrEmpty(id))
@@ -81,7 +94,8 @@ namespace CrossVertical.Announcement.Repository
 
         public async Task AddOrUpdateItemAsync(string id, T item)
         {
-            if (CachedItems.ContainsKey(id))
+            var existingItem = await GetItemAsync(id);
+            if (existingItem != null)
             {
                 // Update Existing
                 await DocumentDBRepository.UpdateItemAsync(id, item);
@@ -89,8 +103,15 @@ namespace CrossVertical.Announcement.Repository
             }
             else
             {
-                await DocumentDBRepository.CreateItemAsync(item);
-                CachedItems.Add(id, item);
+                try
+                {
+                    await DocumentDBRepository.CreateItemAsync(item);
+                    CachedItems.Add(id, item);
+                }
+                catch (System.Exception ex)
+                {
+                    Helpers.ErrorLogService.LogError(ex);
+                }
             }
         }
 

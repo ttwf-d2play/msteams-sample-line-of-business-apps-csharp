@@ -30,10 +30,9 @@ using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Connector;
 using Microsoft.Bot.Connector.Teams;
 using Microsoft.Bot.Connector.Teams.Models;
-
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -67,6 +66,7 @@ namespace CrossVertical.Announcement.Controllers
                     await HandleReactions(activity);
                     break;
             }
+
             return new HttpResponseMessage(HttpStatusCode.Accepted);
         }
 
@@ -90,12 +90,12 @@ namespace CrossVertical.Announcement.Controllers
                         var channelData = activity.GetChannelData<TeamsChannelData>();
                         var tid = channelData.Tenant.Id;
 
-                        string emailId = await RootDialog.GetUserEmailId(activity);
-                        if (emailId == null)
+                        string currentUser = await RootDialog.GetCurrentUserEmailId(activity);
+                        if (currentUser == null)
                         {
                             return new HttpResponseMessage(HttpStatusCode.OK);
                         }
-                        var response = await MessageExtension.HandleMessageExtensionQuery(connector, activity, tid, emailId);
+                        var response = await MessageExtension.HandleMessageExtensionQuery(connector, activity, tid, currentUser);
                         return response != null
                             ? Request.CreateResponse(response)
                             : new HttpResponseMessage(HttpStatusCode.OK);
@@ -151,8 +151,8 @@ namespace CrossVertical.Announcement.Controllers
                     taskInfo.Title = "Details";
                     var showDetails = JsonConvert.DeserializeObject<TaskModule.TaskModuleActionData<AnnouncementActionDetails>>(activityValue);
                     card = await CardHelper.GetPreviewAnnouncementCard(showDetails.Data.Data.Id);
-                   taskInfo.Height = 900;
-                   taskInfo.Width = 600;
+                    taskInfo.Height = 900;
+                    taskInfo.Width = 600;
 
                     break;
                 case Constants.ShowEditAnnouncementTaskModule:
@@ -163,8 +163,8 @@ namespace CrossVertical.Announcement.Controllers
                     if (campaign == null || campaign.Status == Status.Sent)
                     {
                         card = CardHelper.GetUpdateMessageCard($"This {Helper.ApplicationSettings.AppFeature} is already sent and not allowed to edit.");
-                       taskInfo.Height = 100;
-                       taskInfo.Width = 500;
+                        taskInfo.Height = 100;
+                        taskInfo.Width = 500;
                     }
                     else
                         card = await CardHelper.GetEditAnnouncementCard(editAnnouncement.Data.Data.Id, tenantId);
@@ -179,7 +179,7 @@ namespace CrossVertical.Announcement.Controllers
                 Task = new TaskModuleContinueResponse
                 {
                     Type = "continue",
-                    Value =taskInfo
+                    Value = taskInfo
                 }
             };
 
@@ -193,7 +193,6 @@ namespace CrossVertical.Announcement.Controllers
 
             // Ensure that we have an entry for this tenant in the database
             var tenant = await Common.CheckAndAddTenantDetails(channelData.Tenant.Id);
-            await RootDialog.CheckAndAddUserDetails(message, channelData);
 
             // Treat 1:1 add/remove events as if they were add/remove of a team member
             if (channelData.EventType == null)
@@ -210,6 +209,15 @@ namespace CrossVertical.Announcement.Controllers
                     // Team member was added (user or bot)
                     if (message.MembersAdded.Any(m => m.Id.Contains(message.Recipient.Id)))
                     {
+                        if (channelData.Team == null)
+                        {
+                            if (message.From.Id == message.Recipient.Id)
+                                return;
+                            var userEmailId = await RootDialog.GetCurrentUserEmailId(message);
+                            var userFromDB = await Cache.Users.GetItemAsync(userEmailId);
+                            if (userFromDB != null)
+                                return;
+                        }
                         // Bot was added to a team: send welcome message
                         message.Text = Constants.ShowWelcomeScreen;
                         await Conversation.SendAsync(message, () => new RootDialog());
@@ -293,11 +301,9 @@ namespace CrossVertical.Announcement.Controllers
                     if (!messageFound && channelData.Team != null)
                         foreach (var channel in announcement.Recipients.Channels)
                         {
-                            //var user = channel.LikedUsers.FirstOrDefault(u => u.MessageId == replyToId);
-
                             if (channel.Channel.MessageId == replyToId)
                             {
-                                var EmailId = await RootDialog.GetUserEmailId(message);
+                                var EmailId = await RootDialog.GetCurrentUserEmailId(message);
                                 if (message.ReactionsAdded != null && message.ReactionsAdded.Count != 0)
                                 {
                                     if (!channel.LikedUsers.Contains(EmailId))
@@ -308,7 +314,6 @@ namespace CrossVertical.Announcement.Controllers
                                     if (channel.LikedUsers.Contains(EmailId))
                                         channel.LikedUsers.Remove(EmailId);
                                 }
-                                // channel.Channel.LikeCount += reactionToAdd;
                                 messageFound = true;
                                 break;
 
@@ -408,9 +413,11 @@ namespace CrossVertical.Announcement.Controllers
                 }
                 else
                 {
+                    var teamChannelData = message.GetChannelData<TeamsChannelDataExt>();
                     team = new Team
                     {
-                        Id = channelData.Team.Id
+                        Id = channelData.Team.Id,
+                        AadObjectId = teamChannelData.Team.AADGroupId
                     };
                 }
 
@@ -438,39 +445,65 @@ namespace CrossVertical.Announcement.Controllers
         private static async Task SendWelcomeMessageToAllMembers(Tenant tenant, Activity message, TeamsChannelData channelData, IEnumerable<TeamsChannelAccount> members)
         {
             var tid = channelData.Tenant.Id;
-            var emailId = await RootDialog.GetUserEmailId(message);
+            var currentUser = members.FirstOrDefault(m => m.Id == message.From.Id)?.AsTeamsChannelAccount()?.UserPrincipalName?.ToLower();
             var tenatInfo = await Cache.Tenants.GetItemAsync(tid);
-            Role role = Common.GetUserRole(emailId, tenatInfo);
-            var card = CardHelper.GetWelcomeScreen(false, role);
+            var moderatorCard = CardHelper.GetWelcomeScreen(false, Role.Moderator);
+            var userCard = CardHelper.GetWelcomeScreen(false, Role.User);
+            var newUsers = new List<User>();
+
             foreach (var member in members)
             {
-                var userDetails = await Cache.Users.GetItemAsync(member.UserPrincipalName.ToLower());
-                if (userDetails == null)
+                var emailId = member.UserPrincipalName.ToLower().Trim();
+
+                emailId = Common.RemoveHashFromGuestUserUPN(emailId);
+
+                if (!tenatInfo.Users.Contains(emailId))
                 {
-                    userDetails = new User()
+                    var userDetails = new User()
                     {
                         BotConversationId = member.Id,
-                        Id = member.UserPrincipalName.ToLower().Trim(),
-                        Name = member.Name ?? member.GivenName
+                        Id = emailId,
+                        Name = member.Name ?? member.GivenName,
+                        AadObjectId = member.AadObjectId
+                        
                     };
-                    await Cache.Users.AddOrUpdateItemAsync(userDetails.Id, userDetails);
-
                     tenant.Users.Add(userDetails.Id);
-                    await Cache.Tenants.AddOrUpdateItemAsync(tenant.Id, tenant);
+                    newUsers.Add(userDetails);
+                }
+            }
 
-                    if (tenant.IsAdminConsented)
-                    {
-                        if (tenant.Moderators.Contains(userDetails.Id))
-                        {
-                            await ProactiveMessageHelper.SendNotification(message.ServiceUrl, channelData.Tenant.Id, member.Id, null, card);
-                        }
-                        else
-                        {
-                            // Get User welcome card.
-                            await ProactiveMessageHelper.SendNotification(message.ServiceUrl, channelData.Tenant.Id, member.Id,
-                                $"Welcome to {ApplicationSettings.AppName}. We will deliver company {ApplicationSettings.AppFeature}s here.", null);
-                        }
-                    }
+            var importResult = await DocumentDBRepository.BulkExecutor.BulkImportAsync(newUsers);
+            if (importResult.NumberOfDocumentsImported != newUsers.Count)
+            {
+                // TODO: Take action
+            }
+
+            // Save all the user's details in the tenant.
+            await Cache.Tenants.AddOrUpdateItemAsync(tenant.Id, tenant);
+
+            // Comment this if you don't want to send welcome message to each new user.
+            if (tenant.IsAdminConsented && newUsers.Count > 0)
+            {
+
+                var serviceUrl = message.ServiceUrl;
+                var tenantId = channelData.Tenant.Id;
+                var results = new ConcurrentBag<NotificationSendStatus>();
+                await Common.ForEachAsync(newUsers, ApplicationSettings.NoOfParallelTasks,
+                async userDetails =>
+                {
+                    Attachment card = tenant.Moderators.Contains(userDetails.Id) ? moderatorCard : userCard;
+                    var result = await ProactiveMessageHelper.SendPersonalNotification(serviceUrl, tenantId, userDetails, null, card);
+                    results.Add(result);
+                });
+
+                var owner = await Cache.Users.GetItemAsync(currentUser);
+                if (owner != null)
+                {
+                    var successCount = results.Count(m => m.IsSuccessful);
+
+                    await ProactiveMessageHelper.SendPersonalNotification(serviceUrl, tenantId, owner,
+                                                $"Process of sending welcome message to all members of {channelData.Team.Name} completed. Successful: {successCount}. " +
+                                                $"Failure: {results.Count - successCount}.", null);
                 }
             }
         }
