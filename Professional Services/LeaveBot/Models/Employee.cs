@@ -3,7 +3,6 @@ using System.Linq;
 
 namespace ProfessionalServices.LeaveBot.Models
 {
-
     public class Employee
     {
         [JsonIgnore]
@@ -34,7 +33,7 @@ namespace ProfessionalServices.LeaveBot.Models
         public string Name { get; set; }
 
         [JsonIgnore]
-        public string DisplayName { get { return (Name??string.Empty).Split(' ').First(); } }
+        public string DisplayName { get { return (Name ?? string.Empty).Split(' ').First(); } }
 
         [JsonIgnore]
         public int Totalleaves { get; set; }
@@ -53,7 +52,6 @@ namespace ProfessionalServices.LeaveBot.Models
 
         [JsonProperty(PropertyName = "jobTitle")]
         public string JobTitle { get; set; }
-
     }
 
     public class LeaveBalance

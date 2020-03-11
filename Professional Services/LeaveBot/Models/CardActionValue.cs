@@ -25,5 +25,4 @@ namespace TaskModule
         [JsonProperty("data")]
         public BotFrameworkCardValue<T> Data { get; set; }
     }
-
 }

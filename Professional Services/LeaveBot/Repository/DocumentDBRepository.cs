@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using Microsoft.Azure.Documents;
+﻿using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using Microsoft.Azure.Documents.Linq;
+using System;
+using System.Collections.Generic;
 using System.Configuration;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using System.Net;
-using ProfessionalServices.LeaveBot.Models;
 
 namespace ProfessionalServices.LeaveBot.Repository
 {
@@ -78,6 +75,13 @@ namespace ProfessionalServices.LeaveBot.Repository
             CreateCollectionIfNotExistsAsync().Wait();
         }
 
+        public static async Task InitializeAsync()
+        {
+            client = new DocumentClient(new Uri(ConfigurationManager.AppSettings["endpoint"]), ConfigurationManager.AppSettings["authKey"]);
+            await CreateDatabaseIfNotExistsAsync();
+            await CreateCollectionIfNotExistsAsync();
+        }
+
         private static async Task CreateDatabaseIfNotExistsAsync()
         {
             try
@@ -113,6 +117,21 @@ namespace ProfessionalServices.LeaveBot.Repository
                         new RequestOptions { OfferThroughput = 1000 });
                 }
                 else
+                {
+                    throw;
+                }
+            }
+        }
+
+        public static async Task CleanUpAsync()
+        {
+            try
+            {
+                await client.DeleteDocumentCollectionAsync(UriFactory.CreateDocumentCollectionUri(DatabaseId, CollectionId));
+            }
+            catch (DocumentClientException e)
+            {
+                if (e.StatusCode != System.Net.HttpStatusCode.NotFound)
                 {
                     throw;
                 }

@@ -1,15 +1,12 @@
 ﻿<html>
 <body>
-    
+
     <form>
         <input type="radio" name="leavebot" value="leaveboard" onclick="onClick();"> Leave Board<br>
         <input type="radio" name="leavebot" value="holidays" onclick="onClick();"> Public Holidays<br />
         <input type="radio" name="leavebot" value="help" onclick="onClick();"> Help<br />
-       
     </form>
 
-
-    
     <script src="MicrosoftTeams.min.js"></script>
     <script type="text/javascript">
         microsoftTeams.initialize();
@@ -47,7 +44,6 @@
         function onClick() {
             microsoftTeams.settings.setValidityState(true);
         }
-
     </script>
 </body>
 </html>

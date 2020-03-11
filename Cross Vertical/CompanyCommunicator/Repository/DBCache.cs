@@ -36,6 +36,15 @@ namespace CrossVertical.Announcement.Repository
         public static DBCache<Team> Teams { get; set; } = new DBCache<Team>();
         public static DBCache<User> Users { get; set; } = new DBCache<User>();
         public static DBCache<Campaign> Announcements { get; set; } = new DBCache<Campaign>();
+
+        public static void Clear()
+        {
+            Tenants = new DBCache<Tenant>();
+            Groups = new DBCache<Group>();
+            Teams = new DBCache<Team>();
+            Users = new DBCache<User>();
+            Announcements = new DBCache<Campaign>();
+        }
     }
 
     public class DBCache<T> where T : DatabaseItem

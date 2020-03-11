@@ -1,5 +1,6 @@
 ﻿using AdaptiveCards;
 using Microsoft.Bot.Connector;
+using Newtonsoft.Json;
 using ProfessionalServices.LeaveBot.Helper;
 using ProfessionalServices.LeaveBot.Helpers;
 using ProfessionalServices.LeaveBot.Models;
@@ -11,17 +12,14 @@ namespace ProfessionalServices.LeaveBot
 {
     public class EchoBot
     {
-
         public static Attachment WelcomeLeaveCard(string userName, bool isManager)
         {
             var WelcomeCard = new AdaptiveCard()
             {
                 Body = new List<AdaptiveElement>()
                 {
-
                     new AdaptiveContainer
                     {
-
                         Items=new List<AdaptiveElement>()
                         {
                             new AdaptiveImage()
@@ -142,13 +140,8 @@ namespace ProfessionalServices.LeaveBot
                                     }
                                 }
                             }
-
-
-
-
                         }
                     }
-
              }
             };
 
@@ -234,12 +227,10 @@ namespace ProfessionalServices.LeaveBot
 
             var LeaveRequest = new AdaptiveCard()
             {
-
                 Body = new List<AdaptiveElement>()
                 {
                     new AdaptiveContainer
                     {
-
                         Items=new List<AdaptiveElement>()
                         {
                              new AdaptiveColumnSet()
@@ -253,11 +244,7 @@ namespace ProfessionalServices.LeaveBot
                                 {
                                     new AdaptiveTextBlock(){Text="From", Weight=AdaptiveTextWeight.Lighter,Size=AdaptiveTextSize.Medium,Wrap=true },
                                     new AdaptiveDateInput(){Id="FromDate",Placeholder="From Date", Value = leaveDetails?.StartDate.Date.ToUniversalTime().ToString("u") }
-
-
                                 }
-
-
                             },
                             new AdaptiveColumn()
                             {
@@ -267,15 +254,10 @@ namespace ProfessionalServices.LeaveBot
                                    new AdaptiveTextBlock(){Text="Duration", Weight=AdaptiveTextWeight.Lighter,Size=AdaptiveTextSize.Medium,Wrap=true },
                                     new AdaptiveChoiceSetInput(){Id="FromDuration",  Choices=new List<AdaptiveChoice>(durations), IsMultiSelect=false,Style=AdaptiveChoiceInputStyle.Compact,
                                         Value =leaveDetails!=null? leaveDetails.StartDate.Type.ToString() : DayType.FullDay.ToString() }
-
                                 }
-
                             }
                         }
-
                     },
-
-
                         }
                     },
                     new AdaptiveContainer
@@ -293,11 +275,7 @@ namespace ProfessionalServices.LeaveBot
                                 {
                                     new AdaptiveTextBlock(){Text="To", Weight=AdaptiveTextWeight.Lighter,Size=AdaptiveTextSize.Medium,Wrap=true },
                                     new AdaptiveDateInput(){Id="ToDate",Placeholder="To Date", Value = leaveDetails?.EndDate.Date.ToUniversalTime().ToString("u")}
-
-
                                 }
-
-
                             },
                             new AdaptiveColumn()
                             {
@@ -307,15 +285,10 @@ namespace ProfessionalServices.LeaveBot
                                    new AdaptiveTextBlock(){Text="Duration", Weight=AdaptiveTextWeight.Lighter,Size=AdaptiveTextSize.Medium,Wrap=true },
                                     new AdaptiveChoiceSetInput(){Id="ToDuration", Choices=new List<AdaptiveChoice>(durations), IsMultiSelect=false, Style=AdaptiveChoiceInputStyle.Compact,
                                         Value =leaveDetails!=null? leaveDetails.EndDate.Type.ToString() : DayType.FullDay.ToString()}
-
                                 }
-
                             }
                         }
-
                     },
-
-
                         }
                     },
                     new AdaptiveContainer()
@@ -325,11 +298,9 @@ namespace ProfessionalServices.LeaveBot
                             new AdaptiveTextBlock(){Text="Please specify a reason for your leave", Color=AdaptiveTextColor.Accent, Weight=AdaptiveTextWeight.Lighter, Size=AdaptiveTextSize.Default}
                         }
                     }
-
                 },
                 Actions = new List<AdaptiveAction>()
                 {
-
                     new AdaptiveShowCardAction()
                     {
                         Title="Vacation",
@@ -361,19 +332,14 @@ namespace ProfessionalServices.LeaveBot
                                             Items=new List<AdaptiveElement>()
                                             {
                                                 new AdaptiveTextBlock(){Text="Yay! Have a great vacation!"}
-
                                             }
-
                                         }
                                     }
-
                                 },
-
-
                                     }
                                 }
                              ,
-                              new AdaptiveChoiceSetInput(){Id="LeaveType", Choices=new List<AdaptiveChoice>{paidLeave, optionalLeave, carriedOverLeave  } , IsMultiSelect=false, Style=AdaptiveChoiceInputStyle.Compact,
+                              new AdaptiveChoiceSetInput(){Id="LeaveTypeVacation", Choices=new List<AdaptiveChoice>{paidLeave, optionalLeave, carriedOverLeave  } , IsMultiSelect=false, Style=AdaptiveChoiceInputStyle.Compact,
                                   Value  = leaveDetails?.LeaveCategory== LeaveCategory.Vacation?leaveDetails.LeaveType.ToString():"" , IsRequired=true},
                               new AdaptiveTextInput(){Id="LeaveReason", IsMultiline=true,MaxLength=300, IsRequired=true, Placeholder="Comments (Optional)",
                               Value = leaveDetails?.LeaveCategory== LeaveCategory.Vacation?leaveDetails.EmployeeComment:""}
@@ -419,19 +385,14 @@ namespace ProfessionalServices.LeaveBot
                                             Items=new List<AdaptiveElement>()
                                             {
                                                 new AdaptiveTextBlock(){Text="Get well soon!"}
-
                                             }
-
                                         }
                                     }
-
                                 },
-
-
                                     }
                                 }
                                ,
-                              new AdaptiveChoiceSetInput(){Id="LeaveType", Choices=new List<AdaptiveChoice>(){ sickLeave }, IsMultiSelect=false, Style=AdaptiveChoiceInputStyle.Compact,
+                              new AdaptiveChoiceSetInput(){Id="LeaveTypeSickness", Choices=new List<AdaptiveChoice>(){ sickLeave }, IsMultiSelect=false, Style=AdaptiveChoiceInputStyle.Compact,
                                   Value  = leaveDetails?.LeaveCategory== LeaveCategory.Sickness?leaveDetails.LeaveType.ToString():"" , IsRequired=true},
                               new AdaptiveTextInput(){Id="LeaveReason", IsMultiline=true,MaxLength=300, IsRequired=true, Placeholder="Comments (Optional)",
                                Value = leaveDetails?.LeaveCategory== LeaveCategory.Sickness?leaveDetails.EmployeeComment:""}
@@ -478,14 +439,12 @@ namespace ProfessionalServices.LeaveBot
                                             {
                                                     new AdaptiveTextBlock(){Text="Go ahead"}
                                             }
-
                                         }
                                     }
-
                                 },
                                     }
                                 },
-                              new AdaptiveChoiceSetInput(){Id="LeaveType", Choices=new List<AdaptiveChoice>() { paidLeave, optionalLeave, carriedOverLeave }, IsMultiSelect=false, Style=AdaptiveChoiceInputStyle.Compact,
+                              new AdaptiveChoiceSetInput(){Id="LeaveTypePersonal", Choices=new List<AdaptiveChoice>() { paidLeave, optionalLeave, carriedOverLeave }, IsMultiSelect=false, Style=AdaptiveChoiceInputStyle.Compact,
                                   Value =leaveDetails?.LeaveCategory== LeaveCategory.Personal?leaveDetails.LeaveType.ToString():"", IsRequired=true},
                               new AdaptiveTextInput(){Id="LeaveReason", IsMultiline=true,MaxLength=300, IsRequired=true, Placeholder="Comments (Optional)",
                                   Value = leaveDetails?.LeaveCategory== LeaveCategory.Personal?leaveDetails.EmployeeComment:""}
@@ -509,7 +468,7 @@ namespace ProfessionalServices.LeaveBot
                           {
                               new AdaptiveTextInput(){Id="LeaveReason", IsMultiline=true,MaxLength=300, IsRequired=true, Placeholder="Comments (Optional)",
                               Value = leaveDetails?.LeaveCategory== LeaveCategory.Other?leaveDetails.EmployeeComment:""},
-                              new AdaptiveChoiceSetInput(){Id="LeaveType", Choices=new List<AdaptiveChoice>() { optionalLeave, maternityLeave, paternityLeave, caregiverLeave }, IsMultiSelect=false, Style=AdaptiveChoiceInputStyle.Compact,
+                              new AdaptiveChoiceSetInput(){Id="LeaveTypeOther", Choices=new List<AdaptiveChoice>() { optionalLeave, maternityLeave, paternityLeave, caregiverLeave }, IsMultiSelect=false, Style=AdaptiveChoiceInputStyle.Compact,
                                   Value =leaveDetails?.LeaveCategory== LeaveCategory.Other?leaveDetails.LeaveType.ToString():"", IsRequired=true},
                           },
                           Actions=new List<AdaptiveAction>()
@@ -522,7 +481,6 @@ namespace ProfessionalServices.LeaveBot
                           }
                        }
                     }
-
                 },
             };
             if (leaveDetails != null)
@@ -560,13 +518,16 @@ namespace ProfessionalServices.LeaveBot
                 case LeaveStatus.Pending:
                     leaveMessage = $"{employee.DisplayName} has requested for {leaveType} for {dayCount} days";
                     break;
+
                 case LeaveStatus.Rejected:
                 case LeaveStatus.Approved:
                     leaveMessage = $"{employee.DisplayName}'s {dayCount} days {leaveType} is {leaveDetails.Status.ToString()}";
                     break;
+
                 case LeaveStatus.Withdrawn:
                     leaveMessage = $"{employee.DisplayName} has withdrawn this leave.";
                     break;
+
                 default:
                     break;
             }
@@ -588,11 +549,9 @@ namespace ProfessionalServices.LeaveBot
                                 Width=AdaptiveColumnWidth.Auto,
                                 Items=new List<AdaptiveElement>()
                                 {
-
                                     new AdaptiveImage(){Size=AdaptiveImageSize.Large,Url=photoUri,
                                         Style =AdaptiveImageStyle.Person}
                                 }
-
                             },
                             new AdaptiveColumn()
                             {
@@ -608,16 +567,12 @@ namespace ProfessionalServices.LeaveBot
                                      new AdaptiveTextBlock(){Text=$"{startDate}   - {endDate}, {leaveDetails.EndDate.Date.Year}",Size=AdaptiveTextSize.Default,Wrap=true},
                                      new AdaptiveTextBlock(){Text=$"Reason: {leaveType}",Weight=AdaptiveTextWeight.Bolder,Size=AdaptiveTextSize.Medium,Wrap=true},
                                     new AdaptiveTextBlock(){Text=leaveDetails.EmployeeComment,HorizontalAlignment=AdaptiveHorizontalAlignment.Left,Wrap=true }
-
                                 }
-
                             }
                         }
-
                     },
                         }
                     }
-
                 },
                 Actions = new List<AdaptiveAction>()
                 {
@@ -637,7 +592,6 @@ namespace ProfessionalServices.LeaveBot
                               {
                                   Title="Approve",
                                   DataJson= @"{'Type':'" + Constants.ApproveLeave+"', 'LeaveId':'" + leaveDetails.LeaveId+"'}"
-
                               }
                           }
                        }
@@ -698,15 +652,19 @@ namespace ProfessionalServices.LeaveBot
                 case LeaveStatus.Pending:
                     statusColor = AdaptiveTextColor.Warning;
                     break;
+
                 case LeaveStatus.Approved:
                     statusColor = AdaptiveTextColor.Good;
                     break;
+
                 case LeaveStatus.Rejected:
                     statusColor = AdaptiveTextColor.Attention;
                     break;
+
                 case LeaveStatus.Withdrawn:
                     statusColor = AdaptiveTextColor.Accent;
                     break;
+
                 default:
                     break;
             }
@@ -841,7 +799,6 @@ namespace ProfessionalServices.LeaveBot
                 ContentType = AdaptiveCard.ContentType,
                 Content = card3
             };
-
         }
 
         public static double GetDayCount(LeaveDetails leaveDetails)
@@ -860,18 +817,25 @@ namespace ProfessionalServices.LeaveBot
             {
                 case LeaveType.PaidLeave:
                     return "Paid Leave";
+
                 case LeaveType.SickLeave:
                     return "Sick Leave";
+
                 case LeaveType.OptionalLeave:
                     return "Optional Leave";
+
                 case LeaveType.CarriedLeave:
                     return "Carried Leave";
+
                 case LeaveType.MaternityLeave:
                     return "Maternity Leave";
+
                 case LeaveType.PaternityLeave:
                     return "Paternity Leave";
+
                 case LeaveType.Caregiver:
                     return "Caregiver Leave";
+
                 default:
                     break;
             }
@@ -884,18 +848,25 @@ namespace ProfessionalServices.LeaveBot
             {
                 case LeaveType.PaidLeave:
                     return "PL";
+
                 case LeaveType.SickLeave:
                     return "SL";
+
                 case LeaveType.OptionalLeave:
                     return "OL";
+
                 case LeaveType.CarriedLeave:
                     return "CL";
+
                 case LeaveType.MaternityLeave:
                     return "ML";
+
                 case LeaveType.PaternityLeave:
                     return "PT";
+
                 case LeaveType.Caregiver:
                     return "CG";
+
                 default:
                     break;
             }
@@ -912,7 +883,6 @@ namespace ProfessionalServices.LeaveBot
                     {
                         Items=new List<AdaptiveElement>()
                         {
-
                             new AdaptiveTextBlock()
                             {
                                 Text="Here's your balance ",
@@ -925,38 +895,25 @@ namespace ProfessionalServices.LeaveBot
 
                         Columns=new List<AdaptiveColumn>()
                         {
-
                             new AdaptiveColumn()
                             {
-
                                 Width="50",
                                 Spacing=AdaptiveSpacing.ExtraLarge,
                                 Items=new List<AdaptiveElement>()
                                 {
                                     new AdaptiveTextBlock(){Text="Type", Size=AdaptiveTextSize.Medium,Wrap=true, Separator=true, Spacing=AdaptiveSpacing.Padding,Color=AdaptiveTextColor.Accent, Weight=AdaptiveTextWeight.Lighter}
-
-
                                 }
-
                             },
                             new AdaptiveColumn()
                             {
-
                                 Width="50",
                                 Spacing=AdaptiveSpacing.ExtraLarge,
                                 Items=new List<AdaptiveElement>()
                                 {
                                      new AdaptiveTextBlock(){Text="Remaining", Size=AdaptiveTextSize.Medium,Wrap=true, Separator=true,  Spacing=AdaptiveSpacing.Padding, Color=AdaptiveTextColor.Accent, Weight=AdaptiveTextWeight.Lighter}
-
-
                                 }
-
                             }
-
-
                         },
-
-
                     },
                              new AdaptiveColumnSet()
                     {
@@ -964,41 +921,25 @@ namespace ProfessionalServices.LeaveBot
                                  Spacing=AdaptiveSpacing.ExtraLarge,
                         Columns=new List<AdaptiveColumn>()
                         {
-
                             new AdaptiveColumn()
                             {
-
                                 Width="50",
                                 Spacing=AdaptiveSpacing.ExtraLarge,
                                 Items=new List<AdaptiveElement>()
                                 {
-
                                     new AdaptiveTextBlock(){Text="Paid leaves", Size=AdaptiveTextSize.Medium,Wrap=true, Separator=true, Spacing=AdaptiveSpacing.Padding, Weight=AdaptiveTextWeight.Default}
-
-
-
                                 }
-
                             },
                             new AdaptiveColumn()
                             {
-
                                 Width="50",
                                 Spacing=AdaptiveSpacing.ExtraLarge,
                                 Items=new List<AdaptiveElement>()
                                 {
-
                                      new AdaptiveTextBlock(){Text=employee.LeaveBalance.PaidLeave.ToString(), Size=AdaptiveTextSize.Medium,Wrap=true, Separator=true,  Spacing=AdaptiveSpacing.Padding, Color=AdaptiveTextColor.Accent}
-
-
                                 }
-
                             }
-
-
                         },
-
-
                     },
                              new AdaptiveColumnSet()
                     {
@@ -1006,25 +947,17 @@ namespace ProfessionalServices.LeaveBot
                                  Spacing=AdaptiveSpacing.ExtraLarge,
                         Columns=new List<AdaptiveColumn>()
                         {
-
                             new AdaptiveColumn()
                             {
-
                                 Width="50",
                                 Spacing=AdaptiveSpacing.ExtraLarge,
                                 Items=new List<AdaptiveElement>()
                                 {
-
                                      new AdaptiveTextBlock(){Text="Sick leaves", Size=AdaptiveTextSize.Medium,Wrap=true, Separator=true, Spacing=AdaptiveSpacing.Padding, Weight=AdaptiveTextWeight.Default}
-
-
-
                                 }
-
                             },
                             new AdaptiveColumn()
                             {
-
                                 Width="50",
                                 Spacing=AdaptiveSpacing.ExtraLarge,
                                 Items=new List<AdaptiveElement>()
@@ -1033,8 +966,6 @@ namespace ProfessionalServices.LeaveBot
                                 }
                             }
                         },
-
-
                     },
                              new AdaptiveColumnSet()
                     {
@@ -1042,15 +973,12 @@ namespace ProfessionalServices.LeaveBot
                                  Spacing=AdaptiveSpacing.ExtraLarge,
                         Columns=new List<AdaptiveColumn>()
                         {
-
                             new AdaptiveColumn()
                             {
-
                                 Width="50",
                                 Spacing=AdaptiveSpacing.ExtraLarge,
                                 Items=new List<AdaptiveElement>()
                                 {
-
                                       new AdaptiveTextBlock(){Text="Carried over from last year Recommended to utilise for vacations", Size=AdaptiveTextSize.Medium,Wrap=true, Separator=true, Spacing=AdaptiveSpacing.Padding, Weight=AdaptiveTextWeight.Default}
                                 }
                            },
@@ -1070,7 +998,6 @@ namespace ProfessionalServices.LeaveBot
                 },
                 Actions = new List<AdaptiveAction>()
                 {
-
                     new AdaptiveOpenUrlAction()
                     {
                         Title="View Details",
@@ -1093,17 +1020,13 @@ namespace ProfessionalServices.LeaveBot
             List<PublicHoliday> displayList = new List<PublicHoliday>();
             foreach (var item in PublicHolidaysList.HolidayList)
             {
-
                 if (item.Date.Date > DateTime.Now.Date)
                 {
                     displayList.Add(item);
                 }
                 if (displayList.Count == 2)
                     break;
-
-
             }
-
 
             var PublicHolidaysCard = new AdaptiveCard()
             {
@@ -1113,7 +1036,6 @@ namespace ProfessionalServices.LeaveBot
                     {
                         Items=new List<AdaptiveElement>()
                         {
-
                             new AdaptiveTextBlock()
                             {
                                 Text="Here is the list of upcoming public holidays",
@@ -1126,52 +1048,34 @@ namespace ProfessionalServices.LeaveBot
 
                         Columns=new List<AdaptiveColumn>()
                         {
-
                             new AdaptiveColumn()
                             {
-
                                 Width="50",
                                 Spacing=AdaptiveSpacing.ExtraLarge,
                                 Items=new List<AdaptiveElement>()
                                 {
                                     new AdaptiveTextBlock(){Text="Date", Size=AdaptiveTextSize.Medium,Wrap=true, Separator=true, Spacing=AdaptiveSpacing.Padding,Color=AdaptiveTextColor.Accent, Weight=AdaptiveTextWeight.Lighter}
-
-
                                 }
-
                             },
                             new AdaptiveColumn()
                             {
-
                                 Width="50",
                                 Spacing=AdaptiveSpacing.ExtraLarge,
                                 Items=new List<AdaptiveElement>()
                                 {
                                      new AdaptiveTextBlock(){Text="Day", Size=AdaptiveTextSize.Medium,Wrap=true, Separator=true,  Spacing=AdaptiveSpacing.Padding, Color=AdaptiveTextColor.Accent, Weight=AdaptiveTextWeight.Lighter}
-
-
                                 }
-
                             },
                              new AdaptiveColumn()
                             {
-
                                 Width="50",
                                 Spacing=AdaptiveSpacing.ExtraLarge,
                                 Items=new List<AdaptiveElement>()
                                 {
                                      new AdaptiveTextBlock(){Text="Event", Size=AdaptiveTextSize.Medium,Wrap=true, Separator=true,  Spacing=AdaptiveSpacing.Padding, Color=AdaptiveTextColor.Accent, Weight=AdaptiveTextWeight.Lighter}
-
-
                                 }
-
                             }
-
-
-
                         },
-
-
                     },
                              new AdaptiveColumnSet()
                     {
@@ -1179,55 +1083,34 @@ namespace ProfessionalServices.LeaveBot
                                  Spacing=AdaptiveSpacing.ExtraLarge,
                         Columns=new List<AdaptiveColumn>()
                         {
-
                             new AdaptiveColumn()
                             {
-
                                 Width="50",
                                 Spacing=AdaptiveSpacing.ExtraLarge,
                                 Items=new List<AdaptiveElement>()
                                 {
-
                                     new AdaptiveTextBlock(){Text=displayList[0].Date.ToShortDateString(), Size=AdaptiveTextSize.Medium,Wrap=true, Separator=true, Spacing=AdaptiveSpacing.Padding, Weight=AdaptiveTextWeight.Bolder}
-
-
-
                                 }
-
                             },
                             new AdaptiveColumn()
                             {
-
                                 Width="50",
                                 Spacing=AdaptiveSpacing.ExtraLarge,
                                 Items=new List<AdaptiveElement>()
                                 {
-
                                      new AdaptiveTextBlock(){Text=displayList[0].Date.DayOfWeek.ToString(), Size=AdaptiveTextSize.Medium,Wrap=true, Separator=true,  Spacing=AdaptiveSpacing.Padding, Weight=AdaptiveTextWeight.Default}
-
-
                                 }
-
                             },
                              new AdaptiveColumn()
                             {
-
                                 Width="50",
                                 Spacing=AdaptiveSpacing.ExtraLarge,
                                 Items=new List<AdaptiveElement>()
                                 {
-
                                      new AdaptiveTextBlock(){Text=displayList[0].Title, Size=AdaptiveTextSize.Medium,Wrap=true, Separator=true,  Spacing=AdaptiveSpacing.Padding, Weight=AdaptiveTextWeight.Default}
-
-
                                 }
-
                             }
-
-
                         },
-
-
                     },
                              new AdaptiveColumnSet()
                     {
@@ -1235,65 +1118,40 @@ namespace ProfessionalServices.LeaveBot
                                  Spacing=AdaptiveSpacing.ExtraLarge,
                         Columns=new List<AdaptiveColumn>()
                         {
-
                             new AdaptiveColumn()
                             {
-
                                 Width="50",
                                 Spacing=AdaptiveSpacing.ExtraLarge,
                                 Items=new List<AdaptiveElement>()
                                 {
-
                                      new AdaptiveTextBlock(){Text=displayList[1].Date.ToShortDateString(), Size=AdaptiveTextSize.Medium,Wrap=true, Separator=true, Spacing=AdaptiveSpacing.Padding, Weight=AdaptiveTextWeight.Bolder}
-
-
-
                                 }
-
                             },
                             new AdaptiveColumn()
                             {
-
                                 Width="50",
                                 Spacing=AdaptiveSpacing.ExtraLarge,
                                 Items=new List<AdaptiveElement>()
                                 {
-
-
                                      new AdaptiveTextBlock(){Text=displayList[1].Date.DayOfWeek.ToString(), Size=AdaptiveTextSize.Medium,Wrap=true, Separator=true,  Spacing=AdaptiveSpacing.Padding, Weight=AdaptiveTextWeight.Default}
-
-
                                 }
-
                             },
                             new AdaptiveColumn()
                             {
-
                                 Width="50",
                                 Spacing=AdaptiveSpacing.ExtraLarge,
                                 Items=new List<AdaptiveElement>()
                                 {
-
-
                                      new AdaptiveTextBlock(){Text=displayList[1].Title, Size=AdaptiveTextSize.Medium,Wrap=true, Separator=true,  Spacing=AdaptiveSpacing.Padding, Weight=AdaptiveTextWeight.Default}
-
-
                                 }
-
                             }
-
-
                         },
-
-
                     },
-
                        }
                     }
                 },
                 Actions = new List<AdaptiveAction>()
                 {
-
                     new AdaptiveOpenUrlAction()
                     {
                         Title="View Details",
@@ -1333,7 +1191,6 @@ namespace ProfessionalServices.LeaveBot
     public class InputDetails
     {
         public string Type { get; set; }
-
     }
 
     public class SetManagerDetails : InputDetails
@@ -1347,7 +1204,6 @@ namespace ProfessionalServices.LeaveBot
         public string Manager { get; set; }
     }
 
-
     public class VacationDetails : InputDetails
     {
         public string FromDate { get; set; }
@@ -1355,17 +1211,31 @@ namespace ProfessionalServices.LeaveBot
         public string ToDate { get; set; }
         public string ToDuration { get; set; }
         public string LeaveType { get; set; }
+
+        #region Properties to fix issue with multiple Ids for Leave Type
+        [JsonProperty("LeaveTypeVacation")]
+        private string LeaveTypeVacation { set { LeaveType = value; } }
+
+        [JsonProperty("LeaveTypeSickness")]
+        private string LeaveTypeSickness { set { LeaveType = value; } }
+
+        [JsonProperty("LeaveTypePersonal")]
+        private string LeaveTypePersonal { set { LeaveType = value; } }
+
+        [JsonProperty("LeaveTypeOther")]
+        private string LeaveTypeOther { set { LeaveType = value; } }
+
+        #endregion
+
         public string LeaveReason { get; set; }
 
         public string LeaveId { get; set; }
-
     }
 
     public class EditRequest
     {
         public VacationDetails data { get; set; }
     }
-
 
     public class ManagerResponse : InputDetails
     {
@@ -1377,5 +1247,4 @@ namespace ProfessionalServices.LeaveBot
     {
         public string LeaveId { get; set; }
     }
-
 }

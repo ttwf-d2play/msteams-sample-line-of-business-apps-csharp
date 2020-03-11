@@ -7,6 +7,7 @@
     font-weight: bold;
     line-height: 20px;
 }
+
 .jobtitle {
     height: 16px;
     width: 66px;
@@ -15,6 +16,7 @@
     font-size: 12px;
     line-height: 16px;
 }
+
 .daysoof {
     height: 16px;
     width: 65px;
@@ -23,6 +25,7 @@
     font-size: 12px;
     line-height: 16px;
 }
+
 .months {
     height: 16px;
     width: 41px;
@@ -31,22 +34,25 @@
     font-size: 12px;
     line-height: 16px;
 }
+
 .html {
     height: 732px;
     width: 1135px;
     background-color: #ffffff;
     overflow-y: scroll;
 }
+
 .vb {
     padding-top: 2px;
     padding-left: 110px;
 }
+
 .centered img {
     width: 72px;
     height: 72px;
     border-radius: 50%;
     float: left;
-    border:0px solid rgba(230,230,232,0.8);
+    border: 0px solid rgba(230,230,232,0.8);
 }
 
 .rect {
@@ -467,11 +473,9 @@ i.fas.fa-circle.icon1 {
     display: none;
 }
 
-
 /* Media start */
 
 @media only screen and (min-width: 320px) {
-
     .content,
     .content1 {
         font-size: small;
@@ -760,7 +764,6 @@ i.fas.fa-circle.icon1 {
         width: 100px;
     }
 
-
     span.manager {
         font-size: small;
     }
@@ -769,7 +772,6 @@ i.fas.fa-circle.icon1 {
     .footer1 span {
         font-size: 12px;
     }
-
 
     .content1 {
         margin-top: 18px;
@@ -924,7 +926,6 @@ i.fas.fa-circle.icon1 {
 }
 
 @media only screen and (min-width : 1440px) {
-
     td.count.cent,
     td.allow.cent,
     td.used-leave.cent,
@@ -977,6 +978,5 @@ i.fas.fa-circle.icon1 {
         right: 58%;
     }
 }
-
 
 /*Media start end  */

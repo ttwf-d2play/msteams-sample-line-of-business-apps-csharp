@@ -4,8 +4,7 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
-        
-        
+
         .text {
             height: 24px;
             width: 34px;
@@ -95,7 +94,6 @@
         }
 
         .tabcontent p {
-           
             top: 0;
             font-family: "Segoe UI";
             font-size: 17px;
@@ -117,10 +115,9 @@
         }
 
         td {
-            
             font-family: "Segoe UI";
         }
-        
+
         .vr {
             width: 2px;
             background-color: rgb(240,240,240);
@@ -136,7 +133,6 @@
         <p style="padding-left:30px;" class="text">Help</p>
         <button class="tablinks" onclick="openFunc(event, 'What Can You Do'); myColor();" id="defaultOpen" style="margin-top:5px;font-family: Segoe UI;">What Can You Do??</button>
         <button class="tablinks" id="defaultOpen1" onclick="openFunc(event, 'FAQs'); myColor1();" style="font-family: Segoe UI;">FAQs</button>
-
     </div>
     <div class="vr">&nbsp;</div>
     <div id="What Can You Do" class="tabcontent">
@@ -181,8 +177,6 @@
         </p>
     </div>
 
-
-
     <script type="text/javascript">
         function myColor() {
             document.getElementById("defaultOpen").style.background = "#8184B9";
@@ -198,8 +192,6 @@
             document.getElementById("defaultOpen1").style.color = "white";
             document.getElementById("defaultOpen").style.color = "black";
         };
-
-
 
         function openFunc(evt, cityName) {
             var i, tabcontent, tablinks;
@@ -219,6 +211,5 @@
 
         document.getElementById("defaultOpen").click();
     </script>
-
 </body>
 </html> 

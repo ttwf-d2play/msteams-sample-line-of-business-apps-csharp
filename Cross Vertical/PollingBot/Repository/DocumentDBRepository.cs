@@ -66,6 +66,7 @@ namespace CrossVertical.PollingBot.Repository
             return await client.ReplaceDocumentAsync(UriFactory.CreateDocumentUri(DatabaseId, CollectionId, id), item);
         }
 
+        
         public static async Task DeleteItemAsync(string id)
         {
             await client.DeleteDocumentAsync(UriFactory.CreateDocumentUri(DatabaseId, CollectionId, id));
@@ -76,6 +77,13 @@ namespace CrossVertical.PollingBot.Repository
             client = new DocumentClient(new Uri(ConfigurationManager.AppSettings["endpoint"]), ConfigurationManager.AppSettings["authKey"]);
             CreateDatabaseIfNotExistsAsync().Wait();
             CreateCollectionIfNotExistsAsync().Wait();
+        }
+
+        public static async Task InitializeAsync()
+        {
+            client = new DocumentClient(new Uri(ConfigurationManager.AppSettings["endpoint"]), ConfigurationManager.AppSettings["authKey"]);
+            await CreateDatabaseIfNotExistsAsync();
+            await CreateCollectionIfNotExistsAsync();
         }
 
         private static async Task CreateDatabaseIfNotExistsAsync()
@@ -122,6 +130,21 @@ namespace CrossVertical.PollingBot.Repository
         internal static Task CreateItemAsync(object newquestionBank)
         {
             throw new NotImplementedException();
+        }
+
+        public static async Task CleanUpAsync()
+        {
+            try
+            {
+                await client.DeleteDocumentCollectionAsync(UriFactory.CreateDocumentCollectionUri(DatabaseId, CollectionId));
+            }
+            catch (DocumentClientException e)
+            {
+                if (e.StatusCode != System.Net.HttpStatusCode.NotFound)
+                {
+                    throw;
+                }
+            }
         }
     }
 }
