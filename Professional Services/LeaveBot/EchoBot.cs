@@ -1,5 +1,6 @@
 ﻿using AdaptiveCards;
 using Microsoft.Bot.Connector;
+using Newtonsoft.Json;
 using ProfessionalServices.LeaveBot.Helper;
 using ProfessionalServices.LeaveBot.Helpers;
 using ProfessionalServices.LeaveBot.Models;
@@ -338,7 +339,7 @@ namespace ProfessionalServices.LeaveBot
                                     }
                                 }
                              ,
-                              new AdaptiveChoiceSetInput(){Id="LeaveType", Choices=new List<AdaptiveChoice>{paidLeave, optionalLeave, carriedOverLeave  } , IsMultiSelect=false, Style=AdaptiveChoiceInputStyle.Compact,
+                              new AdaptiveChoiceSetInput(){Id="LeaveTypeVacation", Choices=new List<AdaptiveChoice>{paidLeave, optionalLeave, carriedOverLeave  } , IsMultiSelect=false, Style=AdaptiveChoiceInputStyle.Compact,
                                   Value  = leaveDetails?.LeaveCategory== LeaveCategory.Vacation?leaveDetails.LeaveType.ToString():"" , IsRequired=true},
                               new AdaptiveTextInput(){Id="LeaveReason", IsMultiline=true,MaxLength=300, IsRequired=true, Placeholder="Comments (Optional)",
                               Value = leaveDetails?.LeaveCategory== LeaveCategory.Vacation?leaveDetails.EmployeeComment:""}
@@ -391,7 +392,7 @@ namespace ProfessionalServices.LeaveBot
                                     }
                                 }
                                ,
-                              new AdaptiveChoiceSetInput(){Id="LeaveType", Choices=new List<AdaptiveChoice>(){ sickLeave }, IsMultiSelect=false, Style=AdaptiveChoiceInputStyle.Compact,
+                              new AdaptiveChoiceSetInput(){Id="LeaveTypeSickness", Choices=new List<AdaptiveChoice>(){ sickLeave }, IsMultiSelect=false, Style=AdaptiveChoiceInputStyle.Compact,
                                   Value  = leaveDetails?.LeaveCategory== LeaveCategory.Sickness?leaveDetails.LeaveType.ToString():"" , IsRequired=true},
                               new AdaptiveTextInput(){Id="LeaveReason", IsMultiline=true,MaxLength=300, IsRequired=true, Placeholder="Comments (Optional)",
                                Value = leaveDetails?.LeaveCategory== LeaveCategory.Sickness?leaveDetails.EmployeeComment:""}
@@ -443,7 +444,7 @@ namespace ProfessionalServices.LeaveBot
                                 },
                                     }
                                 },
-                              new AdaptiveChoiceSetInput(){Id="LeaveType", Choices=new List<AdaptiveChoice>() { paidLeave, optionalLeave, carriedOverLeave }, IsMultiSelect=false, Style=AdaptiveChoiceInputStyle.Compact,
+                              new AdaptiveChoiceSetInput(){Id="LeaveTypePersonal", Choices=new List<AdaptiveChoice>() { paidLeave, optionalLeave, carriedOverLeave }, IsMultiSelect=false, Style=AdaptiveChoiceInputStyle.Compact,
                                   Value =leaveDetails?.LeaveCategory== LeaveCategory.Personal?leaveDetails.LeaveType.ToString():"", IsRequired=true},
                               new AdaptiveTextInput(){Id="LeaveReason", IsMultiline=true,MaxLength=300, IsRequired=true, Placeholder="Comments (Optional)",
                                   Value = leaveDetails?.LeaveCategory== LeaveCategory.Personal?leaveDetails.EmployeeComment:""}
@@ -467,7 +468,7 @@ namespace ProfessionalServices.LeaveBot
                           {
                               new AdaptiveTextInput(){Id="LeaveReason", IsMultiline=true,MaxLength=300, IsRequired=true, Placeholder="Comments (Optional)",
                               Value = leaveDetails?.LeaveCategory== LeaveCategory.Other?leaveDetails.EmployeeComment:""},
-                              new AdaptiveChoiceSetInput(){Id="LeaveType", Choices=new List<AdaptiveChoice>() { optionalLeave, maternityLeave, paternityLeave, caregiverLeave }, IsMultiSelect=false, Style=AdaptiveChoiceInputStyle.Compact,
+                              new AdaptiveChoiceSetInput(){Id="LeaveTypeOther", Choices=new List<AdaptiveChoice>() { optionalLeave, maternityLeave, paternityLeave, caregiverLeave }, IsMultiSelect=false, Style=AdaptiveChoiceInputStyle.Compact,
                                   Value =leaveDetails?.LeaveCategory== LeaveCategory.Other?leaveDetails.LeaveType.ToString():"", IsRequired=true},
                           },
                           Actions=new List<AdaptiveAction>()
@@ -1210,6 +1211,22 @@ namespace ProfessionalServices.LeaveBot
         public string ToDate { get; set; }
         public string ToDuration { get; set; }
         public string LeaveType { get; set; }
+
+        #region Properties to fix issue with multiple Ids for Leave Type
+        [JsonProperty("LeaveTypeVacation")]
+        private string LeaveTypeVacation { set { LeaveType = value; } }
+
+        [JsonProperty("LeaveTypeSickness")]
+        private string LeaveTypeSickness { set { LeaveType = value; } }
+
+        [JsonProperty("LeaveTypePersonal")]
+        private string LeaveTypePersonal { set { LeaveType = value; } }
+
+        [JsonProperty("LeaveTypeOther")]
+        private string LeaveTypeOther { set { LeaveType = value; } }
+
+        #endregion
+
         public string LeaveReason { get; set; }
 
         public string LeaveId { get; set; }
